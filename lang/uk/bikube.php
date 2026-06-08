@@ -1,0 +1,68 @@
+<?php
+
+return array (
+  'admin' => 
+  array (
+    'dashboard' => 'Панель',
+    'operations' => 'Операції',
+    'dispatch' => 'Диспетчерська',
+    'orders' => 'Замовлення',
+    'people' => 'Люди',
+    'services' => 'Послуги',
+    'finance' => 'Фінанси',
+    'support' => 'Підтримка',
+    'content' => 'Контент',
+    'system' => 'Система',
+    'module_foundation' => 'Фундамент модуля BiKuBe Next',
+  ),
+  'system_security' => 
+  array (
+    'title' => 'Система і безпека',
+    'back_to_admin' => 'Назад до Admin OS',
+    'kicker' => 'BiKuBe Next / Система',
+    'description' => 'Реальний статус середовища, пакетів і готовності основи Admin OS. Ця сторінка показує лише встановлені, налаштовані та відсутні елементи.',
+    'application_environment' => 'Середовище застосунку',
+    'debug_mode' => 'Режим налагодження',
+    'database_driver' => 'Драйвер бази даних',
+    'cache_driver' => 'Драйвер кешу',
+    'queue_driver' => 'Драйвер черг',
+    'operational_modules' => 'Операційні модулі',
+    'installed_foundation_status' => 'Статус встановленої основи',
+    'security_foundation' => 'Основа безпеки',
+    'auth_rbac_audit' => 'Авторизація, RBAC і аудит',
+    'security_checklist' => 'Чеклист безпеки',
+  ),
+  'delivery' => 
+  array (
+    'headline' => 'Усе, що потрібно, з швидкою доставкою',
+    'subtitle' => 'Продукти, готова їжа та великі доставки — швидко й безпечно додому.',
+    'add_to_cart' => 'Додати',
+    'cart' => 'Кошик',
+    'checkout' => 'Перейти до оформлення',
+  ),
+  'common' => 
+  array (
+    'back_to_admin' => 'Назад до Admin OS',
+    'current_state' => 'Поточний стан',
+    'skeleton_only' => 'тільки каркас',
+    'safe_foundation_only' => 'тільки безпечна основа',
+    'blocked_until_domain_work' => 'заблоковано до доменної доробки',
+    'not_implemented_yet' => 'ще не реалізовано',
+    'open_real_route' => 'Відкрити реальний маршрут',
+    'implementation_checklist' => 'Чеклист впровадження',
+    'next_production_safe_steps' => 'Наступні production-safe кроки',
+    'approval_boundaries' => 'Межі погодження',
+    'module' => 'Модуль',
+    'module_status' => 'Статус модуля',
+    'module_placeholder' => 'Заглушка модуля очікує доменної реалізації.',
+    'no_fake_operational_data' => 'Legacy-дані, фейкові метрики та production-дії не підключені.',
+    'owning_context' => 'Відповідальний контекст',
+    'unassigned' => 'Не призначено',
+    'bounded_context_shell_notice' => 'Ця сторінка — чистий shell для bounded context. Доменні моделі, політики та сервіси навмисно не вигадуються.',
+    'what_is_real_now' => 'Що реально зараз',
+    'navigation_route_and_skeleton_are_real' => 'Навігаційний маршрут і skeleton-контекст реальні.',
+    'no_production_action_wired_yet' => 'Production-дію ще не підключено.',
+    'needs_real_module_pass' => 'Потрібен реальний прохід по модулю',
+    'approval_boundaries_notice' => 'Backend-записи, міграції, конфігурація провайдерів, legacy-підключення до бази та операційні дії потребують окремо затвердженої задачі.',
+  ),
+);

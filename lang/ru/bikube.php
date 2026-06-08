@@ -1,0 +1,68 @@
+<?php
+
+return array (
+  'admin' => 
+  array (
+    'dashboard' => 'Панель',
+    'operations' => 'Операции',
+    'dispatch' => 'Диспетчерская',
+    'orders' => 'Заказы',
+    'people' => 'Люди',
+    'services' => 'Услуги',
+    'finance' => 'Финансы',
+    'support' => 'Поддержка',
+    'content' => 'Контент',
+    'system' => 'Система',
+    'module_foundation' => 'Фундамент модуля BiKuBe Next',
+  ),
+  'system_security' => 
+  array (
+    'title' => 'Система и безопасность',
+    'back_to_admin' => 'Назад в Admin OS',
+    'kicker' => 'BiKuBe Next / Система',
+    'description' => 'Реальный статус среды, пакетов и готовности основы Admin OS. Эта страница показывает только установленные, настроенные и отсутствующие элементы.',
+    'application_environment' => 'Среда приложения',
+    'debug_mode' => 'Режим отладки',
+    'database_driver' => 'Драйвер базы данных',
+    'cache_driver' => 'Драйвер кэша',
+    'queue_driver' => 'Драйвер очередей',
+    'operational_modules' => 'Операционные модули',
+    'installed_foundation_status' => 'Статус установленной основы',
+    'security_foundation' => 'Основа безопасности',
+    'auth_rbac_audit' => 'Авторизация, RBAC и аудит',
+    'security_checklist' => 'Чеклист безопасности',
+  ),
+  'delivery' => 
+  array (
+    'headline' => 'Всё, что нужно, с быстрой доставкой',
+    'subtitle' => 'Продукты, готовая еда и крупные доставки — быстро и безопасно домой.',
+    'add_to_cart' => 'Добавить',
+    'cart' => 'Корзина',
+    'checkout' => 'Перейти к оформлению',
+  ),
+  'common' => 
+  array (
+    'back_to_admin' => 'Назад в Admin OS',
+    'current_state' => 'Текущее состояние',
+    'skeleton_only' => 'только каркас',
+    'safe_foundation_only' => 'только безопасный фундамент',
+    'blocked_until_domain_work' => 'заблокировано до доменной доработки',
+    'not_implemented_yet' => 'ещё не реализовано',
+    'open_real_route' => 'Открыть реальный маршрут',
+    'implementation_checklist' => 'Чеклист внедрения',
+    'next_production_safe_steps' => 'Следующие production-safe шаги',
+    'approval_boundaries' => 'Границы согласования',
+    'module' => 'Модуль',
+    'module_status' => 'Статус модуля',
+    'module_placeholder' => 'Заглушка модуля ожидает доменной реализации.',
+    'no_fake_operational_data' => 'Legacy-данные, фейковые метрики и production-действия не подключены.',
+    'owning_context' => 'Ответственный контекст',
+    'unassigned' => 'Не назначено',
+    'bounded_context_shell_notice' => 'Эта страница — чистый shell для bounded context. Доменные модели, политики и сервисы намеренно не угадываются.',
+    'what_is_real_now' => 'Что реально сейчас',
+    'navigation_route_and_skeleton_are_real' => 'Навигационный маршрут и skeleton-контекст реальны.',
+    'no_production_action_wired_yet' => 'Production-действие ещё не подключено.',
+    'needs_real_module_pass' => 'Нужен реальный проход по модулю',
+    'approval_boundaries_notice' => 'Backend-записи, миграции, конфигурация провайдеров, legacy-подключения к базе и операционные действия требуют отдельной утверждённой задачи.',
+  ),
+);

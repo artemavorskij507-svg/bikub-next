@@ -1,0 +1,68 @@
+<?php
+
+return array (
+  'admin' => 
+  array (
+    'dashboard' => 'Kontrollpanel',
+    'operations' => 'Operasjoner',
+    'dispatch' => 'Dispatch',
+    'orders' => 'Bestillinger',
+    'people' => 'Personer',
+    'services' => 'Tjenester',
+    'finance' => 'Økonomi',
+    'support' => 'Kundestøtte',
+    'content' => 'Innhold',
+    'system' => 'System',
+    'module_foundation' => 'BiKuBe Next modulgrunnlag',
+  ),
+  'system_security' => 
+  array (
+    'title' => 'System og sikkerhet',
+    'back_to_admin' => 'Tilbake til Admin OS',
+    'kicker' => 'BiKuBe Next / System',
+    'description' => 'Reell status for drift, sikkerhet og pakker i Admin OS. Denne siden viser bare installerte, konfigurerte og manglende oppsett.',
+    'application_environment' => 'Applikasjonsmiljø',
+    'debug_mode' => 'Feilsøkingsmodus',
+    'database_driver' => 'Databasedriver',
+    'cache_driver' => 'Cache-driver',
+    'queue_driver' => 'Kødriver',
+    'operational_modules' => 'Operasjonelle moduler',
+    'installed_foundation_status' => 'Installert grunnstatus',
+    'security_foundation' => 'Sikkerhetsgrunnlag',
+    'auth_rbac_audit' => 'Autentisering, RBAC og revisjon',
+    'security_checklist' => 'Sikkerhetssjekkliste',
+  ),
+  'delivery' => 
+  array (
+    'headline' => 'Alt du trenger, levert raskt',
+    'subtitle' => 'Dagligvarer, ferdigmat og store leveranser — raskt og trygt levert hjem.',
+    'add_to_cart' => 'Legg til',
+    'cart' => 'Handlekurv',
+    'checkout' => 'Gå til kassen',
+  ),
+  'common' => 
+  array (
+    'back_to_admin' => 'Tilbake til Admin OS',
+    'current_state' => 'Nåværende status',
+    'skeleton_only' => 'kun grunnstruktur',
+    'safe_foundation_only' => 'kun trygg grunnstruktur',
+    'blocked_until_domain_work' => 'blokkert til domenearbeid er gjort',
+    'not_implemented_yet' => 'ikke implementert ennå',
+    'open_real_route' => 'Åpne faktisk rute',
+    'implementation_checklist' => 'Implementeringssjekkliste',
+    'next_production_safe_steps' => 'Neste produksjonssikre steg',
+    'approval_boundaries' => 'Godkjenningsgrenser',
+    'module' => 'Modul',
+    'module_status' => 'Modulstatus',
+    'module_placeholder' => 'Modulplassholder venter på domenearbeid.',
+    'no_fake_operational_data' => 'Ingen legacy-data, falske målinger eller produksjonshandlinger er koblet til.',
+    'owning_context' => 'Eiende kontekst',
+    'unassigned' => 'Ikke tildelt',
+    'bounded_context_shell_notice' => 'Denne siden er et rent skall for bounded context. Domenemodeller, policies og tjenester gjettes ikke.',
+    'what_is_real_now' => 'Hva som er ekte nå',
+    'navigation_route_and_skeleton_are_real' => 'Navigasjonsruten og skeleton-konteksten er ekte.',
+    'no_production_action_wired_yet' => 'Ingen produksjonshandling er koblet til ennå.',
+    'needs_real_module_pass' => 'Trenger reell modulgjennomgang',
+    'approval_boundaries_notice' => 'Backend-skriving, migreringer, leverandørkonfigurasjon, legacy-databasekoblinger og operasjonelle handlinger krever en separat godkjent oppgave.',
+  ),
+);
