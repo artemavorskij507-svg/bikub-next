@@ -1,215 +1,1407 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
         <title>BiKuBe — локальная операционная система услуг</title>
-        <meta name="description" content="BiKuBe — локальная платформа для Narvik и окрестностей. Доставка, переезды, сервис и партнёры без ненужных обещаний." />
+        <meta name="description" content="BiKuBe — локальная платформа для Narvik и окрестностей. Доставка, переезды, автопомощь, утилизация и мастера на час без лишних обещаний." />
         @fonts
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
+
         <style>
-            :root { color-scheme: dark; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #050807; color: #f8fafc; }
-            * { box-sizing: border-box; }
-            html, body { margin: 0; min-height: 100%; }
-            body { background: radial-gradient(circle at top left, rgba(125,250,146,0.14), transparent 26%), linear-gradient(180deg, #050708 0%, #081118 100%); }
-            a { color: inherit; text-decoration: none; }
-            .page { display: flex; flex-direction: column; min-height: 100vh; }
-            .page__content { flex: 1; }
-            .site-header { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); background: rgba(3, 8, 13, 0.92); border-bottom: 1px solid rgba(126,250,146,0.08); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
-            .site-header__inner { max-width: 1200px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-            .brand { display: inline-flex; align-items: center; gap: 12px; font-weight: 900; letter-spacing: 0.02em; font-size: 1.1rem; }
-            .brand__mark { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(135deg, #7dfa92 0%, #2f9d57 100%); color: #071115; font-size: 1.2rem; font-weight: 900; box-shadow: 0 6px 20px rgba(125,250,146,0.3); }
-            .nav-links { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
-            .nav-links a { color: #cbd5e1; font-size: 0.95rem; font-weight: 500; transition: color .2s ease; letter-spacing: 0.01em; }
-            .nav-links a:hover { color: #7dfa92; }
-            .header-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-            .button { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; padding: 12px 22px; font-weight: 700; transition: all .2s ease; font-size: 0.95rem; letter-spacing: 0.01em; }
-            .button--primary { background: linear-gradient(135deg, #7dfa92 0%, #34b36b 100%); color: #071115; box-shadow: 0 6px 20px rgba(125,250,146,0.25); }
-            .button--primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(125,250,146,0.35); }
-            .button--secondary { border: 1.5px solid rgba(126,250,146,0.3); color: #cbd5e1; background: rgba(255,255,255,0.04); }
-            .button--secondary:hover { border-color: rgba(126,250,146,0.5); background: rgba(126,250,146,0.08); color: #7dfa92; }
-            .hero { position: relative; overflow: hidden; padding: 160px 24px 120px; background: linear-gradient(180deg, rgba(8,18,13,0.3) 0%, transparent 60%); }
-            .hero::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 80% 20%, rgba(126,250,146,0.24), transparent 35%), radial-gradient(circle at 20% 80%, rgba(126,250,146,0.1), transparent 45%); pointer-events: none; }
-            .hero::after { content: ""; position: absolute; top: 35%; right: -15%; width: 700px; height: 700px; border-radius: 999px; background: radial-gradient(circle, rgba(126,250,146,0.08), transparent); pointer-events: none; }
-            .hero__grid { max-width: 1200px; margin: 0 auto; display: grid; gap: 32px; grid-template-columns: 1.05fr 0.95fr; align-items: center; }
-            .hero-copy { position: relative; z-index: 1; }
-            .badge { display: inline-flex; align-items: center; gap: 10px; padding: 11px 18px; border-radius: 999px; background: linear-gradient(135deg, rgba(126,250,146,0.18), rgba(126,250,146,0.08)); border: 1.5px solid rgba(126,250,146,0.35); color: #9ef5ad; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 20px; font-weight: 600; }
-            .hero-copy h1 { margin: 0 0 20px; font-size: clamp(2.8rem, 6vw, 4.2rem); line-height: 1.1; max-width: 16ch; color: #f8fafc; font-weight: 900; letter-spacing: -0.03em; text-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-            .hero-copy p { margin: 0 0 32px; max-width: 620px; color: #c8d4e1; font-size: 1.05rem; line-height: 1.8; font-weight: 500; }
-            .hero-actions { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 40px; }
-            .hero-stats { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .stat-card { background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border: 1px solid rgba(126,250,146,0.2); border-radius: 24px; padding: 24px; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-            .stat-card__value { font-size: 1.8rem; font-weight: 900; color: #7dfa92; margin-bottom: 8px; }
-            .stat-card__label { color: #a7b6c4; font-size: 0.9rem; line-height: 1.6; font-weight: 500; }
-            .hero-panel { position: relative; border-radius: 36px; min-height: 540px; padding: 40px; background: linear-gradient(135deg, rgba(15,35,25,0.8), rgba(5,8,10,0.95)); border: 1px solid rgba(126,250,146,0.15); box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 1px rgba(126,250,146,0.1); backdrop-filter: blur(10px); }
-            .hero-panel::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at top left, rgba(126,250,146,0.16), transparent 35%), radial-gradient(circle at bottom right, rgba(126,250,146,0.04), transparent 50%); pointer-events: none; border-radius: 36px; }
-            .hero-panel::after { content: ""; position: absolute; top: 20px; right: 20px; width: 280px; height: 340px; background: linear-gradient(135deg, rgba(126,250,146,0.15), rgba(126,250,146,0.04)); border: 1px solid rgba(126,250,146,0.2); border-radius: 24px; pointer-events: none; }
-            .hero-panel__inner { position: relative; z-index: 2; }
-            .hero-panel__title { margin: 0 0 16px; font-size: 1.85rem; line-height: 1.2; color: #f8fafc; font-weight: 800; }
-            .hero-panel__text { margin: 0 0 28px; color: #b9c6d3; line-height: 1.8; font-size: 1rem; }
-            .hero-panel__list { display: grid; gap: 18px; }
-            .hero-panel__item { display: flex; align-items: flex-start; gap: 16px; color: #e2ecf5; background: linear-gradient(135deg, rgba(126,250,146,0.08), transparent); padding: 16px; border-radius: 16px; border: 1px solid rgba(126,250,146,0.1); transition: all .3s ease; }
-            .hero-panel__item:hover { background: linear-gradient(135deg, rgba(126,250,146,0.12), rgba(126,250,146,0.02)); border-color: rgba(126,250,146,0.2); }
-            .hero-panel__item span { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; min-height: 40px; border-radius: 999px; background: linear-gradient(135deg, #7dfa92, #34b36b); color: #071115; font-weight: 800; font-size: 1.1rem; flex-shrink: 0; }
-            .hero-panel__item strong { font-weight: 700; color: #f8fafc; }
-            .section { max-width: 1200px; margin: 0 auto; padding: 80px 24px; position: relative; }
-            .section + .section { border-top: 1px solid rgba(126,250,146,0.08); }
-            .section__head { display: flex; justify-content: space-between; gap: 20px; align-items: flex-end; margin-bottom: 48px; }
-            .section__eyebrow { color: #7dfa92; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.82rem; font-weight: 700; }
-            .section__title { margin: 0; font-size: clamp(2.2rem, 2.8vw, 3.2rem); color: #f8fafc; font-weight: 900; letter-spacing: -0.02em; }
-            .section__text { margin: 0; color: #c8d4e1; max-width: 700px; line-height: 1.85; font-size: 1rem; }
-            .category-grid { display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-            .category-card { background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01)); border: 1px solid rgba(126,250,146,0.15); border-radius: 28px; padding: 28px; min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; transition: all .3s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-            .category-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(126,250,146,0.1), transparent); opacity: 0; transition: opacity .3s ease; pointer-events: none; }
-            .category-card::after { content: ""; position: absolute; bottom: -40%; right: -40%; width: 200px; height: 200px; border-radius: 999px; background: radial-gradient(circle, rgba(126,250,146,0.1), transparent); opacity: 0; transition: opacity .3s ease; }
-            .category-card:hover { transform: translateY(-8px); border-color: rgba(126,250,146,0.35); background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); box-shadow: 0 20px 50px rgba(126,250,146,0.15); }
-            .category-card:hover::before { opacity: 1; }
-            .category-card:hover::after { opacity: 1; }
-            .category-card__meta { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.15em; color: #7dfa92; margin-bottom: 12px; opacity: 0.75; font-weight: 600; }
-            .category-card__title { margin: 0 0 12px; font-size: 1.45rem; color: #f8fafc; font-weight: 800; letter-spacing: -0.01em; }
-            .category-card__text { margin: 0; color: #c8d4e1; line-height: 1.7; font-size: 0.95rem; }
-            .category-card__action { margin-top: 24px; color: #7dfa92; font-weight: 700; }
-            .category-grid { display: grid; gap: 20px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-            .grid-3 { display: grid; gap: 24px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-            .grid-2 { display: grid; gap: 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .card { background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01)); border: 1px solid rgba(126,250,146,0.12); border-radius: 28px; padding: 32px; min-height: 220px; display: flex; flex-direction: column; justify-content: space-between; transition: all .3s cubic-bezier(0.4,0,0.2,1); position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-            .card::before { content: ""; position: absolute; inset: 0; border-radius: 28px; background: linear-gradient(135deg, rgba(126,250,146,0.08), transparent); opacity: 0; transition: opacity .3s ease; pointer-events: none; }
-            .card::after { content: ""; position: absolute; bottom: -30%; right: -30%; width: 180px; height: 180px; border-radius: 999px; background: radial-gradient(circle, rgba(126,250,146,0.08), transparent); opacity: 0; transition: opacity .3s ease; }
-            .card:hover { transform: translateY(-6px); background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border-color: rgba(126,250,146,0.25); box-shadow: 0 20px 50px rgba(126,250,146,0.12); }
-            .card:hover::before { opacity: 1; }
-            .card:hover::after { opacity: 1; }
-            .card__title { margin: 0 0 14px; font-size: 1.4rem; color: #f8fafc; font-weight: 800; letter-spacing: -0.01em; }
-            .card__text { margin: 0; color: #c8d4e1; line-height: 1.75; font-size: 1rem; }
-            .card__link { margin-top: 20px; display: inline-flex; color: #7dfa92; font-weight: 700; }
-            .footer { background: linear-gradient(180deg, #030609 0%, #020305 100%); padding: 48px 24px 32px; color: #8b98a8; border-top: 1px solid rgba(126,250,146,0.1); }
-            .footer__inner { max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px; align-items: center; }
-            .footer__brand { display: flex; align-items: center; gap: 12px; color: #f8fafc; font-weight: 800; font-size: 1.1rem; }
-            .footer__links { display: flex; flex-wrap: wrap; gap: 20px; }
-            .footer__links a { color: #8b98a8; font-size: 0.95rem; font-weight: 500; transition: color .2s ease; }
-            .footer__links a:hover { color: #7dfa92; }
-            @media (max-width: 1024px) { .hero__grid, .category-grid, .grid-3, .grid-2, .hero-stats { grid-template-columns: 1fr; } .site-header__inner { flex-wrap: wrap; } .nav-links { justify-content: center; flex-basis: 100%; } .category-card::after, .card::after { display: none; } }
-            @media (max-width: 720px) { .site-header__inner { padding: 16px; } .hero { padding: 100px 20px 80px; } .hero-copy h1 { font-size: 2.2rem; } .hero-panel { min-height: auto; padding: 30px; margin-top: 24px; } .hero-panel::after { display: none; } .section { padding: 56px 18px; } .section__head { flex-direction: column; align-items: flex-start; margin-bottom: 32px; } .category-grid { gap: 16px; } .grid-3, .grid-2 { gap: 16px; } .hero-stats { grid-template-columns: 1fr 1fr; } }
+            :root {
+                color-scheme: dark;
+                font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                background: #040a14;
+                color: #f8fafc;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background:
+                    radial-gradient(85% 70% at 50% 0%, rgba(16, 47, 101, 0.4) 0%, rgba(4, 10, 30, 0) 65%),
+                    linear-gradient(180deg, #050d1a 0%, #03070f 100%);
+                min-height: 100vh;
+                overflow-x: hidden;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            a {
+                color: inherit;
+                text-decoration: none;
+            }
+
+            .page {
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+            }
+
+            .page__content {
+                flex: 1;
+            }
+
+            /* Glassmorphism Header */
+            .site-header {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                background: rgba(4, 11, 28, 0.85);
+                border-bottom: 1px solid rgba(161, 196, 255, 0.08);
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            }
+
+            .site-header__inner {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 16px 24px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+            }
+
+            .brand {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                font-weight: 900;
+                font-size: 1.5rem;
+                letter-spacing: -0.02em;
+                color: #ffffff;
+            }
+
+            .brand__mark {
+                width: 32px;
+                height: 32px;
+                border-radius: 999px;
+                background: linear-gradient(135deg, #b8f829, #76b90e);
+                box-shadow: 0 0 15px rgba(184, 248, 41, 0.4);
+                position: relative;
+                display: inline-block;
+            }
+
+            .brand__mark::after {
+                content: "";
+                position: absolute;
+                inset: 7px;
+                border-radius: 999px;
+                background: #041022;
+            }
+
+            .nav-links {
+                display: flex;
+                gap: 24px;
+                align-items: center;
+            }
+
+            .nav-links a {
+                color: #cde2ff;
+                font-size: 0.9rem;
+                font-weight: 500;
+                transition: color 0.2s ease;
+            }
+
+            .nav-links a:hover {
+                color: #b8f829;
+            }
+
+            .header-actions {
+                display: flex;
+                gap: 12px;
+                align-items: center;
+            }
+
+            .button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-weight: 700;
+                transition: all 0.2s ease;
+                font-size: 0.9rem;
+                border: 1px solid transparent;
+                cursor: pointer;
+            }
+
+            .button--primary {
+                background: linear-gradient(135deg, #b8f829 0%, #76b90e 100%);
+                color: #041022;
+                box-shadow: 0 4px 15px rgba(184, 248, 41, 0.25);
+            }
+
+            .button--primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(184, 248, 41, 0.4);
+                filter: brightness(1.05);
+            }
+
+            .button--secondary {
+                border-color: rgba(255, 255, 255, 0.15);
+                color: #f3f8ff;
+                background: rgba(10, 23, 47, 0.45);
+            }
+
+            .button--secondary:hover {
+                border-color: rgba(184, 248, 41, 0.4);
+                background: rgba(184, 248, 41, 0.05);
+                color: #b8f829;
+            }
+
+            /* Hero Section */
+            .hero {
+                position: relative;
+                overflow: hidden;
+                padding: 120px 24px 80px;
+                background: linear-gradient(180deg, rgba(16, 47, 101, 0.15) 0%, transparent 60%);
+            }
+
+            .hero__inner {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: grid;
+                gap: 48px;
+                grid-template-columns: 1.1fr 0.9fr;
+                align-items: center;
+            }
+
+            .hero-copy {
+                position: relative;
+                z-index: 10;
+            }
+
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 16px;
+                border-radius: 999px;
+                background: rgba(8, 23, 48, 0.8);
+                border: 1px solid rgba(169, 203, 247, 0.25);
+                color: #def0ff;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 24px;
+                font-weight: 700;
+            }
+
+            .badge__dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 999px;
+                background: #b8f829;
+                box-shadow: 0 0 10px rgba(184, 248, 41, 0.8);
+            }
+
+            .badge__flag {
+                display: inline-flex;
+                min-width: 20px;
+                height: 14px;
+                border-radius: 2px;
+                background: linear-gradient(90deg, #ba1c2b 0 28%, #fff 28% 35%, #00205b 35% 65%, #fff 65% 72%, #ba1c2b 72%);
+            }
+
+            .hero-copy h1 {
+                margin: 0 0 20px;
+                font-size: clamp(2.5rem, 5vw, 4rem);
+                line-height: 1.1;
+                color: #ffffff;
+                font-weight: 850;
+                letter-spacing: -0.02em;
+            }
+
+            .hero-copy h1 span {
+                color: #b8f829;
+                background: linear-gradient(to right, #b8f829, #8ae610);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .hero-copy p {
+                margin: 0 0 36px;
+                color: #b9d2ee;
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+
+            .hero-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 16px;
+                margin-bottom: 48px;
+            }
+
+            .hero-stats {
+                display: grid;
+                gap: 16px;
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 500px;
+            }
+
+            .stat-card {
+                background: rgba(8, 24, 49, 0.5);
+                border: 1px solid rgba(160, 195, 243, 0.15);
+                border-radius: 16px;
+                padding: 18px;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                transition: border-color 0.2s ease;
+            }
+
+            .stat-card:hover {
+                border-color: rgba(184, 248, 41, 0.3);
+            }
+
+            .stat-card__value {
+                font-size: 1.8rem;
+                font-weight: 850;
+                color: #b8f829;
+                margin-bottom: 4px;
+            }
+
+            .stat-card__label {
+                color: #c3d8f4;
+                font-size: 0.85rem;
+                font-weight: 500;
+            }
+
+            /* Hero Device/Art Panel */
+            .hero-art {
+                position: relative;
+                z-index: 10;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .hero-art__glow {
+                position: absolute;
+                width: 120%;
+                height: 120%;
+                background: radial-gradient(circle, rgba(16, 47, 101, 0.4) 0%, transparent 70%);
+                filter: blur(40px);
+                pointer-events: none;
+            }
+
+            .hero-art__wrapper {
+                position: relative;
+                width: 100%;
+                max-width: 480px;
+                border-radius: 24px;
+                border: 1px solid rgba(161, 196, 255, 0.15);
+                background: rgba(4, 11, 28, 0.6);
+                padding: 12px;
+                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                overflow: hidden;
+            }
+
+            .hero-art__image {
+                width: 100%;
+                height: auto;
+                border-radius: 16px;
+                display: block;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .hero-art__badge {
+                position: absolute;
+                bottom: 24px;
+                left: 24px;
+                background: rgba(4, 11, 28, 0.95);
+                border: 1px solid rgba(184, 248, 41, 0.3);
+                border-radius: 16px;
+                padding: 16px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+                backdrop-filter: blur(10px);
+                animation: float-badge 6s ease-in-out infinite;
+            }
+
+            @keyframes float-badge {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+            }
+
+            /* Sections layout */
+            .section {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 80px 24px;
+            }
+
+            .section__head {
+                margin-bottom: 48px;
+                max-width: 800px;
+            }
+
+            .section__eyebrow {
+                color: #b8f829;
+                text-transform: uppercase;
+                letter-spacing: 0.15em;
+                font-size: 0.8rem;
+                font-weight: 800;
+                margin-bottom: 12px;
+            }
+
+            .section__title {
+                font-size: clamp(2rem, 3.5vw, 3rem);
+                color: #ffffff;
+                font-weight: 850;
+                letter-spacing: -0.02em;
+                line-height: 1.15;
+            }
+
+            .section__text {
+                margin-top: 16px;
+                color: #a8c3e2;
+                font-size: 1.05rem;
+                line-height: 1.5;
+            }
+
+            /* Categories Grid */
+            .categories-grid {
+                display: grid;
+                gap: 20px;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+
+            .category-card {
+                position: relative;
+                border-radius: 20px;
+                min-height: 200px;
+                padding: 24px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                border: 1px solid rgba(159, 194, 241, 0.15);
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            }
+
+            .category-card::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, rgba(4, 16, 36, 0.1) 0%, rgba(4, 16, 36, 0.85) 100%);
+                z-index: 1;
+                transition: opacity 0.3s ease;
+            }
+
+            .category-card:hover {
+                transform: translateY(-6px);
+                border-color: rgba(184, 248, 41, 0.5);
+                box-shadow: 0 20px 40px rgba(184, 248, 41, 0.15);
+            }
+
+            .category-card:hover::before {
+                background: linear-gradient(180deg, rgba(4, 16, 36, 0.2) 0%, rgba(4, 16, 36, 0.92) 100%);
+            }
+
+            .category-card__header {
+                position: relative;
+                z-index: 2;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+
+            .category-card__num {
+                font-size: 0.85rem;
+                font-weight: 800;
+                color: #b8f829;
+                background: rgba(4, 10, 24, 0.7);
+                padding: 4px 8px;
+                border-radius: 6px;
+                border: 1px solid rgba(184, 248, 41, 0.2);
+            }
+
+            .category-card__content {
+                position: relative;
+                z-index: 2;
+                margin-top: auto;
+            }
+
+            .category-card__title {
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: #ffffff;
+                margin-bottom: 8px;
+                letter-spacing: -0.01em;
+            }
+
+            .category-card__desc {
+                color: #cbd5e1;
+                font-size: 0.9rem;
+                line-height: 1.4;
+                margin-bottom: 16px;
+            }
+
+            .category-card__arrow {
+                width: 36px;
+                height: 36px;
+                border-radius: 999px;
+                background: rgba(4, 10, 24, 0.8);
+                color: #b8f829;
+                border: 1px solid rgba(184, 248, 41, 0.3);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.1rem;
+                transition: all 0.2s ease;
+            }
+
+            .category-card:hover .category-card__arrow {
+                background: #b8f829;
+                color: #041022;
+                border-color: #b8f829;
+                transform: translateX(4px);
+            }
+
+            /* Dropdown lists of Scenarios inside Categories */
+            .category-scenarios {
+                margin-top: 14px;
+                background: rgba(4, 11, 28, 0.6);
+                border: 1px solid rgba(161, 196, 255, 0.1);
+                border-radius: 12px;
+                padding: 8px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .category-scenarios__item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 12px;
+                border-radius: 8px;
+                background: transparent;
+                transition: all 0.2s ease;
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #cbd5e1;
+            }
+
+            .category-scenarios__item:hover {
+                background: rgba(184, 248, 41, 0.08);
+                color: #b8f829;
+                padding-left: 16px;
+            }
+
+            .category-scenarios__arrow {
+                font-size: 0.75rem;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+            }
+
+            .category-scenarios__item:hover .category-scenarios__arrow {
+                opacity: 1;
+            }
+
+            /* Popular Scenarios Horizontal Slider */
+            .popular-scenarios {
+                background: rgba(7, 20, 45, 0.4);
+                border-radius: 24px;
+                border: 1px solid rgba(130, 168, 225, 0.15);
+            }
+
+            .bk-horizontal {
+                display: flex;
+                gap: 16px;
+                overflow-x: auto;
+                scroll-behavior: smooth;
+                padding: 4px 0 16px;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(135, 170, 214, 0.3) transparent;
+            }
+
+            .bk-horizontal::-webkit-scrollbar {
+                height: 8px;
+            }
+
+            .bk-horizontal::-webkit-scrollbar-thumb {
+                background: rgba(135, 170, 214, 0.3);
+                border-radius: 999px;
+            }
+
+            .scenario-card {
+                min-width: 260px;
+                flex: 0 0 auto;
+                min-height: 180px;
+                border-radius: 16px;
+                border: 1px solid rgba(156, 192, 245, 0.15);
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                color: #ffffff;
+                background-size: cover;
+                background-position: center;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+                transition: all 0.2s ease;
+            }
+
+            .scenario-card::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(166deg, rgba(4, 16, 36, 0.2), rgba(4, 16, 36, 0.85));
+                z-index: 1;
+            }
+
+            .scenario-card:hover {
+                transform: translateY(-4px);
+                border-color: rgba(184, 248, 41, 0.3);
+            }
+
+            .scenario-card__title {
+                position: relative;
+                z-index: 2;
+                font-size: 1.25rem;
+                line-height: 1.2;
+                font-weight: 800;
+                max-width: 90%;
+            }
+
+            .scenario-card__footer {
+                position: relative;
+                z-index: 2;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .scenario-card__action {
+                border-radius: 999px;
+                padding: 6px 14px;
+                background: rgba(184, 248, 41, 0.12);
+                border: 1px solid rgba(184, 248, 41, 0.4);
+                color: #b8f829;
+                font-size: 0.75rem;
+                font-weight: 700;
+            }
+
+            /* Process Steps */
+            .steps-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 24px;
+                margin-top: 16px;
+            }
+
+            .step-item {
+                position: relative;
+                background: linear-gradient(180deg, rgba(7, 21, 47, 0.4), rgba(4, 14, 33, 0.5));
+                border: 1px solid rgba(146, 184, 236, 0.15);
+                border-radius: 20px;
+                padding: 32px 24px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                transition: border-color 0.2s ease;
+            }
+
+            .step-item:hover {
+                border-color: rgba(184, 248, 41, 0.3);
+            }
+
+            .step-item:not(:last-child)::after {
+                content: "→";
+                position: absolute;
+                top: 50%;
+                right: -18px;
+                font-size: 1.5rem;
+                color: rgba(184, 248, 41, 0.5);
+                transform: translateY(-50%);
+                z-index: 10;
+            }
+
+            .step-icon {
+                width: 64px;
+                height: 64px;
+                border-radius: 999px;
+                background: rgba(184, 248, 41, 0.1);
+                border: 1px solid rgba(184, 248, 41, 0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+                box-shadow: 0 0 20px rgba(184, 248, 41, 0.08);
+            }
+
+            .step-item h3 {
+                font-size: 1.15rem;
+                font-weight: 800;
+                color: #ffffff;
+                margin-bottom: 10px;
+            }
+
+            .step-item p {
+                color: #cbd5e1;
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+
+            /* Banners Split Grid */
+            .split-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .banner-card {
+                position: relative;
+                border-radius: 24px;
+                padding: 40px;
+                min-height: 240px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                border: 1px solid rgba(130, 168, 225, 0.15);
+                background-size: cover;
+                background-position: center;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                transition: transform 0.2s ease, border-color 0.2s ease;
+            }
+
+            .banner-card::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, rgba(4, 16, 36, 0.65) 0%, rgba(4, 16, 36, 0.9) 100%);
+                z-index: 1;
+            }
+
+            .banner-card:hover {
+                transform: translateY(-4px);
+                border-color: rgba(184, 248, 41, 0.3);
+            }
+
+            .banner-card__content {
+                position: relative;
+                z-index: 2;
+                max-width: 80%;
+            }
+
+            .banner-card__title {
+                font-size: 1.75rem;
+                font-weight: 850;
+                color: #ffffff;
+                margin-bottom: 10px;
+                letter-spacing: -0.02em;
+            }
+
+            .banner-card__text {
+                color: #cbd5e1;
+                font-size: 0.95rem;
+                line-height: 1.5;
+            }
+
+            .banner-card__link {
+                position: relative;
+                z-index: 2;
+                align-self: flex-start;
+                font-size: 0.9rem;
+                font-weight: 700;
+                color: #b8f829;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .banner-card__link::after {
+                content: "→";
+                transition: transform 0.2s ease;
+            }
+
+            .banner-card:hover .banner-card__link::after {
+                transform: translateX(4px);
+            }
+
+            /* Mobile App Promo Block */
+            .promo-block {
+                display: grid;
+                grid-template-columns: 1.1fr 0.9fr;
+                gap: 48px;
+                align-items: center;
+                background: linear-gradient(135deg, rgba(8, 24, 49, 0.6) 0%, rgba(4, 11, 28, 0.8) 100%);
+                border: 1px solid rgba(130, 168, 225, 0.15);
+                border-radius: 28px;
+                padding: 48px;
+                overflow: hidden;
+            }
+
+            .promo-block__left h3 {
+                font-size: 2.2rem;
+                font-weight: 850;
+                color: #ffffff;
+                margin-bottom: 16px;
+                letter-spacing: -0.02em;
+            }
+
+            .promo-block__left p {
+                color: #cbd5e1;
+                font-size: 1.05rem;
+                line-height: 1.6;
+                margin-bottom: 32px;
+            }
+
+            .store-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 16px;
+                align-items: center;
+            }
+
+            .store-button {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 24px;
+                border-radius: 12px;
+                background: #030812;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: #ffffff;
+                font-weight: 700;
+                font-size: 0.85rem;
+                transition: all 0.2s ease;
+            }
+
+            .store-button:hover {
+                border-color: rgba(184, 248, 41, 0.4);
+                background: rgba(184, 248, 41, 0.04);
+            }
+
+            .qr-code {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 16px;
+                padding: 12px 18px;
+            }
+
+            .qr-code__box {
+                width: 60px;
+                height: 60px;
+                background: #ffffff;
+                border-radius: 8px;
+                display: grid;
+                place-items: center;
+                color: #030812;
+                font-weight: 900;
+                font-size: 0.75rem;
+            }
+
+            .qr-code__text {
+                font-size: 0.8rem;
+                color: #cbd5e1;
+                line-height: 1.3;
+            }
+
+            .promo-block__right {
+                position: relative;
+                display: flex;
+                gap: 16px;
+                justify-content: center;
+                height: 340px;
+            }
+
+            .promo-card {
+                position: absolute;
+                border-radius: 16px;
+                background-size: cover;
+                background-position: center;
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+                transition: all 0.3s ease;
+            }
+
+            .promo-card--phone {
+                width: 170px;
+                height: 320px;
+                z-index: 10;
+                left: 10%;
+                top: 0;
+                animation: promo-float-1 7s ease-in-out infinite;
+            }
+
+            .promo-card--panel {
+                width: 190px;
+                height: 270px;
+                z-index: 5;
+                right: 5%;
+                top: 30px;
+                animation: promo-float-2 8s ease-in-out infinite;
+            }
+
+            @keyframes promo-float-1 {
+                0%, 100% { transform: translateY(0) rotate(2deg); }
+                50% { transform: translateY(-10px) rotate(0deg); }
+            }
+
+            @keyframes promo-float-2 {
+                0%, 100% { transform: translateY(0) rotate(-2deg); }
+                50% { transform: translateY(-8px) rotate(1deg); }
+            }
+
+            /* Footer */
+            .footer {
+                background: #03070f;
+                border-top: 1px solid rgba(161, 196, 255, 0.08);
+                padding: 64px 24px 32px;
+                color: #8b98a8;
+            }
+
+            .footer__inner {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .footer-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 40px;
+                margin-bottom: 48px;
+            }
+
+            .footer-col h4 {
+                color: #ffffff;
+                font-weight: 800;
+                font-size: 1rem;
+                margin-bottom: 20px;
+            }
+
+            .footer-links {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .footer-links a {
+                color: #8b98a8;
+                font-size: 0.9rem;
+                transition: color 0.2s ease;
+            }
+
+            .footer-links a:hover {
+                color: #b8f829;
+            }
+
+            .footer-contact {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                font-size: 0.9rem;
+            }
+
+            .footer-contact__item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .footer-contact__icon {
+                color: #b8f829;
+            }
+
+            .footer-bottom {
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+                padding-top: 32px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 16px;
+                font-size: 0.8rem;
+            }
+
+            .footer-legal {
+                display: flex;
+                gap: 20px;
+            }
+
+            .footer-legal a {
+                transition: color 0.2s ease;
+            }
+
+            .footer-legal a:hover {
+                color: #b8f829;
+            }
+
+            /* Responsive Utilities */
+            @media (max-width: 1024px) {
+                .hero__inner {
+                    grid-template-columns: 1fr;
+                    text-align: center;
+                }
+
+                .hero-copy {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .hero-actions {
+                    justify-content: center;
+                }
+
+                .hero-stats {
+                    width: 100%;
+                    max-width: 100%;
+                }
+
+                .hero-art__wrapper {
+                    max-width: 420px;
+                }
+
+                .steps-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+
+                .step-item:not(:last-child)::after {
+                    display: none;
+                }
+
+                .split-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .promo-block {
+                    grid-template-columns: 1fr;
+                    padding: 32px;
+                }
+
+                .promo-block__right {
+                    height: 280px;
+                }
+
+                .footer-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (max-width: 768px) {
+                .site-header__inner {
+                    padding: 12px 16px;
+                }
+
+                .nav-links {
+                    display: none; /* Mobile menu fallback */
+                }
+
+                .hero {
+                    padding: 80px 16px 60px;
+                }
+
+                .steps-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .promo-block__right {
+                    display: none;
+                }
+
+                .footer-grid {
+                    grid-template-columns: 1fr;
+                    gap: 32px;
+                }
+
+                .footer-bottom {
+                    flex-direction: column;
+                    text-align: center;
+                }
+            }
         </style>
     </head>
+
     <body>
         <div class="page">
+            {{-- Header --}}
             <header class="site-header">
                 <div class="site-header__inner">
-                    <a href="/" class="brand"><span class="brand__mark">B</span>BiKuBe</a>
+                    <a href="/" class="brand">
+                        <span class="brand__mark"></span>
+                        <span>BiKuBe</span>
+                    </a>
+
                     <nav class="nav-links">
                         <a href="#categories">Категории</a>
+                        <a href="#popular-scenarios">Популярные услуги</a>
                         <a href="#how-it-works">Как это работает</a>
                         <a href="#business">Для бизнеса</a>
-                        <a href="#partners">Партнёрам</a>
-                        <a href="#footer">Контакты</a>
+                        <a href="#readiness">Статус платформы</a>
                     </nav>
+
                     <div class="header-actions">
-                        <a href="/login" class="button button--secondary">Войти</a>
-                        <a href="#categories" class="button button--primary">Выбрать услугу</a>
+                        @auth
+                            <a href="/admin" class="button button--secondary">Кабинет</a>
+                        @else
+                            <a href="/login" class="button button--secondary">Войти</a>
+                        @endauth
+                        <a href="#categories" class="button button--primary">Создать заказ</a>
                     </div>
                 </div>
             </header>
+
             <main class="page__content">
+                {{-- Hero Section --}}
                 <section class="hero">
-                    <div class="hero__grid">
+                    <div class="hero__inner">
                         <div class="hero-copy">
-                            <span class="badge">Narvik, Norway</span>
-                            <h1>BiKuBe — локальная ОС услуг</h1>
-                            <p>Платформа для связи клиентов и исполнителей в Narvik. Доставка, переезды, ремонт, уборка и помощь по дороге — всё на одной платформе.</p>
+                            <div class="badge">
+                                <span class="badge__dot"></span>
+                                <span>Narvik, Norway</span>
+                                <span class="badge__flag"></span>
+                            </div>
+                            <h1>BiKuBe — локальная <span>операционная система услуг</span></h1>
+                            <p>Инновационная платформа для быстрого поиска исполнителей и заказа услуг в Нарвике. Доставка, переезды, помощь на дороге, эко-утилизация и мастера на все руки — всё в один клик.</p>
+
                             <div class="hero-actions">
                                 <a href="#categories" class="button button--primary">Выбрать услугу</a>
-                                <a href="#business" class="button button--secondary">Для партнёров</a>
+                                <a href="#readiness" class="button button--secondary">Что доступно сейчас</a>
                             </div>
+
                             <div class="hero-stats">
-                                <div class="stat-card"><span class="stat-card__value">5+</span><span class="stat-card__label">направлений</span></div>
-                                <div class="stat-card"><span class="stat-card__value">24/7</span><span class="stat-card__label">открыто</span></div>
-                                <div class="stat-card"><span class="stat-card__value">Narvik</span><span class="stat-card__label">локальные</span></div>
-                                <div class="stat-card"><span class="stat-card__value">Честно</span><span class="stat-card__label">без обещаний</span></div>
-                            </div>
-                        </div>
-                        <aside class="hero-panel">
-                            <div class="hero-panel__inner">
-                                <h2 class="hero-panel__title">Прямой контакт исполнителей</h2>
-                                <p class="hero-panel__text">BiKuBe упрощает общение между клиентом и местным мастером без лишних посредников и бюрократии.</p>
-                                <div class="hero-panel__list">
-                                    <div class="hero-panel__item"><span>1</span><div><strong>Выберите направление</strong><p>Найдите нужную услугу в нашем каталоге.</p></div></div>
-                                    <div class="hero-panel__item"><span>2</span><div><strong>Опишите задачу</strong><p>Укажите детали, адрес и время выполнения.</p></div></div>
-                                    <div class="hero-panel__item"><span>3</span><div><strong>Получите результат</strong><p>Исполнитель помогает вам в назначенное время.</p></div></div>
+                                <div class="stat-card">
+                                    <div class="stat-card__value">10+</div>
+                                    <div class="stat-card__label">направлений услуг</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card__value">Request</div>
+                                    <div class="stat-card__label">реальная форма заявки</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card__value">Narvik</div>
+                                    <div class="stat-card__label">локальные исполнители</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card__value">Честно</div>
+                                    <div class="stat-card__label">без ложных обещаний</div>
                                 </div>
                             </div>
-                        </aside>
+                        </div>
+
+                        <div class="hero-art">
+                            <div class="hero-art__glow"></div>
+                            <div class="hero-art__wrapper">
+                                <img src="{{ asset('images/bikube/home/hero-main.png') }}" alt="BiKuBe OS" class="hero-art__image" />
+                                <div class="hero-art__badge">
+                                    <div class="brand__mark"></div>
+                                    <div>
+                                        <div style="font-weight: 800; font-size: 0.85rem; color: #fff;">BiKuBe Ecosystem</div>
+                                        <div style="font-size: 0.75rem; color: #cbd5e1;">Service requests active</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
+
+                {{-- Categories Section --}}
                 <section id="categories" class="section">
                     <div class="section__head">
-                        <div>
-                            <p class="section__eyebrow">Категории</p>
-                            <h2 class="section__title">Популярные направления</h2>
-                        </div>
-                        <p class="section__text">BiKuBe охватывает основные локальные сервисы Narvik. Выберите направление и опишите свою задачу.</p>
+                        <p class="section__eyebrow">Каталог</p>
+                        <h2 class="section__title">Выберите категорию услуг</h2>
+                        <p class="section__text">BiKuBe собирает активные сценарии локальных услуг Narvik. Заявки принимаются на рассмотрение без обещания назначения или оплаты.</p>
                     </div>
-                    <div class="category-grid">
-                        <a class="category-card" href="#categories"><span class="category-card__meta">Доставка</span><h3 class="category-card__title">🚚 Доставка</h3><p class="category-card__text">Товары, продукты и посылки по городу.</p><span class="category-card__action">Узнать →</span></a>
-                        <a class="category-card" href="#categories"><span class="category-card__meta">Переезд</span><h3 class="category-card__title">📦 Переезд</h3><p class="category-card__text">Помощь с переездом и грузоперевозкой.</p><span class="category-card__action">Узнать →</span></a>
-                        <a class="category-card" href="#categories"><span class="category-card__meta">Ремонт</span><h3 class="category-card__title">🔧 Ремонт и сборка</h3><p class="category-card__text">Мелкий ремонт, сборка мебели, помощь по дому.</p><span class="category-card__action">Узнать →</span></a>
-                        <a class="category-card" href="#categories"><span class="category-card__meta">Уборка</span><h3 class="category-card__title">🧹 Уборка</h3><p class="category-card__text">Генеральная и текущая уборка помещений.</p><span class="category-card__action">Узнать →</span></a>
-                        <a class="category-card" href="#categories"><span class="category-card__meta">Помощь</span><h3 class="category-card__title">🚗 Помощь на дороге</h3><p class="category-card__text">Помощь при поломке, эвакуация транспорта.</p><span class="category-card__action">Узнать →</span></a>
-                        <a class="category-card" href="#categories"><span class="category-card__meta">Вывоз</span><h3 class="category-card__title">♻️ Утилизация</h3><p class="category-card__text">Вывоз мусора, мебели и техники.</p><span class="category-card__action">Узнать →</span></a>
+
+                    @php
+                        $dbCategories = \App\Models\ServiceCategory::active()
+                            ->with(['scenarios' => fn($q) => $q->active()->orderBy('sort_order')])
+                            ->orderBy('sort_order')
+                            ->get();
+
+                        $categoryIcons = [
+                            'delivery' => '🚚',
+                            'moving' => '📦',
+                            'eco' => '♻️',
+                            'handyman' => '🔧',
+                            'roadside' => '🚗',
+                            'personal-task' => '👤',
+                            'classifieds' => '🛒'
+                        ];
+
+                        $categoryDescs = [
+                            'delivery' => 'Доставка продуктов, еды и посылок по Нарвику.',
+                            'moving' => 'Профессиональные квартирные и офисные переезды.',
+                            'eco' => 'Вывоз мусора, старой мебели и крупной бытовой техники.',
+                            'handyman' => 'Мелкий бытовой ремонт, сборка мебели, услуги сантехника.',
+                            'roadside' => 'Заявка на эвакуатор или помощь на дороге.',
+                            'personal-task' => 'Выполнение личных поручений, курьеры и консьерж-сервис.',
+                            'classifieds' => 'Заявка на доставку покупки с доски объявлений.'
+                        ];
+                    @endphp
+
+                    <div class="categories-grid">
+                        @foreach($dbCategories as $index => $category)
+                            @php
+                                $icon = $categoryIcons[$category->slug] ?? '⚡';
+                                $desc = $categoryDescs[$category->slug] ?? ($category->description ?: 'Профессиональные услуги в Narvik.');
+                                $imgName = $category->slug === 'roadside' ? 'category-tow.png' : ($category->slug === 'personal-task' ? 'category-assistant.png' : 'category-' . $category->slug . '.png');
+                                $bgUrl = asset('images/bikube/home/' . $imgName);
+                            @endphp
+
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div class="category-card" style="background-image: url('{{ $bgUrl }}')">
+                                    <div class="category-card__header">
+                                        <span class="category-card__num">{{ $index + 1 }}.</span>
+                                        <span style="font-size: 1.8rem;">{{ $icon }}</span>
+                                    </div>
+
+                                    <div class="category-card__content">
+                                        <h3 class="category-card__title">{{ $category->title }}</h3>
+                                        <p class="category-card__desc">{{ $desc }}</p>
+                                        <div class="category-card__arrow">→</div>
+                                    </div>
+                                </div>
+
+                                @if($category->scenarios->isNotEmpty())
+                                    <div class="category-scenarios">
+                                        @foreach($category->scenarios as $scenario)
+                                            <a href="{{ route('public.cms.service-page', ['serviceSlug' => $scenario->slug]) }}" class="category-scenarios__item">
+                                                <span>{{ $scenario->title }}</span>
+                                                <span class="category-scenarios__arrow">→</span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
                 </section>
+
+                {{-- Popular Scenarios Slider --}}
+                <section id="popular-scenarios" class="section popular-scenarios" style="padding: 48px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; gap: 16px;">
+                        <div>
+                            <p class="section__eyebrow" style="margin-bottom: 6px;">Быстрый выбор</p>
+                            <h2 class="section__title" style="font-size: clamp(1.8rem, 3vw, 2.5rem);">Популярные сценарии заказа</h2>
+                        </div>
+                        <div class="bk-row-nav">
+                            <button type="button" onclick="bkScroll('scenarios-slider', -1)" aria-label="Назад" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(160, 194, 239, 0.25); color: #d8eafc; background: rgba(5, 17, 40, 0.72); cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 900;">←</button>
+                            <button type="button" onclick="bkScroll('scenarios-slider', 1)" aria-label="Вперед" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(160, 194, 239, 0.25); color: #d8eafc; background: rgba(5, 17, 40, 0.72); cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 900;">→</button>
+                        </div>
+                    </div>
+
+                    @php
+                        $featuredScenarios = [
+                            ['title' => 'Доставка продуктов', 'slug' => 'delivery-groceries', 'img' => 'slide-groceries.png'],
+                            ['title' => 'Доставка готовых блюд', 'slug' => 'delivery-meals', 'img' => 'slide-meals.png'],
+                            ['title' => 'Доставка крупных грузов', 'slug' => 'delivery-bulky', 'img' => 'slide-bulky.png'],
+                            ['title' => 'Переезд квартиры под ключ', 'slug' => 'moving-home', 'img' => 'category-moving.png'],
+                            ['title' => 'Сборка и разборка мебели', 'slug' => 'handyman-assembly', 'img' => 'category-handyman.png'],
+                            ['title' => 'Вывоз крупного мусора', 'slug' => 'eco-disposal', 'img' => 'category-eco.png'],
+                            ['title' => 'Заявка на эвакуатор', 'slug' => 'tow-emergency', 'img' => 'banner-roadside.png'],
+                            ['title' => 'Доставка с доски объявлений', 'slug' => 'classifieds-delivery', 'img' => 'scenario-classifieds.png'],
+                        ];
+                    @endphp
+
+                    <div id="scenarios-slider" class="bk-horizontal">
+                        @foreach($featuredScenarios as $scen)
+                            <a href="{{ route('public.cms.service-page', ['serviceSlug' => $scen['slug']]) }}" class="scenario-card" style="background-image: url('{{ asset('images/bikube/home/' . $scen['img']) }}')">
+                                <span class="scenario-card__title">{{ $scen['title'] }}</span>
+                                <div class="scenario-card__footer">
+                                    <span class="scenario-card__action">Заказать</span>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
+
+                {{-- How it works Section --}}
                 <section id="how-it-works" class="section">
-                    <div class="section__head">
-                        <div>
-                            <p class="section__eyebrow">Процесс</p>
-                            <h2 class="section__title">Как это работает</h2>
-                        </div>
-                        <p class="section__text">Простой алгоритм: выберите услугу, опишите задачу, получите помощь от местного исполнителя.</p>
+                    <div class="section__head" style="text-align: center; margin: 0 auto 48px;">
+                        <p class="section__eyebrow">Процесс</p>
+                        <h2 class="section__title">Как это работает</h2>
+                        <p class="section__text">Три простых шага для решения любой задачи — без посредников и лишних звонков.</p>
                     </div>
-                    <div class="grid-3">
-                        <div class="card"><h3 class="card__title">1️⃣ Выбор</h3><p class="card__text">Найдите нужную категорию услуги и опишите, что вам нужно.</p></div>
-                        <div class="card"><h3 class="card__title">2️⃣ Детали</h3><p class="card__text">Укажите адрес, время и дополнительные требования.</p></div>
-                        <div class="card"><h3 class="card__title">3️⃣ Помощь</h3><p class="card__text">Исполнитель приходит и выполняет работу в назначенное время.</p></div>
+
+                    <div class="steps-grid">
+                        <div class="step-item">
+                            <div class="step-icon">🔍</div>
+                            <h3>1. Выбор услуги</h3>
+                            <p>Выберите нужную категорию и конкретный сценарий работы в каталоге.</p>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-icon">📋</div>
+                            <h3>2. Детали и адрес</h3>
+                            <p>Заполните простую форму заказа: укажите адреса, время и требования.</p>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-icon">💳</div>
+                            <h3>3. Заявка на рассмотрение</h3>
+                            <p>Отправьте реальную заявку. Оплата и назначение исполнителя пока не подключены.</p>
+                        </div>
+                        <div class="step-item" style="background: linear-gradient(180deg, rgba(184, 248, 41, 0.05), rgba(4, 14, 33, 0.5)); border-color: rgba(184, 248, 41, 0.25);">
+                            <div class="step-icon" style="background: rgba(184, 248, 41, 0.15); border-color: #b8f829; color: #b8f829;">✨</div>
+                            <h3>4. Статус разработки</h3>
+                            <p>Live tracking появится только после подключения реального dispatch и GPS-модуля.</p>
+                        </div>
                     </div>
                 </section>
-                <section id="business" class="section">
-                    <div class="section__head">
-                        <div>
-                            <p class="section__eyebrow">Возможности</p>
-                            <h2 class="section__title">Для бизнеса и исполнителей</h2>
+
+                {{-- Banners split grids --}}
+                <section class="section split-grid" style="padding-top: 0;">
+                    <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'classifieds-delivery']) }}" class="banner-card" style="background-image: url('{{ asset('images/bikube/home/scenario-classifieds.png') }}')">
+                        <div class="banner-card__content">
+                            <h3 class="banner-card__title">Доска объявлений + доставка</h3>
+                            <p class="banner-card__text">Отправьте заявку на доставку локальной покупки. Сделка, оплата и назначение пока не подключены.</p>
                         </div>
-                        <p class="section__text">BiKuBe объединяет местные услуги и дает прямой доступ к клиентам без лишних посредников.</p>
+                        <span class="banner-card__link">Создать заказ</span>
+                    </a>
+
+                    <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'tow-emergency']) }}" class="banner-card" style="background-image: url('{{ asset('images/bikube/home/banner-roadside.png') }}')">
+                        <div class="banner-card__content">
+                            <h3 class="banner-card__title">Эвакуатор и техпомощь</h3>
+                            <p class="banner-card__text">Отправьте заявку на эвакуатор или дорожную помощь. Назначение и отслеживание пока не подключены.</p>
+                        </div>
+                        <span class="banner-card__link">Вызвать помощь</span>
+                    </a>
+                </section>
+
+                <section class="section split-grid" style="padding-top: 0;">
+                    <div class="banner-card" style="background-image: url('{{ asset('images/bikube/home/banner-it.png') }}')">
+                        <div class="banner-card__content">
+                            <h3 class="banner-card__title">Дополнительные направления</h3>
+                            <p class="banner-card__text">Новые направления услуг будут опубликованы только после настройки реального сценария заявки.</p>
+                        </div>
+                        <span class="banner-card__link">Пока недоступно</span>
                     </div>
-                    <div class="grid-3">
-                        <div class="card"><h3 class="card__title">👨‍💼 Клиент</h3><p class="card__text">Используйте BiKuBe для быстрого поиска проверенных исполнителей услуг в Narvik.</p></div>
-                        <div class="card"><h3 class="card__title">🛠️ Мастер</h3><p class="card__text">Получайте заказы от местных клиентов и управляйте своим графиком работы.</p></div>
-                        <div class="card"><h3 class="card__title">🤝 Партнёр</h3><p class="card__text">Интегрируйте свой сервис в экосистему BiKuBe и расширяйте клиентскую базу.</p></div>
+
+                    <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'delivery-meals']) }}" class="banner-card" style="background-image: url('{{ asset('images/bikube/home/banner-glf-mat.png') }}')">
+                        <div class="banner-card__content">
+                            <h3 class="banner-card__title">Заявка на доставку еды</h3>
+                            <p class="banner-card__text">Отправьте запрос по активному сценарию. Ресторанный каталог и partner portal пока не подключены.</p>
+                        </div>
+                        <span class="banner-card__link">Заказать еду</span>
+                    </a>
+                </section>
+
+                {{-- Business and Partners --}}
+                <section id="business" class="section split-grid" style="padding-top: 0;">
+                    <div class="banner-card" style="background-image: url('{{ asset('images/bikube/home/banner-business.png') }}')">
+                        <div class="banner-card__content">
+                            <h3 class="banner-card__title">Для бизнеса</h3>
+                            <p class="banner-card__text">Корпоративный контур, API-интеграции и SLA находятся в плане развития платформы.</p>
+                        </div>
+                        <span class="banner-card__link">Стать клиентом</span>
+                    </div>
+
+                    <div id="partners" class="banner-card" style="background-image: url('{{ asset('images/bikube/home/banner-partners.png') }}')">
+                        <div class="banner-card__content">
+                            <h3 class="banner-card__title">Стать исполнителем</h3>
+                            <p class="banner-card__text">Worker и partner portals пока не подключены. Регистрация исполнителей откроется после проверки операционного процесса.</p>
+                        </div>
+                        <span class="banner-card__link">Присоединиться к сети</span>
                     </div>
                 </section>
-                <section id="partners" class="section">
-                    <div class="section__head">
-                        <div>
-                            <p class="section__eyebrow">Партнёры</p>
-                            <h2 class="section__title">Присоединяйтесь к сети</h2>
+
+                {{-- Product readiness section --}}
+                <section id="readiness" class="section" style="padding-top: 0;">
+                    <div class="promo-block">
+                        <div class="promo-block__left">
+                            <h3>Что доступно сейчас</h3>
+                            <p>Каталог активных услуг и отправка реальных заявок работают. Оплата, dispatch, GPS tracking, чат и мобильные приложения пока не подключены.</p>
+
+                            <div class="store-buttons">
+                                <span class="store-button" aria-disabled="true">Mobile app not available yet</span>
+                                <span class="store-button" aria-disabled="true">Partner portal not connected yet</span>
+                            </div>
                         </div>
-                        <p class="section__text">BiKuBe растёт вместе с местным сообществом мастеров и предпринимателей Narvik.</p>
+
+                        <div class="promo-block__right">
+                            <div class="promo-card promo-card--phone" style="background-image: url('{{ asset('images/bikube/home/set1/img-12.png') }}')"></div>
+                            <div class="promo-card promo-card--panel" style="background-image: url('{{ asset('images/bikube/home/set1/img-13.png') }}')"></div>
+                        </div>
                     </div>
-                    <div class="card"><h3 class="card__title">Станьте частью BiKuBe</h3><p class="card__text">Если вы предоставляете услуги в Narvik, свяжитесь с нами напрямую для интеграции вашего сервиса.</p><span class="card__text" style="margin-top: 12px; font-size: 0.85rem; color: #999;">Контакт: hello@bikube.local</span></div>
                 </section>
             </main>
+
+            {{-- Footer --}}
             <footer id="footer" class="footer">
                 <div class="footer__inner">
-                    <div class="footer__brand"><span class="brand__mark">B</span>BiKuBe</div>
-                    <div class="footer__links">
-                        <a href="#categories">Категории</a>
-                        <a href="#how-it-works">Как это работает</a>
-                        <a href="#business">Для бизнеса</a>
-                        <a href="#partners">Партнёрам</a>
-                        <a href="/login">Войти</a>
+                    <div class="footer-grid">
+                        <div class="footer-col" style="grid-column: span 1.5;">
+                            <a href="/" class="brand" style="margin-bottom: 20px;">
+                                <span class="brand__mark"></span>
+                                <span>BiKuBe</span>
+                            </a>
+                            <p style="line-height: 1.6; font-size: 0.9rem;">BiKuBe Next — Narvik-first платформа локальных услуг. Сейчас доступны каталог и отправка заявок на рассмотрение.</p>
+                        </div>
+
+                        <div class="footer-col">
+                            <h4>Услуги</h4>
+                            <div class="footer-links">
+                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'delivery-groceries']) }}">Доставка</a>
+                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'moving-home']) }}">Переезды</a>
+                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'handyman-hourly']) }}">Мастер на час</a>
+                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'eco-disposal']) }}">Утилизация</a>
+                            </div>
+                        </div>
+
+                        <div class="footer-col">
+                            <h4>Статус</h4>
+                            <div class="footer-links">
+                                <a href="#readiness">Возможности платформы</a>
+                                <a href="#business">План для бизнеса</a>
+                                <a href="/login">Войти в кабинет</a>
+                            </div>
+                        </div>
+
+                        <div class="footer-col">
+                            <h4>Регион запуска</h4>
+                            <div class="footer-contact">
+                                <div class="footer-contact__item">
+                                    <span class="footer-contact__icon">📍</span>
+                                    <span>Narvik, Norway</span>
+                                </div>
+                                <div class="footer-contact__item"><span>Публичные контакты ещё не настроены.</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-bottom">
+                        <span>© {{ date('Y') }} BiKuBe Ecosystem. Все права защищены.</span>
+                        <div class="footer-legal">
+                            <span>Legal pages are not published yet</span>
+                        </div>
                     </div>
                 </div>
             </footer>
         </div>
+
+        <script>
+            function bkScroll(id, direction) {
+                const row = document.getElementById(id);
+                if (!row) return;
+                row.scrollBy({ left: direction * 280, behavior: 'smooth' });
+            }
+        </script>
     </body>
 </html>
