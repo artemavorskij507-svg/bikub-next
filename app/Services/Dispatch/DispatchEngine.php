@@ -7,6 +7,7 @@ use App\Models\DispatchAssignment;
 use App\Models\DispatchEvent;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\Workers\WorkerEligibilityService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -32,7 +33,7 @@ class DispatchEngine
     public function assign(Order $order, User $worker, User $assignedBy, ?string $note = null): DispatchAssignment
     {
         $this->assertDispatchable($order);
-        if (! $this->isEligibleWorker($worker)) {
+        if (! app(WorkerEligibilityService::class)->userIsEligible($worker, $order)) {
             throw ValidationException::withMessages(['worker' => 'No eligible workers available.']);
         }
         if ($order->activeDispatchAssignment()) {
@@ -66,12 +67,7 @@ class DispatchEngine
 
     public function eligibleWorkers(): Collection
     {
-        return User::query()->get()->filter(fn (User $user) => $this->isEligibleWorker($user))->values();
-    }
-
-    private function isEligibleWorker(User $user): bool
-    {
-        return method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['worker', 'courier']);
+        return User::with(['workerProfile', 'workerAvailability'])->get()->filter(fn (User $user) => $user->isEligibleWorker())->values();
     }
 
     private function assertDispatchable(Order $order): void

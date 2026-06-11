@@ -35,4 +35,17 @@ class PeopleWorkforce extends AdminOsModulePage
             $this->status('Fake workers', 'not present', 'This page does not invent workers or staff counts.', 'safe'),
         ];
     }
+
+    public function getWorkerCounts(): array
+    {
+        try {
+            return [
+                'users' => \App\Models\User::count(), 'profiles' => \App\Models\WorkerProfile::count(),
+                'approved' => \App\Models\WorkerProfile::where('status','approved')->count(),
+                'pending' => \App\Models\WorkerProfile::where('status','pending')->count(),
+                'online' => \App\Models\WorkerAvailability::whereIn('status',['online','available'])->count(),
+                'blocked' => \App\Models\WorkerProfile::whereIn('status',['rejected','suspended'])->count(),
+            ];
+        } catch (\Throwable) { return array_fill_keys(['users','profiles','approved','pending','online','blocked'], 0); }
+    }
 }

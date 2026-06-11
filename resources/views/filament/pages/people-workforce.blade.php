@@ -1,6 +1,7 @@
 @php
     $items = $this->getPeopleFoundation();
     $dashboardUrl = route('filament.admin.pages.dashboard');
+    $counts = $this->getWorkerCounts();
 @endphp
 
 <x-filament-panels::page>
@@ -20,6 +21,12 @@
         </section>
 
         <section class="bkb-ops-runtime">
+            <div class="bkb-foundation-strip">
+                @foreach(['users'=>'Total users','profiles'=>'Worker profiles','approved'=>'Approved workers','pending'=>'Pending workers','online'=>'Online / available','blocked'=>'Rejected / suspended'] as $key=>$label)
+                    <article><span>{{ $label }}</span><strong>{{ $counts[$key] }}</strong></article>
+                @endforeach
+            </div>
+            <p><a class="bkb-card-link" href="{{ \App\Filament\Resources\WorkerProfiles\WorkerProfileResource::getUrl() }}">Open real Worker Profiles</a></p>
             <div class="bkb-section-heading">
                 <p class="bkb-kicker">People foundation</p>
                 <h2>Auth and RBAC readiness</h2>
