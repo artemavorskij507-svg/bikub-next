@@ -42,6 +42,7 @@ class OrdersHub extends AdminOsModulePage
             'dispatch_event' => $order->dispatchEvents->first()?->event_type ?? 'No dispatch event',
             'worker_progress' => $order->dispatchEvents->first(fn ($event) => str_starts_with($event->event_type, 'worker.'))?->event_type ?? 'No worker progress',
             'location_pings' => $order->worker_location_pings_count,
+            'latest_ping_at' => $order->workerLocationPings()->first()?->captured_at?->format('Y-m-d H:i:s'),
             'url' => \App\Filament\Resources\Orders\OrderResource::getUrl('edit', ['record' => $order]),
         ])->all();
     }

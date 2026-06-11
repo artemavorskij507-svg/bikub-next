@@ -29,7 +29,7 @@
                 <div>
                     <span class="bkb-card-eyebrow">GPS telemetry</span>
                     <h2>No real GPS pings yet</h2>
-                    <p>Open the worker cockpit on a phone or HTTPS URL and tap <strong>Send real location ping</strong>.</p>
+                    <p>Map center only — no worker marker yet. Open the worker cockpit on a phone or HTTPS URL and tap <strong>Send real GPS ping now</strong>.</p>
                     <div class="bkb-action-row">
                         @if($assignment?->order)
                             <a class="bkb-card-link" href="{{ \App\Filament\Resources\Orders\OrderResource::getUrl('view', ['record' => $assignment->order]) }}">Open assigned order</a>
@@ -52,6 +52,7 @@
                     <div><dt>Order</dt><dd>{{ $assignment->order->order_number }}</dd></div>
                     <div><dt>Order status</dt><dd>{{ str($assignment->order->status->value)->replace('_', ' ')->title() }}</dd></div>
                     <div><dt>GPS status</dt><dd>{{ $this->getPingCount() ? 'Real telemetry available' : 'No ping yet' }}</dd></div>
+                    <div><dt>Worker order URL</dt><dd>{{ route('worker.orders.show', $assignment->order) }}</dd></div>
                 </dl>
                 <a class="bkb-card-link" href="{{ \App\Filament\Resources\Orders\OrderResource::getUrl('view', ['record' => $assignment->order]) }}">Open order telemetry</a>
             @else
@@ -73,7 +74,7 @@
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
-document.addEventListener('DOMContentLoaded',async()=>{const status=document.getElementById('live-map-status'),empty=document.getElementById('live-map-empty'),el=document.getElementById('live-operations-map');try{const response=await fetch(@json(route('admin.live-operations-map.data')),{headers:{Accept:'application/json'}});if(!response.ok)throw new Error('Telemetry endpoint returned '+response.status);const data=await response.json();if(!data.count){status.textContent='No marker rendered because no real GPS ping exists.';return}empty.style.display='none';const map=L.map(el);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);const bounds=[];data.markers.forEach(m=>{bounds.push([m.latitude,m.longitude]);const popup=[`<strong>${escapeHtml(m.worker.name||'Worker #'+m.worker.id)}</strong>`,escapeHtml(m.worker.email||''),`Order: ${escapeHtml(m.order_number||'No linked order')}`,`Order status: ${escapeHtml(m.order_status||'Unknown')}`,`Presence: ${escapeHtml(m.presence_status)}`,`Accuracy: ${m.accuracy_meters??'Unknown'} m`,`Captured: ${escapeHtml(m.captured_at||m.created_at||'Unknown')}`].join('<br>');L.marker([m.latitude,m.longitude]).addTo(map).bindPopup(popup)});map.fitBounds(bounds,{padding:[32,32],maxZoom:16});status.textContent=`Showing ${data.count} marker(s) from real database pings.`}catch(error){status.textContent='Live map unavailable: '+error.message}});function escapeHtml(value){const div=document.createElement('div');div.textContent=value;return div.innerHTML}
+document.addEventListener('DOMContentLoaded',async()=>{const status=document.getElementById('live-map-status'),empty=document.getElementById('live-map-empty'),el=document.getElementById('live-operations-map');const map=L.map(el,{center:[68.4385,17.4272],zoom:10});L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);try{const response=await fetch(@json(route('admin.live-operations-map.data')),{headers:{Accept:'application/json'}});if(!response.ok)throw new Error('Telemetry endpoint returned '+response.status);const data=await response.json();if(!data.count){status.textContent='Map center only — no worker marker yet.';return}empty.style.display='none';const bounds=[];data.markers.forEach(m=>{bounds.push([m.latitude,m.longitude]);const popup=[`<strong>${escapeHtml(m.worker.name||'Worker #'+m.worker.id)}</strong>`,escapeHtml(m.worker.email||''),`Order: ${escapeHtml(m.order_number||'No linked order')}`,`Order status: ${escapeHtml(m.order_status||'Unknown')}`,`Presence: ${escapeHtml(m.presence_status)}`,`Accuracy: ${m.accuracy_meters??'Unknown'} m`,`Captured: ${escapeHtml(m.captured_at||m.created_at||'Unknown')}`].join('<br>');L.marker([m.latitude,m.longitude]).addTo(map).bindPopup(popup)});map.fitBounds(bounds,{padding:[32,32],maxZoom:16});status.textContent=`Showing ${data.count} marker(s) from real database pings.`}catch(error){status.textContent='Live map unavailable: '+error.message}});function escapeHtml(value){const div=document.createElement('div');div.textContent=value;return div.innerHTML}
 </script>
 @endpush
 </x-filament-panels::page>
