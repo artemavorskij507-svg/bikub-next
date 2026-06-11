@@ -45,6 +45,14 @@ class OrderResource extends Resource
                     ->disabled()
                     ->dehydrated(false),
             ]),
+            Section::make('Latest price quote')->description('Read-only estimate. No payment provider is connected.')->schema([
+                TextInput::make('estimated_total')->prefix('NOK')->disabled()->dehydrated(false),
+                Textarea::make('latest_quote')
+                    ->formatStateUsing(function ($state, $record) {
+                        $quote = $record?->latestPriceQuote();
+                        return $quote ? json_encode(['status' => $quote->status, 'currency' => $quote->currency, 'total' => $quote->total, 'breakdown' => $quote->breakdown], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : 'No quote generated.';
+                    })->rows(10)->disabled()->dehydrated(false),
+            ])->columns(2),
             Section::make('Read-only foundation')->description('Lifecycle events are recorded by the Order Engine. Status transitions, payments and dispatch are intentionally not editable here.'),
         ]);
     }
@@ -57,6 +65,7 @@ class OrderResource extends Resource
             TextColumn::make('customer_name')->searchable()->placeholder('Not provided'),
             TextColumn::make('status')->badge(),
             TextColumn::make('payment_status')->badge(),
+            TextColumn::make('estimated_total')->money('NOK')->placeholder('Manual review'),
             TextColumn::make('submitted_at')->dateTime()->sortable(),
         ])->filters([
             SelectFilter::make('status')->options(array_combine(array_map(fn($s) => $s->value, \App\Enums\OrderStatus::cases()), array_map(fn($s) => ucfirst(str_replace('_', ' ', $s->value)), \App\Enums\OrderStatus::cases()))),

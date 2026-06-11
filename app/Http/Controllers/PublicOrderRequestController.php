@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ServiceScenario;
 use App\Models\ServiceScenarioField;
 use App\Services\Orders\OrderEngine;
+use App\Services\Pricing\PricingEngine;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -17,7 +18,7 @@ class PublicOrderRequestController extends Controller
         return view('public.orders.request', compact('scenario'));
     }
 
-    public function store(Request $request, string $serviceSlug, OrderEngine $engine): RedirectResponse
+    public function store(Request $request, string $serviceSlug, OrderEngine $engine, PricingEngine $pricing): RedirectResponse
     {
         $scenario = ServiceScenario::active()->with(['fields' => fn ($query) => $query->active()])->where('slug', $serviceSlug)->firstOrFail();
         abort_if($scenario->fields->isEmpty(), 422, 'Scenario intake fields are not configured yet.');
@@ -44,13 +45,14 @@ class PublicOrderRequestController extends Controller
             'source' => 'public',
             'locale' => app()->getLocale(),
         ]));
+        $pricing->quoteForOrder($order);
 
         return redirect()->route('public.orders.confirmation', $order->order_number);
     }
 
     public function confirmation(string $orderNumber): View
     {
-        $order = \App\Models\Order::with('scenario.fields')->where('order_number', $orderNumber)->firstOrFail();
+        $order = \App\Models\Order::with(['scenario.fields', 'priceQuotes'])->where('order_number', $orderNumber)->firstOrFail();
         return view('public.orders.confirmation', compact('order'));
     }
 

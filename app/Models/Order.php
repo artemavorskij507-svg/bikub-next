@@ -21,6 +21,8 @@ class Order extends Model
     public function scenario(): BelongsTo { return $this->belongsTo(ServiceScenario::class, 'service_scenario_id'); }
     public function items(): HasMany { return $this->hasMany(OrderItem::class); }
     public function events(): HasMany { return $this->hasMany(OrderEvent::class)->orderByDesc('created_at'); }
+    public function priceQuotes(): HasMany { return $this->hasMany(OrderPriceQuote::class)->orderByDesc('created_at'); }
+    public function latestPriceQuote(): ?OrderPriceQuote { return $this->priceQuotes()->first(); }
     public function scopeWithStatus(Builder $query, OrderStatus|string $status): Builder { return $query->where('status', $status instanceof OrderStatus ? $status->value : $status); }
     public function canTransitionTo(OrderStatus $status): bool { return $this->status->canTransitionTo($status); }
 }

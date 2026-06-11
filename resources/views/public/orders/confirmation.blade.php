@@ -23,6 +23,18 @@
                 @endforeach
             </dl>
         @endif
+        @php($quote = $order->latestPriceQuote())
+        @if($quote)
+            <h2>Price estimate</h2>
+            <dl class="request-summary">
+                <div><dt>Pricing status</dt><dd>{{ str_replace('_', ' ', ucfirst($quote->status)) }}</dd></div>
+                @foreach($quote->breakdown ?? [] as $line)<div><dt>{{ $line['label'] }}</dt><dd>{{ number_format((float) $line['amount'], 2) }} {{ $quote->currency }}</dd></div>@endforeach
+                <div><dt>Subtotal</dt><dd>{{ number_format((float) $quote->subtotal, 2) }} {{ $quote->currency }}</dd></div>
+                <div><dt>Fees / discounts / tax</dt><dd>{{ number_format((float) $quote->fees_total, 2) }} / {{ number_format((float) $quote->discounts_total, 2) }} / {{ number_format((float) $quote->tax_total, 2) }} {{ $quote->currency }}</dd></div>
+                <div><dt>Estimated total</dt><dd>{{ number_format((float) $quote->total, 2) }} {{ $quote->currency }}</dd></div>
+            </dl>
+            <p><strong>Payment provider is not connected yet.</strong> This is an estimate/request quote, not a paid booking.</p>
+        @endif
     </div>
 </article>
 @endsection
