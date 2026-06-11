@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Models\DispatchAssignment;
 use App\Models\Order;
+use App\Models\WorkerLocationPing;
 use App\Services\Dispatch\DispatchEngine;
 use Filament\Notifications\Notification;
 use Illuminate\Validation\ValidationException;
@@ -62,6 +63,8 @@ class DispatchCenter extends AdminOsModulePage
                 'assigned' => DispatchAssignment::with(['order.scenario', 'order.dispatchEvents', 'assignedUser.workerAvailability'])->whereIn('status', ['assigned', 'accepted'])->latest()->get(),
                 'eligible_workers' => $engine->eligibleWorkers(),
                 'events' => \App\Models\DispatchEvent::latest()->limit(12)->get(),
+                'location_ping_count' => WorkerLocationPing::count(),
+                'latest_location_ping_at' => WorkerLocationPing::latest('captured_at')->value('captured_at'),
             ];
         } catch (\Throwable) {
             return [
@@ -69,6 +72,8 @@ class DispatchCenter extends AdminOsModulePage
                 'assigned' => collect(),
                 'eligible_workers' => collect(),
                 'events' => collect(),
+                'location_ping_count' => 0,
+                'latest_location_ping_at' => null,
             ];
         }
     }

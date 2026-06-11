@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PublicWorkerApplicationController;
 use App\Http\Controllers\PublicWorkerInvitationController;
 use App\Http\Controllers\WorkerCockpitController;
+use App\Http\Controllers\AdminLiveOperationsMapDataController;
 
 Route::get('/', function () {
     return view('public.home');
@@ -37,3 +38,7 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
     Route::post('/presence/offline', [WorkerCockpitController::class, 'offline'])->name('presence.offline');
     Route::post('/location-pings', [WorkerCockpitController::class, 'location'])->name('location-pings.store');
 });
+
+Route::get('/admin/live-operations-map/data', AdminLiveOperationsMapDataController::class)
+    ->middleware(['auth', 'admin.operator'])
+    ->name('admin.live-operations-map.data');

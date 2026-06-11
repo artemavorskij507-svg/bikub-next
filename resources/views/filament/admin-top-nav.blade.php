@@ -22,6 +22,7 @@
             'route' => 'filament.admin.pages.dispatch-center',
             'items' => [
                 ['label' => 'Dispatch Center', 'description' => 'Assignment foundation', 'route' => 'filament.admin.pages.dispatch-center'],
+                ['label' => 'Live Operations Map', 'description' => 'Real worker GPS pings only', 'route' => 'filament.admin.pages.live-operations-map'],
             ],
         ],
         [
