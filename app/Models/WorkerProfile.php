@@ -13,4 +13,5 @@ class WorkerProfile extends Model
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
     public function approvedBy(): BelongsTo { return $this->belongsTo(User::class, 'approved_by_user_id'); }
     public function availability(): HasOne { return $this->hasOne(WorkerAvailability::class); }
+    public function documents() { return $this->hasMany(WorkerDocument::class); }
 }

@@ -33,6 +33,8 @@ class User extends Authenticatable
 
     public function workerProfile(): HasOne { return $this->hasOne(WorkerProfile::class); }
     public function workerAvailability(): HasOne { return $this->hasOne(WorkerAvailability::class); }
+    public function workerApplications() { return $this->hasMany(WorkerApplication::class); }
+    public function workerDocuments() { return $this->hasMany(WorkerDocument::class); }
     public function isEligibleWorker(): bool
     {
         return $this->workerProfile?->status === 'approved'

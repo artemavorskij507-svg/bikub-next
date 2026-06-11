@@ -1,0 +1,1 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Application received</title></head><body><main><h1>Application received</h1><p>Admin approval is required before dispatch eligibility.</p><a href="/">Back to BiKuBe</a></main></body></html>

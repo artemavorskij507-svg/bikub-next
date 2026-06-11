@@ -45,7 +45,11 @@ class PeopleWorkforce extends AdminOsModulePage
                 'pending' => \App\Models\WorkerProfile::where('status','pending')->count(),
                 'online' => \App\Models\WorkerAvailability::whereIn('status',['online','available'])->count(),
                 'blocked' => \App\Models\WorkerProfile::whereIn('status',['rejected','suspended'])->count(),
+                'applications' => \App\Models\WorkerApplication::count(),
+                'submitted' => \App\Models\WorkerApplication::where('status','submitted')->count(),
+                'documents' => \App\Models\WorkerDocument::where('status','pending')->count(),
+                'eligible' => app(\App\Services\Dispatch\DispatchEngine::class)->eligibleWorkers()->count(),
             ];
-        } catch (\Throwable) { return array_fill_keys(['users','profiles','approved','pending','online','blocked'], 0); }
+        } catch (\Throwable) { return array_fill_keys(['users','profiles','approved','pending','online','blocked','applications','submitted','documents','eligible'], 0); }
     }
 }

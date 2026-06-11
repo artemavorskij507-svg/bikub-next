@@ -22,11 +22,12 @@
 
         <section class="bkb-ops-runtime">
             <div class="bkb-foundation-strip">
-                @foreach(['users'=>'Total users','profiles'=>'Worker profiles','approved'=>'Approved workers','pending'=>'Pending workers','online'=>'Online / available','blocked'=>'Rejected / suspended'] as $key=>$label)
+                @foreach(['users'=>'Total users','applications'=>'Applications','submitted'=>'Submitted applications','profiles'=>'Worker profiles','approved'=>'Approved workers','online'=>'Online / available','eligible'=>'Dispatch eligible','documents'=>'Documents pending'] as $key=>$label)
                     <article><span>{{ $label }}</span><strong>{{ $counts[$key] }}</strong></article>
                 @endforeach
             </div>
             <p><a class="bkb-card-link" href="{{ \App\Filament\Resources\WorkerProfiles\WorkerProfileResource::getUrl() }}">Open real Worker Profiles</a></p>
+            <p><a class="bkb-card-link" href="{{ \App\Filament\Resources\WorkerApplications\WorkerApplicationResource::getUrl() }}">Review Worker Applications</a></p>
             <div class="bkb-section-heading">
                 <p class="bkb-kicker">People foundation</p>
                 <h2>Auth and RBAC readiness</h2>

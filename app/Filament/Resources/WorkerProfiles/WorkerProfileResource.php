@@ -29,7 +29,7 @@ class WorkerProfileResource extends Resource
         Section::make('Real worker identity')->columns(2)->schema([
             Select::make('user_id')->relationship('user','email')->required()->searchable()->preload()->unique(ignoreRecord:true),
             TextInput::make('display_name')->maxLength(255), Select::make('worker_type')->options(['courier'=>'Courier','worker'=>'Worker','driver'=>'Driver'])->required(),
-            Select::make('status')->options(['pending'=>'Pending','approved'=>'Approved','rejected'=>'Rejected','suspended'=>'Suspended'])->required(),
+            Select::make('status')->options(['pending'=>'Pending','approved'=>'Approved','rejected'=>'Rejected','suspended'=>'Suspended'])->disabled()->dehydrated(false)->helperText('Approval and suspension require the audited onboarding workflow.'),
             TextInput::make('phone')->tel()->maxLength(255), TextInput::make('vehicle_type')->maxLength(255), TextInput::make('service_area')->maxLength(255),
             Checkbox::make('can_deliver'), Checkbox::make('can_move'), Checkbox::make('can_handle_eco'), Checkbox::make('can_do_handyman'), Checkbox::make('can_tow'), Checkbox::make('can_run_errands'),
         ]),
