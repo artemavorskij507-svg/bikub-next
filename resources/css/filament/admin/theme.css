@@ -1013,6 +1013,9 @@ body {
     }
 }
 
+.bkb-operator{gap:1rem}.bkb-operator-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.2rem 0 .65rem;border-bottom:1px solid var(--bkb-border)}.bkb-operator-head h1{margin:0;color:#fff;font-size:1.7rem}.bkb-operator-head p{margin:.2rem 0 0;color:var(--bkb-soft)}.bkb-operator-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1rem}.bkb-action-list{display:grid;gap:.35rem}.bkb-action-list a,.bkb-os-card>a{display:block;padding:.55rem .7rem;border:1px solid var(--bkb-border);border-radius:.55rem;color:#b9ffd8}.bkb-table-wrap{overflow:auto;border:1px solid var(--bkb-border);border-radius:.75rem;background:rgba(7,17,29,.78);padding:.8rem}.bkb-table-wrap h2{margin:0 0 .65rem;color:#fff;font-size:1rem}.bkb-ops-table{width:100%;border-collapse:collapse;font-size:.82rem}.bkb-ops-table th{color:var(--bkb-soft);text-align:left;font-size:.68rem;text-transform:uppercase;padding:.55rem}.bkb-ops-table td{border-top:1px solid rgba(159,180,206,.12);padding:.62rem;color:#e5edf6;vertical-align:top}.bkb-ops-table small{display:block;color:var(--bkb-soft);margin-top:.15rem}.bkb-dispatch-workbench{display:grid;grid-template-columns:minmax(15rem,.8fr) minmax(20rem,1.2fr) minmax(15rem,.75fr);gap:.8rem;align-items:start}.bkb-dispatch-workbench .bkb-os-card{min-height:20rem}.bkb-queue-list{display:grid;gap:.35rem}.bkb-queue-list a{display:grid;padding:.6rem;border:1px solid var(--bkb-border);border-radius:.55rem;color:#dceaf3}.bkb-queue-list a.is-active{border-color:#22e58a;background:rgba(34,229,138,.08)}.bkb-queue-list span,.bkb-queue-list small{color:var(--bkb-soft)}
+@media(max-width:1050px){.bkb-dispatch-workbench,.bkb-operator-grid{grid-template-columns:1fr}.bkb-operator-head{align-items:flex-start;flex-direction:column}}
+
 /* Operational module wiring status views */
 .bkb-status-cockpit {
     gap: 1.35rem;
