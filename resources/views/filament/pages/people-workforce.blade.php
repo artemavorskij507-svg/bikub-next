@@ -28,6 +28,7 @@
             </div>
             <p><a class="bkb-card-link" href="{{ \App\Filament\Resources\WorkerProfiles\WorkerProfileResource::getUrl() }}">Open real Worker Profiles</a></p>
             <p><a class="bkb-card-link" href="{{ \App\Filament\Resources\WorkerApplications\WorkerApplicationResource::getUrl() }}">Review Worker Applications</a></p>
+            <p><a class="bkb-card-link" href="{{ \App\Filament\Resources\WorkerDocuments\WorkerDocumentResource::getUrl() }}">Review Worker Documents</a></p>
             <div class="bkb-section-heading">
                 <p class="bkb-kicker">People foundation</p>
                 <h2>Auth and RBAC readiness</h2>

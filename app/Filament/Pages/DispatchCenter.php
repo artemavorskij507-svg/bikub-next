@@ -37,6 +37,11 @@ class DispatchCenter extends AdminOsModulePage
             Notification::make()->title(collect($exception->errors())->flatten()->first())->warning()->send();
         }
     }
+    public function assignWorker(int $orderId, int $userId): void
+    {
+        try { app(DispatchEngine::class)->assign(Order::findOrFail($orderId), \App\Models\User::findOrFail($userId), auth()->user(), 'Assigned from Dispatch Center.'); Notification::make()->title('Order assigned')->success()->send(); }
+        catch (ValidationException $e) { Notification::make()->title(collect($e->errors())->flatten()->first())->warning()->send(); }
+    }
 
     public function getDispatchData(): array
     {
@@ -48,6 +53,7 @@ class DispatchCenter extends AdminOsModulePage
             'quote' => $order->latestPriceQuote()?->status ?? 'No quote', 'payment' => $order->payment_status->value,
             'ready' => $order->isDispatchReady(), 'latest_event' => $order->dispatchEvents->first()?->event_type ?? 'No dispatch event',
             'url' => OrderResource::getUrl('edit', ['record' => $order]),
+            'eligible' => app(\App\Services\Workers\WorkerEligibilityService::class)->eligibleForOrder($order),
         ];
 
         try {
