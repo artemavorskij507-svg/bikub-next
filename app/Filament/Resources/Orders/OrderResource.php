@@ -4,15 +4,19 @@ namespace App\Filament\Resources\Orders;
 
 use App\Filament\Resources\Orders\Pages\EditOrder;
 use App\Filament\Resources\Orders\Pages\ListOrders;
+use App\Filament\Resources\Orders\Pages\ViewOrder;
 use App\Models\Order;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Infolists\Components\TextEntry;
+use Fahiem\FilamentPinpoint\PinpointEntry;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -97,11 +101,39 @@ class OrderResource extends Resource
         ])->filters([
             SelectFilter::make('status')->options(array_combine(array_map(fn($s) => $s->value, \App\Enums\OrderStatus::cases()), array_map(fn($s) => ucfirst(str_replace('_', ' ', $s->value)), \App\Enums\OrderStatus::cases()))),
             SelectFilter::make('payment_status')->options(['not_required'=>'Not required','pending'=>'Pending']),
-        ])->recordActions([EditAction::make()]);
+        ])->recordActions([ViewAction::make(), EditAction::make()]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('Order and real telemetry')->schema([
+                TextEntry::make('order_number')->label('Order'),
+                TextEntry::make('status')->badge(),
+                TextEntry::make('customer_name')->label('Customer'),
+                TextEntry::make('latest_ping_status')
+                    ->label('Latest real GPS ping')
+                    ->state(fn (Order $record) => $record->workerLocationPings()->first()?->captured_at?->format('Y-m-d H:i:s') ?? 'No real GPS ping yet'),
+            ])->columns(2),
+            Section::make('Latest worker location')
+                ->description('Read-only Leaflet map from the latest real worker_location_pings record.')
+                ->schema([
+                    PinpointEntry::make('latest_worker_location')
+                        ->provider('leaflet')
+                        ->pins(fn (Order $record) => ($ping = $record->workerLocationPings()->first()) ? [[
+                            'lat' => (float) $ping->latitude,
+                            'lng' => (float) $ping->longitude,
+                            'label' => $record->order_number,
+                        ]] : [])
+                        ->height(360)
+                        ->columnSpanFull(),
+                ])
+                ->visible(fn (Order $record) => $record->workerLocationPings()->exists()),
+        ]);
     }
 
     public static function getPages(): array
     {
-        return ['index' => ListOrders::route('/'), 'edit' => EditOrder::route('/{record}/edit')];
+        return ['index' => ListOrders::route('/'), 'view' => ViewOrder::route('/{record}'), 'edit' => EditOrder::route('/{record}/edit')];
     }
 }

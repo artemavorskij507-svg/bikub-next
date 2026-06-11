@@ -5,15 +5,19 @@ namespace App\Filament\Resources\WorkerProfiles;
 use App\Filament\Resources\WorkerProfiles\Pages\CreateWorkerProfile;
 use App\Filament\Resources\WorkerProfiles\Pages\EditWorkerProfile;
 use App\Filament\Resources\WorkerProfiles\Pages\ListWorkerProfiles;
+use App\Filament\Resources\WorkerProfiles\Pages\ViewWorkerProfile;
 use App\Models\WorkerProfile;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Infolists\Components\TextEntry;
+use Fahiem\FilamentPinpoint\PinpointEntry;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -38,6 +42,16 @@ class WorkerProfileResource extends Resource
         TextColumn::make('user.email')->label('Existing user')->searchable(), TextColumn::make('display_name')->placeholder('Not set'),
         TextColumn::make('worker_type')->badge(), TextColumn::make('status')->badge(), TextColumn::make('availability.status')->label('Availability')->badge()->placeholder('Offline / not set'),
         IconColumn::make('can_deliver')->boolean(), TextColumn::make('service_area')->placeholder('Not set'),
-    ])->recordActions([EditAction::make()]); }
-    public static function getPages(): array { return ['index'=>ListWorkerProfiles::route('/'),'create'=>CreateWorkerProfile::route('/create'),'edit'=>EditWorkerProfile::route('/{record}/edit')]; }
+    ])->recordActions([ViewAction::make(), EditAction::make()]); }
+    public static function infolist(Schema $schema): Schema { return $schema->components([
+        Section::make('Worker location telemetry')->schema([
+            TextEntry::make('user.email')->label('Worker account'),
+            TextEntry::make('availability.status')->label('Presence')->badge()->placeholder('Offline / not set'),
+            TextEntry::make('last_ping')->label('Latest real GPS ping')->state(fn(WorkerProfile $record)=>$record->latestLocationPing()?->captured_at?->format('Y-m-d H:i:s') ?? 'No real GPS ping yet'),
+        ])->columns(3),
+        Section::make('Latest real location')->description('Read-only Leaflet map. Hidden until a real browser ping exists.')->schema([
+            PinpointEntry::make('latest_location')->provider('leaflet')->pins(fn(WorkerProfile $record)=>($ping=$record->latestLocationPing())?[['lat'=>(float)$ping->latitude,'lng'=>(float)$ping->longitude,'label'=>$record->display_name ?: $record->user?->name]]:[])->height(360)->columnSpanFull(),
+        ])->visible(fn(WorkerProfile $record)=>$record->locationPings()->exists()),
+    ]); }
+    public static function getPages(): array { return ['index'=>ListWorkerProfiles::route('/'),'create'=>CreateWorkerProfile::route('/create'),'view'=>ViewWorkerProfile::route('/{record}'),'edit'=>EditWorkerProfile::route('/{record}/edit')]; }
 }

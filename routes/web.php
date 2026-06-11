@@ -8,6 +8,8 @@ use App\Http\Controllers\PublicWorkerInvitationController;
 use App\Http\Controllers\WorkerCockpitController;
 use App\Http\Controllers\AdminLiveOperationsMapDataController;
 
+Route::pattern('order', '[0-9]+');
+
 Route::get('/', function () {
     return view('public.home');
 });
@@ -37,7 +39,7 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
     Route::post('/presence/online', [WorkerCockpitController::class, 'online'])->name('presence.online');
     Route::post('/presence/offline', [WorkerCockpitController::class, 'offline'])->name('presence.offline');
     Route::post('/location-pings', [WorkerCockpitController::class, 'location'])->name('location-pings.store');
-});
+})->whereNumber('order');
 
 Route::get('/admin/live-operations-map/data', AdminLiveOperationsMapDataController::class)
     ->middleware(['auth', 'admin.operator'])

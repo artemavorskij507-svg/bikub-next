@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class WorkerProfile extends Model
 {
@@ -14,4 +15,6 @@ class WorkerProfile extends Model
     public function approvedBy(): BelongsTo { return $this->belongsTo(User::class, 'approved_by_user_id'); }
     public function availability(): HasOne { return $this->hasOne(WorkerAvailability::class); }
     public function documents() { return $this->hasMany(WorkerDocument::class); }
+    public function locationPings(): HasMany { return $this->hasMany(WorkerLocationPing::class, 'worker_profile_id')->latest('captured_at'); }
+    public function latestLocationPing(): ?WorkerLocationPing { return $this->locationPings()->first(); }
 }

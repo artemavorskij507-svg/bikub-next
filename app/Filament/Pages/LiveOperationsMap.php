@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\WorkerLocationPing;
+use App\Models\DispatchAssignment;
 
 class LiveOperationsMap extends AdminOsModulePage
 {
@@ -25,4 +26,13 @@ class LiveOperationsMap extends AdminOsModulePage
     public function getModuleKey(): string { return 'dispatch'; }
     public function getPingCount(): int { return WorkerLocationPing::count(); }
     public function getLatestPingAt(): string { return WorkerLocationPing::latest('captured_at')->value('captured_at')?->format('Y-m-d H:i:s') ?? 'No real ping yet'; }
+    public function getOrdersWithPingsCount(): int { return WorkerLocationPing::whereNotNull('order_id')->distinct('order_id')->count('order_id'); }
+    public function getActiveAssignmentCount(): int { return DispatchAssignment::whereIn('status', ['assigned', 'accepted'])->count(); }
+    public function getCurrentAssignment(): ?DispatchAssignment
+    {
+        return DispatchAssignment::with(['order', 'assignedUser.workerAvailability'])
+            ->whereIn('status', ['assigned', 'accepted'])
+            ->latest('assigned_at')
+            ->first();
+    }
 }
