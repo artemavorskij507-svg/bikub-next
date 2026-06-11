@@ -35,6 +35,7 @@ class User extends Authenticatable
     public function workerAvailability(): HasOne { return $this->hasOne(WorkerAvailability::class); }
     public function workerApplications() { return $this->hasMany(WorkerApplication::class); }
     public function workerDocuments() { return $this->hasMany(WorkerDocument::class); }
+    public function locationPings() { return $this->hasMany(WorkerLocationPing::class); }
     public function isEligibleWorker(): bool
     {
         return $this->workerProfile?->status === 'approved'

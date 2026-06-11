@@ -65,6 +65,14 @@ class OrderResource extends Resource
                 Textarea::make('dispatch_events')
                     ->formatStateUsing(fn ($state, $record) => $record ? json_encode($record->dispatchEvents()->get(['event_type', 'payload', 'note', 'created_at'])->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : 'No dispatch events.')
                     ->rows(10)->disabled()->dehydrated(false),
+                TextInput::make('location_ping_count')
+                    ->label('Real location pings')
+                    ->formatStateUsing(fn ($state, $record) => $record?->workerLocationPings()->count() ?? 0)
+                    ->disabled()->dehydrated(false),
+                TextInput::make('last_worker_progress')
+                    ->label('Latest worker progress')
+                    ->formatStateUsing(fn ($state, $record) => $record?->dispatchEvents()->where('event_type', 'like', 'worker.%')->first()?->event_type ?? 'No worker progress recorded')
+                    ->disabled()->dehydrated(false),
             ])->columns(2),
             Section::make('Read-only foundation')->description('Lifecycle events are recorded by the Order Engine. Status transitions, payments and dispatch are intentionally not editable here.'),
         ]);

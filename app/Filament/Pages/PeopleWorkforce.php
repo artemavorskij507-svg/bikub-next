@@ -51,6 +51,7 @@ class PeopleWorkforce extends AdminOsModulePage
                 'eligible' => app(\App\Services\Dispatch\DispatchEngine::class)->eligibleWorkers()->count(),
                 'pending_invitations' => \App\Models\WorkerAccountInvitation::where('status','pending')->count(),
                 'accepted_invitations' => \App\Models\WorkerAccountInvitation::where('status','accepted')->count(),
+                'location_pings' => \App\Models\WorkerLocationPing::count(),
             ];
         } catch (\Throwable) { return array_fill_keys(['users','profiles','approved','pending','online','blocked','applications','submitted','documents','eligible','pending_invitations','accepted_invitations'], 0); }
     }
