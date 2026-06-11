@@ -1,5 +1,6 @@
 @php
     $modules = $this->getAdminModules();
+    $proof = $this->getProof();
     $moduleRoutes = [
         'operations' => route('filament.admin.pages.operations-command-center'),
         'dispatch' => route('filament.admin.pages.dispatch-center'),
@@ -35,9 +36,9 @@
                     Production-grade local services operating system for Norway — Narvik first.
                 </p>
                 <div class="bkb-status-row" aria-label="Foundation status">
-                    <span class="bkb-status-badge bkb-status-badge--safe">Skeleton foundation</span>
-                    <span class="bkb-status-badge">No fake data</span>
-                    <span class="bkb-status-badge">Legacy not connected</span>
+                    <span class="bkb-status-badge bkb-status-badge--safe">Real module foundation</span>
+                    <span class="bkb-status-badge">Database-backed counts</span>
+                    <span class="bkb-status-badge">No fake actions</span>
                 </div>
             </div>
 
@@ -56,7 +57,7 @@
                 </div>
                 <div>
                     <span class="bkb-panel-label">Porting</span>
-                    <strong>Not started</strong>
+                    <strong>Controlled modules active</strong>
                 </div>
             </div>
         </section>
@@ -64,7 +65,7 @@
         <section class="bkb-foundation-strip" aria-label="Honest foundation constraints">
             <article>
                 <span>Reality</span>
-                <strong>No old BiKuBe data is connected.</strong>
+                <strong>Service, intake, order and pricing foundations are connected.</strong>
             </article>
             <article>
                 <span>Safety</span>
@@ -72,8 +73,23 @@
             </article>
             <article>
                 <span>Next</span>
-                <strong>Implement real domain modules one boundary at a time.</strong>
+                <strong>Dispatch, GPS and payment provider remain disconnected.</strong>
             </article>
+        </section>
+
+        <section class="bkb-section-heading"><div><p class="bkb-kicker">Implementation proof</p><h2>Real Admin OS module status</h2></div></section>
+        <section class="bkb-module-grid">
+            @foreach($proof as $area => $metrics)
+                <article class="bkb-module-card">
+                    <h3>{{ str($area)->title() }}</h3>
+                    <dl class="bkb-module-meta">@foreach($metrics as $label => $value)<div><dt>{{ str($label)->replace('_', ' ')->title() }}</dt><dd>{{ $value }}</dd></div>@endforeach</dl>
+                    @if($area === 'services')<a class="bkb-card-link" href="{{ route('filament.admin.pages.services-catalog') }}">Open Service Catalog</a>
+                    @elseif($area === 'orders' || $area === 'intake')<a class="bkb-card-link" href="{{ route('filament.admin.pages.orders-hub') }}">Open Orders Hub</a>
+                    @elseif($area === 'pricing')<a class="bkb-card-link" href="{{ route('filament.admin.pages.finance-control') }}">Open Finance Control</a>
+                    @else<a class="bkb-card-link" href="{{ route('filament.admin.pages.content-cms') }}">Open Content CMS</a>@endif
+                </article>
+            @endforeach
+            <article class="bkb-module-card"><h3>Provider readiness</h3><dl class="bkb-module-meta"><div><dt>Payment provider</dt><dd>Not connected</dd></div><div><dt>Capture / refund</dt><dd>Not available</dd></div><div><dt>Dispatch</dt><dd>Not connected</dd></div><div><dt>GPS tracking</dt><dd>Not connected</dd></div></dl></article>
         </section>
 
         <section class="bkb-section-heading" aria-labelledby="bkb-modules-title">

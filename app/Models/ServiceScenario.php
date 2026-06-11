@@ -38,6 +38,11 @@ class ServiceScenario extends Model
         return $this->hasMany(ServiceScenarioField::class, 'scenario_id')->orderBy('sort_order');
     }
 
+    public function pricingRules(): HasMany
+    {
+        return $this->hasMany(PricingRule::class, 'service_scenario_id');
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');

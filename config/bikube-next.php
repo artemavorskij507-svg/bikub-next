@@ -4,7 +4,7 @@ return [
     'admin_modules' => [
         'operations' => [
             'label' => 'Operations Command Center',
-            'status' => 'skeleton only',
+            'status' => 'readiness cockpit active',
             'purpose' => 'Owner/admin cockpit for health, launch gates, SLA, incidents, and operational readiness.',
             'owning_context' => 'Operations',
             'safe_actions' => ['Read module readiness once real projections exist.'],
@@ -13,7 +13,7 @@ return [
         ],
         'dispatch' => [
             'label' => 'Dispatch Center',
-            'status' => 'skeleton only',
+            'status' => 'not connected',
             'purpose' => 'Assignment, reassignment, SLA risk, and operational override with audit trail.',
             'owning_context' => 'Dispatch Engine',
             'safe_actions' => ['Read dispatch queue once Order and Worker modules exist.'],
@@ -22,7 +22,7 @@ return [
         ],
         'orders' => [
             'label' => 'Orders Hub',
-            'status' => 'skeleton only',
+            'status' => 'order and intake engines active',
             'purpose' => 'Central order operations for every service scenario and lifecycle event.',
             'owning_context' => 'Order Engine',
             'safe_actions' => ['No action yet.'],
@@ -31,7 +31,7 @@ return [
         ],
         'people' => [
             'label' => 'People & Workforce',
-            'status' => 'skeleton only',
+            'status' => 'RBAC foundation only',
             'purpose' => 'Users, customers, workers, partners, support and finance operator management.',
             'owning_context' => 'Identity & RBAC',
             'safe_actions' => ['Use Filament Shield after policy design.'],
@@ -40,7 +40,7 @@ return [
         ],
         'services' => [
             'label' => 'Service Catalog',
-            'status' => 'skeleton only',
+            'status' => 'scenario engine active',
             'purpose' => 'Service scenarios, form rules, launch visibility, pricing inputs and compliance boundaries.',
             'owning_context' => 'Service Scenario Engine',
             'safe_actions' => ['Read scenario registry once implemented.'],
@@ -49,7 +49,7 @@ return [
         ],
         'finance' => [
             'label' => 'Finance Control',
-            'status' => 'skeleton only',
+            'status' => 'pricing active; provider not connected',
             'purpose' => 'Payments, refunds, wallet ledger, payout batches, partner settlements, and invoices.',
             'owning_context' => 'Payment Engine + Wallet',
             'safe_actions' => ['Read manual/local status only once payment model exists.'],
@@ -58,7 +58,7 @@ return [
         ],
         'support' => [
             'label' => 'Support Center',
-            'status' => 'skeleton only',
+            'status' => 'not implemented',
             'purpose' => 'Customer, worker, partner and payment support tickets with order context and escalation.',
             'owning_context' => 'Support / Chat',
             'safe_actions' => ['No action yet.'],
@@ -67,7 +67,7 @@ return [
         ],
         'content' => [
             'label' => 'CMS & SEO',
-            'status' => 'skeleton only',
+            'status' => 'CMS foundation active',
             'purpose' => 'Landing pages, service pages, SEO metadata, translations, sitemap and legal content.',
             'owning_context' => 'CMS / SEO',
             'safe_actions' => ['Spatie sitemap is installed for later implementation.'],
@@ -76,7 +76,7 @@ return [
         ],
         'system' => [
             'label' => 'System & Security',
-            'status' => 'skeleton only',
+            'status' => 'operational tooling wired',
             'purpose' => 'Audit, feature flags, webhooks, API security, observability, backups and platform settings.',
             'owning_context' => 'Security / Audit / DevOps',
             'safe_actions' => ['Pennant, Pulse, Horizon, Telescope and Activitylog are installed for later wiring.'],

@@ -53,6 +53,11 @@ class OrderResource extends Resource
                         return $quote ? json_encode(['status' => $quote->status, 'currency' => $quote->currency, 'total' => $quote->total, 'breakdown' => $quote->breakdown], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : 'No quote generated.';
                     })->rows(10)->disabled()->dehydrated(false),
             ])->columns(2),
+            Section::make('Lifecycle events')->schema([
+                Textarea::make('lifecycle_events')
+                    ->formatStateUsing(fn ($state, $record) => $record ? json_encode($record->events()->get(['event_type', 'from_status', 'to_status', 'created_at'])->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : 'No lifecycle events.')
+                    ->rows(12)->disabled()->dehydrated(false),
+            ]),
             Section::make('Read-only foundation')->description('Lifecycle events are recorded by the Order Engine. Status transitions, payments and dispatch are intentionally not editable here.'),
         ]);
     }
@@ -62,10 +67,15 @@ class OrderResource extends Resource
         return $table->columns([
             TextColumn::make('order_number')->searchable()->copyable(),
             TextColumn::make('scenario.title')->label('Service')->searchable(),
+            TextColumn::make('service_scenario_key')->label('Scenario key')->toggleable(),
             TextColumn::make('customer_name')->searchable()->placeholder('Not provided'),
+            TextColumn::make('customer_email')->searchable()->toggleable(),
+            TextColumn::make('customer_phone')->searchable()->toggleable(),
             TextColumn::make('status')->badge(),
             TextColumn::make('payment_status')->badge(),
             TextColumn::make('estimated_total')->money('NOK')->placeholder('Manual review'),
+            TextColumn::make('priceQuotes.status')->label('Latest quote')->badge()->limitList(1),
+            TextColumn::make('events_count')->counts('events')->label('Events'),
             TextColumn::make('submitted_at')->dateTime()->sortable(),
         ])->filters([
             SelectFilter::make('status')->options(array_combine(array_map(fn($s) => $s->value, \App\Enums\OrderStatus::cases()), array_map(fn($s) => ucfirst(str_replace('_', ' ', $s->value)), \App\Enums\OrderStatus::cases()))),

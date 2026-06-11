@@ -35,6 +35,7 @@ class FinanceControl extends AdminOsModulePage
                 'quotes' => OrderPriceQuote::count(),
                 'manual_review' => OrderPriceQuote::where('status', 'manual_review_required')->count(),
                 'quoted_value' => OrderPriceQuote::where('status', 'estimated')->sum('total'),
+                'pending_payment_orders' => \App\Models\Order::where('payment_status', 'pending')->count(),
             ];
         } catch (Throwable) {
             return array_fill_keys(['rules', 'active_rules', 'quotes', 'manual_review', 'quoted_value'], null);

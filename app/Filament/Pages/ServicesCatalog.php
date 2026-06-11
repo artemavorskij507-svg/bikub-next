@@ -34,12 +34,18 @@ class ServicesCatalog extends AdminOsModulePage
     public function getScenarioModules(): array
     {
         try {
-            return ServiceScenario::with('category')->orderBy('sort_order')->get()->map(fn (ServiceScenario $scenario) => [
+            return ServiceScenario::with(['category', 'fields'])->withCount('fields')->orderBy('sort_order')->get()->map(fn (ServiceScenario $scenario) => [
                 'code' => $scenario->scenario_key,
                 'label' => $scenario->title,
                 'scope' => $scenario->category?->title ?? $scenario->service_type,
                 'status' => $scenario->status,
+                'fields' => (string) $scenario->fields_count,
+                'payment' => $scenario->requires_payment ? 'Required' : 'Not required',
+                'tracking' => $scenario->supports_live_tracking ? 'Supported by contract; not connected' : 'Not supported',
+                'pricing' => $scenario->pricingRules()->active()->exists() ? 'Rule configured' : 'No active rule',
+                'edit_url' => ServiceScenarioResource::getUrl('edit', ['record' => $scenario]),
                 'url' => route('public.cms.service-page', ['serviceSlug' => $scenario->slug]),
+                'request_url' => route('public.orders.request', ['serviceSlug' => $scenario->slug]),
             ])->all();
         } catch (Throwable) {
             return [];

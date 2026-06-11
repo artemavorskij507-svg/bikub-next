@@ -38,8 +38,12 @@
                         <p>{{ $service['scope'] }}</p>
                         <dl>
                             <div><dt>Status</dt><dd>{{ $service['status'] }}</dd></div>
-                            <div><dt>Public definition</dt><dd><a href="{{ $service['url'] }}">Open</a></dd></div>
+                            <div><dt>Configured fields</dt><dd>{{ $service['fields'] }}</dd></div>
+                            <div><dt>Payment contract</dt><dd>{{ $service['payment'] }}</dd></div>
+                            <div><dt>Tracking</dt><dd>{{ $service['tracking'] }}</dd></div>
+                            <div><dt>Pricing readiness</dt><dd>{{ $service['pricing'] }}</dd></div>
                         </dl>
+                        <p><a href="{{ $service['edit_url'] }}">Edit scenario</a> · <a href="{{ $service['url'] }}">Public page</a> · <a href="{{ $service['request_url'] }}">Request form</a></p>
                     </article>
                 @endforeach
             </div>

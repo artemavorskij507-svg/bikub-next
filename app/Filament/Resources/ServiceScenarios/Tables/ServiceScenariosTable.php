@@ -23,7 +23,9 @@ class ServiceScenariosTable
                     'active' => 'success', 'paused' => 'warning', 'archived' => 'gray', default => 'info',
                 }),
                 TextColumn::make('service_type')->badge()->sortable(),
+                TextColumn::make('fields_count')->counts('fields')->label('Fields')->sortable(),
                 TextColumn::make('base_price')->money(fn ($record) => $record->currency)->placeholder('Not configured'),
+                IconColumn::make('requires_payment')->boolean()->label('Payment'),
                 IconColumn::make('supports_live_tracking')->boolean()->label('Tracking'),
             ])
             ->filters([
