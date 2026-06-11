@@ -23,6 +23,10 @@ class Order extends Model
     public function events(): HasMany { return $this->hasMany(OrderEvent::class)->orderByDesc('created_at'); }
     public function priceQuotes(): HasMany { return $this->hasMany(OrderPriceQuote::class)->orderByDesc('created_at'); }
     public function latestPriceQuote(): ?OrderPriceQuote { return $this->priceQuotes()->first(); }
+    public function dispatchAssignments(): HasMany { return $this->hasMany(DispatchAssignment::class)->orderByDesc('created_at'); }
+    public function activeDispatchAssignment(): ?DispatchAssignment { return $this->dispatchAssignments()->whereIn('status', ['assigned', 'accepted'])->first(); }
+    public function dispatchEvents(): HasMany { return $this->hasMany(DispatchEvent::class)->orderByDesc('created_at'); }
+    public function isDispatchReady(): bool { return $this->dispatchEvents()->where('event_type', 'dispatch.ready')->exists(); }
     public function scopeWithStatus(Builder $query, OrderStatus|string $status): Builder { return $query->where('status', $status instanceof OrderStatus ? $status->value : $status); }
     public function canTransitionTo(OrderStatus $status): bool { return $this->status->canTransitionTo($status); }
 }

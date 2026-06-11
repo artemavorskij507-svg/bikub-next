@@ -1,3 +1,12 @@
+@php($data = $this->getDispatchData())
 <x-filament-panels::page>
-    {{-- Page content --}}
+<main class="bkb-admin-shell">
+    <section class="bkb-module-hero bkb-surface"><div><p class="bkb-kicker">BiKuBe Next / Dispatch</p><h1>Dispatch Center</h1><p class="bkb-hero__subtitle">Real unassigned order queue and assignment audit trail. No GPS, maps or fake workers.</p></div><aside class="bkb-module-status"><span>Worker availability</span><strong>{{ $data['eligible_workers']->isEmpty() ? 'No eligible workers configured' : $data['eligible_workers']->count().' eligible workers' }}</strong><p>Worker availability domain is not implemented yet.</p></aside></section>
+    <section class="bkb-ops-runtime"><div class="bkb-section-heading"><div><p class="bkb-kicker">Operational queue</p><h2>Unassigned submitted orders</h2></div></div><div class="bkb-service-grid">
+        @forelse($data['unassigned'] as $order)<article class="bkb-service-card"><span>{{ $order['number'] }}</span><h3>{{ $order['scenario'] }}</h3><p>{{ $order['contact'] ?: 'Contact not provided' }}</p><dl><div><dt>Submitted</dt><dd>{{ $order['submitted_at'] }}</dd></div><div><dt>Estimate / quote</dt><dd>{{ $order['estimated'] ? number_format((float)$order['estimated'], 2).' NOK' : 'Manual review' }} / {{ $order['quote'] }}</dd></div><div><dt>Payment</dt><dd>{{ $order['payment'] }} · provider not connected</dd></div><div><dt>Dispatch readiness</dt><dd>{{ $order['ready'] ? 'Ready' : 'Not marked ready' }}</dd></div><div><dt>Latest event</dt><dd>{{ $order['latest_event'] }}</dd></div></dl><p><a href="{{ $order['url'] }}">Open order</a>@if(!$order['ready']) · <button class="bkb-card-link" type="button" wire:click="markReady({{ $order['id'] }})">Mark ready</button>@endif</p></article>@empty<p>No unassigned dispatchable orders.</p>@endforelse
+    </div></section>
+    <section class="bkb-os-card"><h2>Assigned orders</h2>@forelse($data['assigned'] as $assignment)<p>{{ $assignment->order->order_number }} · {{ $assignment->assignedUser?->name ?? 'User unavailable' }} · {{ $assignment->status }}</p>@empty<p>No active assignments.</p>@endforelse</section>
+    <section class="bkb-os-card"><h2>Dispatch audit trail</h2>@forelse($data['events'] as $event)<p>{{ $event->created_at?->format('Y-m-d H:i') }} · {{ $event->event_type }} · order #{{ $event->order_id }}{{ $event->note ? ' · '.$event->note : '' }}</p>@empty<p>No dispatch events yet.</p>@endforelse</section>
+    <section class="bkb-honesty-panel"><div><span>Blocked honestly</span><strong>Assignment · GPS · map · route optimization</strong></div><p>{{ $data['eligible_workers']->isEmpty() ? 'No eligible workers available. ' : '' }}Worker presence and GPS domains are not implemented.</p></section>
+</main>
 </x-filament-panels::page>

@@ -58,6 +58,14 @@ class OrderResource extends Resource
                     ->formatStateUsing(fn ($state, $record) => $record ? json_encode($record->events()->get(['event_type', 'from_status', 'to_status', 'created_at'])->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : 'No lifecycle events.')
                     ->rows(12)->disabled()->dehydrated(false),
             ]),
+            Section::make('Dispatch')->description('Audit-backed dispatch state. Worker availability and GPS are not implemented.')->schema([
+                TextInput::make('dispatch_assignment')
+                    ->formatStateUsing(fn ($state, $record) => $record?->activeDispatchAssignment()?->assignedUser?->name ?? 'Not assigned')
+                    ->disabled()->dehydrated(false),
+                Textarea::make('dispatch_events')
+                    ->formatStateUsing(fn ($state, $record) => $record ? json_encode($record->dispatchEvents()->get(['event_type', 'payload', 'note', 'created_at'])->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : 'No dispatch events.')
+                    ->rows(10)->disabled()->dehydrated(false),
+            ])->columns(2),
             Section::make('Read-only foundation')->description('Lifecycle events are recorded by the Order Engine. Status transitions, payments and dispatch are intentionally not editable here.'),
         ]);
     }
@@ -76,6 +84,7 @@ class OrderResource extends Resource
             TextColumn::make('estimated_total')->money('NOK')->placeholder('Manual review'),
             TextColumn::make('priceQuotes.status')->label('Latest quote')->badge()->limitList(1),
             TextColumn::make('events_count')->counts('events')->label('Events'),
+            TextColumn::make('dispatch_events_count')->counts('dispatchEvents')->label('Dispatch events'),
             TextColumn::make('submitted_at')->dateTime()->sortable(),
         ])->filters([
             SelectFilter::make('status')->options(array_combine(array_map(fn($s) => $s->value, \App\Enums\OrderStatus::cases()), array_map(fn($s) => ucfirst(str_replace('_', ' ', $s->value)), \App\Enums\OrderStatus::cases()))),

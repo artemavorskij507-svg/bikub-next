@@ -98,14 +98,15 @@ class OperationsCommandCenter extends AdminOsModulePage
             ],
             [
                 'name' => 'Order and dispatch wiring',
-                'state' => 'Order Engine works; dispatch blocked',
-                'status' => 'review',
+                'state' => 'Dispatch foundation active',
+                'status' => 'ready',
                 'evidence' => [
                     'Order request model, lifecycle events and Orders resource exist.',
                     'Public request form creates submitted requests from active scenarios.',
-                    'Payment, worker assignment and dispatch remain intentionally disconnected.',
+                    'Unassigned queue, dispatch-ready state and assignment audit trail exist.',
+                    'Worker assignment remains blocked because no eligible worker role/domain exists.',
                 ],
-                'next' => 'Implement customer identity boundary and audited Dispatch queues.',
+                'next' => 'Implement worker eligibility and presence before enabling assignment.',
             ],
             [
                 'name' => 'GPS, maps and live operations',
