@@ -20,8 +20,14 @@ class WorkerLocationService
         if ($latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
             throw ValidationException::withMessages(['location' => 'Coordinates are outside valid geographic bounds.']);
         }
+        if ($latitude === 0.0 && $longitude === 0.0) {
+            throw ValidationException::withMessages(['location' => 'Empty 0,0 coordinates are not accepted as a real location.']);
+        }
         if ($accuracy === null || $accuracy <= 0 || $accuracy > self::MAX_ACCURACY_METERS) {
             throw ValidationException::withMessages(['accuracy_meters' => 'Location accuracy is too low. Enable precise location and try again.']);
+        }
+        if (! in_array($user->workerAvailability?->status, ['online', 'available'], true)) {
+            throw ValidationException::withMessages(['presence' => 'Go online before sharing location.']);
         }
         $assignment = $order?->activeDispatchAssignment();
         if ($order && $assignment?->assigned_user_id !== $user->id) {

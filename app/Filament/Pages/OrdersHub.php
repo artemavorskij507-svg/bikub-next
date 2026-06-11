@@ -32,7 +32,7 @@ class OrdersHub extends AdminOsModulePage
     public function getLatestOrders(): array
     {
         if (! Schema::hasTable('orders')) return [];
-        return Order::with(['scenario', 'priceQuotes', 'dispatchEvents'])->withCount('events')->latest()->limit(8)->get()->map(fn (Order $order) => [
+        return Order::with(['scenario', 'priceQuotes', 'dispatchEvents', 'dispatchAssignments.assignedUser'])->withCount(['events', 'workerLocationPings'])->latest()->limit(8)->get()->map(fn (Order $order) => [
             'number' => $order->order_number, 'scenario' => $order->scenario?->title ?? $order->service_scenario_key,
             'contact' => implode(' · ', array_filter([$order->customer_name, $order->customer_email, $order->customer_phone])),
             'status' => $order->status->value, 'payment' => $order->payment_status->value,
@@ -40,6 +40,8 @@ class OrdersHub extends AdminOsModulePage
             'quote_total' => $order->latestPriceQuote()?->total, 'events' => $order->events_count,
             'dispatch' => $order->activeDispatchAssignment() ? 'Assigned' : ($order->isDispatchReady() ? 'Ready' : 'Unassigned'),
             'dispatch_event' => $order->dispatchEvents->first()?->event_type ?? 'No dispatch event',
+            'worker_progress' => $order->dispatchEvents->first(fn ($event) => str_starts_with($event->event_type, 'worker.'))?->event_type ?? 'No worker progress',
+            'location_pings' => $order->worker_location_pings_count,
             'url' => \App\Filament\Resources\Orders\OrderResource::getUrl('edit', ['record' => $order]),
         ])->all();
     }

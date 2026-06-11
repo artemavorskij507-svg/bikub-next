@@ -58,7 +58,7 @@ class OrderResource extends Resource
                     ->formatStateUsing(fn ($state, $record) => $record ? json_encode($record->events()->get(['event_type', 'from_status', 'to_status', 'created_at'])->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : 'No lifecycle events.')
                     ->rows(12)->disabled()->dehydrated(false),
             ]),
-            Section::make('Dispatch')->description('Audit-backed dispatch state. Worker availability and GPS are not implemented.')->schema([
+            Section::make('Dispatch')->description('Audit-backed dispatch state. Real browser location pings are counted; no customer tracking or map is exposed.')->schema([
                 TextInput::make('dispatch_assignment')
                     ->formatStateUsing(fn ($state, $record) => $record?->activeDispatchAssignment()?->assignedUser?->name ?? 'Not assigned')
                     ->disabled()->dehydrated(false),

@@ -52,7 +52,8 @@ class PeopleWorkforce extends AdminOsModulePage
                 'pending_invitations' => \App\Models\WorkerAccountInvitation::where('status','pending')->count(),
                 'accepted_invitations' => \App\Models\WorkerAccountInvitation::where('status','accepted')->count(),
                 'location_pings' => \App\Models\WorkerLocationPing::count(),
+                'last_seen' => \App\Models\WorkerAvailability::whereNotNull('last_seen_at')->latest('last_seen_at')->value('last_seen_at')?->format('Y-m-d H:i') ?? 'Never',
             ];
-        } catch (\Throwable) { return array_fill_keys(['users','profiles','approved','pending','online','blocked','applications','submitted','documents','eligible','pending_invitations','accepted_invitations'], 0); }
+        } catch (\Throwable) { return array_merge(array_fill_keys(['users','profiles','approved','pending','online','blocked','applications','submitted','documents','eligible','pending_invitations','accepted_invitations','location_pings'], 0), ['last_seen' => 'Unavailable']); }
     }
 }

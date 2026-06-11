@@ -59,7 +59,7 @@ class DispatchCenter extends AdminOsModulePage
         try {
             return [
                 'unassigned' => $engine->listUnassignedOrders()->map($map)->all(),
-                'assigned' => DispatchAssignment::with(['order.scenario', 'assignedUser'])->whereIn('status', ['assigned', 'accepted'])->latest()->get(),
+                'assigned' => DispatchAssignment::with(['order.scenario', 'order.dispatchEvents', 'assignedUser.workerAvailability'])->whereIn('status', ['assigned', 'accepted'])->latest()->get(),
                 'eligible_workers' => $engine->eligibleWorkers(),
                 'events' => \App\Models\DispatchEvent::latest()->limit(12)->get(),
             ];

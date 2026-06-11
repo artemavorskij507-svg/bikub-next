@@ -27,7 +27,12 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
     Route::get('/dashboard', [WorkerCockpitController::class, 'dashboard'])->name('dashboard');
     Route::get('/orders', [WorkerCockpitController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [WorkerCockpitController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{order}/{action}', [WorkerCockpitController::class, 'action'])->whereIn('action', ['accept', 'start', 'arrived-pickup', 'picked-up', 'arrived-dropoff', 'complete'])->name('orders.action');
+    Route::post('/orders/{order}/accept', [WorkerCockpitController::class, 'accept'])->name('orders.accept');
+    Route::post('/orders/{order}/start', [WorkerCockpitController::class, 'start'])->name('orders.start');
+    Route::post('/orders/{order}/arrived-pickup', [WorkerCockpitController::class, 'arrivedPickup'])->name('orders.arrived-pickup');
+    Route::post('/orders/{order}/picked-up', [WorkerCockpitController::class, 'pickedUp'])->name('orders.picked-up');
+    Route::post('/orders/{order}/arrived-dropoff', [WorkerCockpitController::class, 'arrivedDropoff'])->name('orders.arrived-dropoff');
+    Route::post('/orders/{order}/complete', [WorkerCockpitController::class, 'complete'])->name('orders.complete');
     Route::post('/presence/online', [WorkerCockpitController::class, 'online'])->name('presence.online');
     Route::post('/presence/offline', [WorkerCockpitController::class, 'offline'])->name('presence.offline');
     Route::post('/location-pings', [WorkerCockpitController::class, 'location'])->name('location-pings.store');

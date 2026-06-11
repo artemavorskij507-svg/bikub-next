@@ -21,7 +21,7 @@ class WorkerAvailabilityService
         if (! $profile) throw ValidationException::withMessages(['worker' => 'Worker profile is required.']);
         $availability = WorkerAvailability::firstOrNew(['user_id' => $user->id]);
         $from = $availability->exists ? $availability->status : null;
-        $availability->fill(['worker_profile_id'=>$profile->id,'status'=>$status,'source'=>'admin','last_seen_at'=>now(),'notes'=>$note])->save();
+        $availability->fill(['worker_profile_id'=>$profile->id,'status'=>$status,'source'=>auth()->id()===$user->id?'worker':'admin','last_seen_at'=>now(),'notes'=>$note])->save();
         $this->recordStatusEvent($user, 'worker.availability.changed', $from, $status, $note);
         return $availability;
     }
