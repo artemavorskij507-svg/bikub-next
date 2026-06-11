@@ -10,10 +10,11 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 class WorkerApplicationResource extends Resource {
  protected static ?string $model=WorkerApplication::class; protected static string|BackedEnum|null $navigationIcon=Heroicon::OutlinedClipboardDocumentCheck; protected static string|\UnitEnum|null $navigationGroup='People';
  public static function form(Schema $s):Schema{return $s->components([Section::make('Application review')->columns(2)->schema([TextInput::make('name')->disabled(),TextInput::make('email')->disabled(),TextInput::make('phone')->disabled(),TextInput::make('desired_service_area')->disabled(),TextInput::make('vehicle_type')->disabled(),Select::make('status')->options(['submitted'=>'Submitted','needs_user_account'=>'Needs user account','approved'=>'Approved','rejected'=>'Rejected'])->disabled(),Textarea::make('experience_notes')->disabled(),Textarea::make('decision_reason')->disabled()])]);}
- public static function table(Table $t):Table{return $t->columns([TextColumn::make('name')->searchable(),TextColumn::make('email')->searchable(),TextColumn::make('worker_type')->badge(),TextColumn::make('status')->badge(),TextColumn::make('user.email')->label('Linked user')->placeholder('No matching user'),TextColumn::make('submitted_at')->dateTime()])->recordActions([EditAction::make()]);}
+ public static function table(Table $t):Table{return $t->columns([TextColumn::make('name')->searchable(),TextColumn::make('email')->searchable(),TextColumn::make('worker_type')->badge()->formatStateUsing(fn($s)=>str($s)->replace('_',' ')->title()),TextColumn::make('status')->badge()->formatStateUsing(fn($s)=>str($s)->replace('_',' ')->title()),TextColumn::make('user.email')->label('Linked user')->placeholder('No matching user'),TextColumn::make('submitted_at')->dateTime()])->filters([SelectFilter::make('status')->options(['submitted'=>'Submitted','needs_user_account'=>'Needs user account','approved'=>'Approved','rejected'=>'Rejected'])])->recordActions([EditAction::make()]);}
  public static function getPages():array{return ['index'=>ListWorkerApplications::route('/'),'edit'=>EditWorkerApplication::route('/{record}/edit')];}
 }

@@ -43,4 +43,9 @@ class FinanceControl extends AdminOsModulePage
     }
 
     public function getPricingRulesUrl(): string { return PricingRuleResource::getUrl(); }
+    public function getQuoteQueue(): array
+    {
+        try { return OrderPriceQuote::with('order')->latest()->limit(10)->get()->map(fn($q)=>['number'=>$q->quote_number,'order'=>$q->order?->order_number,'status'=>str($q->status)->replace('_',' ')->title(),'total'=>number_format((float)$q->total,2).' '.$q->currency,'url'=>$q->order?\App\Filament\Resources\Orders\OrderResource::getUrl('edit',['record'=>$q->order]):null])->all(); }
+        catch(Throwable){ return []; }
+    }
 }

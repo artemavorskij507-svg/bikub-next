@@ -79,8 +79,8 @@ class OrderResource extends Resource
             TextColumn::make('customer_name')->searchable()->placeholder('Not provided'),
             TextColumn::make('customer_email')->searchable()->toggleable(),
             TextColumn::make('customer_phone')->searchable()->toggleable(),
-            TextColumn::make('status')->badge(),
-            TextColumn::make('payment_status')->badge(),
+            TextColumn::make('status')->badge()->formatStateUsing(fn ($state) => str($state instanceof \BackedEnum ? $state->value : $state)->replace('_', ' ')->title()),
+            TextColumn::make('payment_status')->badge()->formatStateUsing(fn ($state) => str($state instanceof \BackedEnum ? $state->value : $state)->replace('_', ' ')->title()),
             TextColumn::make('estimated_total')->money('NOK')->placeholder('Manual review'),
             TextColumn::make('priceQuotes.status')->label('Latest quote')->badge()->limitList(1),
             TextColumn::make('events_count')->counts('events')->label('Events'),
@@ -88,6 +88,7 @@ class OrderResource extends Resource
             TextColumn::make('submitted_at')->dateTime()->sortable(),
         ])->filters([
             SelectFilter::make('status')->options(array_combine(array_map(fn($s) => $s->value, \App\Enums\OrderStatus::cases()), array_map(fn($s) => ucfirst(str_replace('_', ' ', $s->value)), \App\Enums\OrderStatus::cases()))),
+            SelectFilter::make('payment_status')->options(['not_required'=>'Not required','pending'=>'Pending']),
         ])->recordActions([EditAction::make()]);
     }
 
