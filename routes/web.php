@@ -4,6 +4,7 @@ use App\Http\Controllers\PublicCmsController;
 use App\Http\Controllers\PublicOrderRequestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PublicWorkerApplicationController;
+use App\Http\Controllers\PublicWorkerInvitationController;
 
 Route::get('/', function () {
     return view('public.home');
@@ -17,3 +18,6 @@ Route::get('/order-requests/{orderNumber}/received', [PublicOrderRequestControll
 Route::get('/become-worker', [PublicWorkerApplicationController::class, 'create'])->name('public.workers.apply');
 Route::post('/become-worker', [PublicWorkerApplicationController::class, 'store'])->name('public.workers.store');
 Route::get('/become-worker/received', [PublicWorkerApplicationController::class, 'received'])->name('public.workers.received');
+Route::get('/worker-invitations/received', [PublicWorkerInvitationController::class, 'received'])->name('public.worker-invitations.received');
+Route::get('/worker-invitations/{token}', [PublicWorkerInvitationController::class, 'show'])->name('public.worker-invitations.show');
+Route::post('/worker-invitations/{token}', [PublicWorkerInvitationController::class, 'store'])->name('public.worker-invitations.store');

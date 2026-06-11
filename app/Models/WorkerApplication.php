@@ -6,4 +6,5 @@ class WorkerApplication extends Model {
  protected function casts(): array{return ['capabilities'=>'array','metadata'=>'array','submitted_at'=>'datetime','reviewed_at'=>'datetime'];}
  public function user(){return $this->belongsTo(User::class);} public function reviewer(){return $this->belongsTo(User::class,'reviewed_by_user_id');}
  public function documents(){return $this->hasMany(WorkerDocument::class);} public function events(){return $this->hasMany(WorkerApplicationEvent::class);}
+ public function invitations(){return $this->hasMany(WorkerAccountInvitation::class);}
 }
