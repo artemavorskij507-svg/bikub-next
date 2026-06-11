@@ -16,8 +16,8 @@
             </div>
             <aside class="bkb-module-status">
                 <span>Current state</span>
-                <strong>Scenario Engine operational</strong>
-                <p>Checkout Engine and Order Engine remain intentionally unavailable.</p>
+                <strong>Scenario intake operational</strong>
+                <p>Validated public intake creates real submitted orders. Payment and dispatch remain unavailable.</p>
             </aside>
         </section>
 
@@ -44,6 +44,6 @@
                 @endforeach
             </div>
         </section>
-        <section class="bkb-honesty-panel"><div><span>Unavailable</span><strong>Checkout Engine · Order Engine</strong></div><p>No order or checkout actions are exposed until those domain modules exist.</p></section>
+        <section class="bkb-honesty-panel"><div><span>Works</span><strong>Scenario fields · Order intake</strong></div><p>Public forms use active field definitions. Payment, dispatch and worker assignment are not connected.</p></section>
     </main>
 </x-filament-panels::page>

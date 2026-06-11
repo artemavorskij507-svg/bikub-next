@@ -9,6 +9,7 @@ use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -28,10 +29,23 @@ class OrderResource extends Resource
     {
         return $schema->components([
             Section::make('Order request')->schema([
+                TextInput::make('order_number')->disabled()->dehydrated(false),
+                TextInput::make('service_scenario_key')->label('Scenario')->disabled()->dehydrated(false),
+                TextInput::make('customer_name')->disabled()->dehydrated(false),
+                TextInput::make('customer_email')->disabled()->dehydrated(false),
+                TextInput::make('customer_phone')->disabled()->dehydrated(false),
                 DateTimePicker::make('scheduled_at')->seconds(false),
                 Textarea::make('internal_notes')->rows(5),
             ])->columns(2),
-            Section::make('Read-only foundation')->description('Status transitions, payments and dispatch are intentionally not editable here.'),
+            Section::make('Submitted intake')->description('Validated scenario intake captured with the order.')->schema([
+                Textarea::make('metadata.intake')
+                    ->label('Intake payload')
+                    ->formatStateUsing(fn ($state) => json_encode($state ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))
+                    ->rows(12)
+                    ->disabled()
+                    ->dehydrated(false),
+            ]),
+            Section::make('Read-only foundation')->description('Lifecycle events are recorded by the Order Engine. Status transitions, payments and dispatch are intentionally not editable here.'),
         ]);
     }
 

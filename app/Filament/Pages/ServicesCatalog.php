@@ -53,9 +53,11 @@ class ServicesCatalog extends AdminOsModulePage
                 'categories' => ServiceCategory::count(), 'active' => ServiceScenario::active()->count(),
                 'draft' => ServiceScenario::where('status', 'draft')->count(), 'paused' => ServiceScenario::where('status', 'paused')->count(),
                 'archived' => ServiceScenario::where('status', 'archived')->count(), 'fields' => ServiceScenarioField::count(),
+                'configured' => ServiceScenario::whereHas('fields', fn ($query) => $query->active())->count(),
+                'missing_fields' => ServiceScenario::active()->whereDoesntHave('fields', fn ($query) => $query->active())->count(),
             ];
         } catch (Throwable) {
-            return array_fill_keys(['categories', 'active', 'draft', 'paused', 'archived', 'fields'], null);
+            return array_fill_keys(['categories', 'active', 'draft', 'paused', 'archived', 'fields', 'configured', 'missing_fields'], null);
         }
     }
 
