@@ -19,7 +19,7 @@ class SupportCenter extends Page
 
     protected static ?string $title = 'Support Center';
 
-    protected static ?string $slug = 'support';
+    protected static ?string $slug = 'support-center';
 
     protected string $view = 'filament.pages.support-center';
 

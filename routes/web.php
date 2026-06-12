@@ -67,5 +67,6 @@ Route::get('/admin/worker-documents/{workerDocument}/download', AdminWorkerDocum
 Route::get('/admin/support-activity', AdminSupportActivityController::class)
     ->middleware('auth')
     ->name('admin.support.activity');
+Route::redirect('/admin/support', '/admin/support-center')->middleware('auth')->name('admin.support.redirect');
 Route::get('/admin/support-attachments/{media}/download', AdminSupportAttachmentDownloadController::class)
     ->middleware('auth')->whereNumber('media')->name('admin.support.attachments.download');
