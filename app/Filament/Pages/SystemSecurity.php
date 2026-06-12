@@ -56,6 +56,7 @@ class SystemSecurity extends AdminOsModulePage
             $this->status('Environment indicator', $this->packageVersion('pxlrbt/filament-environment-indicator'), 'Package assets are present; panel plugin wiring can be refined in a later shell pass.', $this->packageInstalled('pxlrbt/filament-environment-indicator') ? 'installed' : 'blocked'),
             $this->status('Typed settings', $this->packageVersion('spatie/laravel-settings'), 'Platform, operations and map settings are persisted and exposed through permission-protected pages.', $this->tableExists('settings') ? 'configured' : 'blocked', route('filament.admin.pages.platform-settings')),
             $this->status('Media Library', $this->packageVersion('spatie/laravel-medialibrary'), 'Private worker-document uploads and optional CMS hero uploads are wired. Upload never auto-approves a document.', $this->tableExists('media') ? 'configured' : 'blocked', route('filament.admin.resources.worker-documents.index')),
+            $this->status('Private worker documents', $this->routeAvailable('admin.worker-documents.download') ? 'ACTIVE' : 'NEEDS SETUP', 'Private local storage and role-authorized audited download route. Retention dates are operator-managed.', $this->routeAvailable('admin.worker-documents.download') ? 'configured' : 'blocked', route('filament.admin.resources.worker-documents.index')),
         ];
     }
 

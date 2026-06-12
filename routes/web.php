@@ -7,6 +7,7 @@ use App\Http\Controllers\PublicWorkerApplicationController;
 use App\Http\Controllers\PublicWorkerInvitationController;
 use App\Http\Controllers\WorkerCockpitController;
 use App\Http\Controllers\AdminLiveOperationsMapDataController;
+use App\Http\Controllers\AdminWorkerDocumentDownloadController;
 
 Route::pattern('order', '[0-9]+');
 
@@ -44,3 +45,6 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
 Route::get('/admin/live-operations-map/data', AdminLiveOperationsMapDataController::class)
     ->middleware(['auth', 'admin.operator'])
     ->name('admin.live-operations-map.data');
+
+Route::get('/admin/worker-documents/{workerDocument}/download', AdminWorkerDocumentDownloadController::class)
+    ->middleware('auth')->whereNumber('workerDocument')->name('admin.worker-documents.download');

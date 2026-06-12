@@ -48,12 +48,17 @@ class PeopleWorkforce extends AdminOsModulePage
                 'applications' => \App\Models\WorkerApplication::count(),
                 'submitted' => \App\Models\WorkerApplication::where('status','submitted')->count(),
                 'documents' => \App\Models\WorkerDocument::where('status','pending')->count(),
+                'documents_missing' => \App\Models\WorkerDocument::where('compliance_status','missing_evidence')->count(),
+                'documents_ready' => \App\Models\WorkerDocument::whereIn('compliance_status',['evidence_uploaded','manually_verified'])->count(),
+                'documents_approved' => \App\Models\WorkerDocument::where('compliance_status','approved')->count(),
+                'documents_expired' => \App\Models\WorkerDocument::where('compliance_status','expired')->count(),
+                'documents_rejected' => \App\Models\WorkerDocument::where('compliance_status','rejected')->count(),
                 'eligible' => app(\App\Services\Dispatch\DispatchEngine::class)->eligibleWorkers()->count(),
                 'pending_invitations' => \App\Models\WorkerAccountInvitation::where('status','pending')->count(),
                 'accepted_invitations' => \App\Models\WorkerAccountInvitation::where('status','accepted')->count(),
                 'location_pings' => \App\Models\WorkerLocationPing::count(),
                 'last_seen' => \App\Models\WorkerAvailability::whereNotNull('last_seen_at')->latest('last_seen_at')->value('last_seen_at')?->format('Y-m-d H:i') ?? 'Never',
             ];
-        } catch (\Throwable) { return array_merge(array_fill_keys(['users','profiles','approved','pending','online','blocked','applications','submitted','documents','eligible','pending_invitations','accepted_invitations','location_pings'], 0), ['last_seen' => 'Unavailable']); }
+        } catch (\Throwable) { return array_merge(array_fill_keys(['users','profiles','approved','pending','online','blocked','applications','submitted','documents','documents_missing','documents_ready','documents_approved','documents_expired','documents_rejected','eligible','pending_invitations','accepted_invitations','location_pings'], 0), ['last_seen' => 'Unavailable']); }
     }
 }

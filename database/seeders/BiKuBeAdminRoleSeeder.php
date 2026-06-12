@@ -19,8 +19,8 @@ class BiKuBeAdminRoleSeeder extends Seeder
         'finance' => ['admin.dashboard.view', 'admin.orders.view', 'admin.finance.view', 'admin.finance.manage'],
         'support' => ['admin.dashboard.view', 'admin.orders.view', 'admin.support.view', 'admin.support.manage'],
         'content_manager' => ['admin.dashboard.view', 'admin.content.view', 'admin.content.manage'],
-        'workforce_manager' => ['admin.dashboard.view', 'admin.people.view', 'admin.people.manage'],
-        'security_manager' => ['admin.dashboard.view', 'admin.system.view', 'admin.system.manage', 'admin.audit.view'],
+        'workforce_manager' => ['admin.dashboard.view', 'admin.people.view', 'admin.people.manage', 'admin.people.documents.download'],
+        'security_manager' => ['admin.dashboard.view', 'admin.system.view', 'admin.system.manage', 'admin.audit.view', 'admin.people.documents.download'],
         'worker' => ['worker.cockpit.view', 'worker.orders.manage', 'worker.location.ping'],
     ];
 
@@ -31,7 +31,7 @@ class BiKuBeAdminRoleSeeder extends Seeder
         'admin.people.view', 'admin.people.manage', 'admin.content.view',
         'admin.content.manage', 'admin.support.view', 'admin.support.manage',
         'admin.system.view', 'admin.system.manage', 'admin.audit.view',
-        'worker.cockpit.view', 'worker.orders.manage', 'worker.location.ping',
+        'worker.cockpit.view', 'worker.orders.manage', 'worker.location.ping', 'admin.people.documents.download',
     ];
 
     public function run(): void
