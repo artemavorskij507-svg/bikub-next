@@ -5,6 +5,8 @@ namespace App\Filament\Pages;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Models\DispatchAssignment;
 use App\Models\Order;
+use App\Models\SupportTicket;
+use App\Filament\Resources\SupportTickets\SupportTicketResource;
 use App\Models\WorkerLocationPing;
 use App\Services\Dispatch\DispatchEngine;
 use Filament\Notifications\Notification;
@@ -44,8 +46,23 @@ class DispatchCenter extends AdminOsModulePage
         catch (ValidationException $e) { Notification::make()->title(collect($e->errors())->flatten()->first())->warning()->send(); }
     }
 
-    public function getDispatchData(): array
+    public function createSupportTicket(int $orderId): void
     {
+        $order = Order::findOrFail($orderId);
+        if (SupportTicket::where('order_id', $order->id)->whereNotIn('status', ['resolved', 'closed'])->exists()) {
+            Notification::make()->title('An open support ticket already exists for this order')->warning()->send();
+            return;
+        }
+        $assignment = $order->activeDispatchAssignment();
+        app(\App\Services\Support\SupportTicketService::class)->createTicket([
+            'subject' => 'Dispatch issue: '.$order->order_number, 'category' => 'delivery_issue', 'priority' => 'normal',
+            'source' => 'admin', 'visibility' => 'internal', 'order_id' => $order->id,
+            'dispatch_assignment_id' => $assignment?->id, 'worker_profile_id' => $assignment?->assignedUser?->workerProfile?->id,
+        ], auth()->user());
+        Notification::make()->title('Support ticket created')->success()->send();
+    }
+
+    public function getDispatchData(): array    {
         $engine = app(DispatchEngine::class);
         $map = fn (Order $order) => [
             'id' => $order->id, 'number' => $order->order_number, 'scenario' => $order->scenario?->title ?? $order->service_scenario_key,
@@ -55,6 +72,9 @@ class DispatchCenter extends AdminOsModulePage
             'ready' => $order->isDispatchReady(), 'latest_event' => $order->dispatchEvents->first()?->event_type ?? 'No dispatch event',
             'url' => OrderResource::getUrl('edit', ['record' => $order]),
             'eligible' => app(\App\Services\Workers\WorkerEligibilityService::class)->eligibleForOrder($order),
+            'support_open' => SupportTicket::where('order_id',$order->id)->whereNotIn('status',['resolved','closed'])->count(),
+            'support_urgent' => SupportTicket::where('order_id',$order->id)->whereNotIn('status',['resolved','closed'])->where(fn($q)=>$q->where('priority','urgent')->orWhere('status','escalated'))->count(),
+            'support_latest' => SupportTicket::where('order_id',$order->id)->latest()->first(),
         ];
 
         try {

@@ -8,6 +8,10 @@ use App\Filament\Resources\Orders\Pages\ViewOrder;
 use App\Models\Order;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use App\Services\Support\SupportTicketService;
+use App\Filament\Resources\SupportTickets\SupportTicketResource;
+use Filament\Forms\Components\Select;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Textarea;
@@ -102,7 +106,7 @@ class OrderResource extends Resource
         ])->filters([
             SelectFilter::make('status')->options(array_combine(array_map(fn($s) => $s->value, \App\Enums\OrderStatus::cases()), array_map(fn($s) => ucfirst(str_replace('_', ' ', $s->value)), \App\Enums\OrderStatus::cases()))),
             SelectFilter::make('payment_status')->options(['not_required'=>'Not required','pending'=>'Pending']),
-        ])->recordActions([ViewAction::make(), EditAction::make()]);
+        ])->recordActions([ViewAction::make(), Action::make('create_support')->label('Create support ticket')->schema([TextInput::make('subject')->default(fn(Order $record)=>'Order issue: '.$record->order_number)->required(),Select::make('category')->options(SupportTicketResource::categories())->default('order_issue')->required(),Select::make('priority')->options(SupportTicketResource::priorities())->default('normal')->required(),Textarea::make('summary'),Textarea::make('internal_note')])->action(function(Order $record,array $data){$assignment=$record->activeDispatchAssignment();$ticket=app(SupportTicketService::class)->createTicket(['subject'=>$data['subject'],'category'=>$data['category'],'priority'=>$data['priority'],'summary'=>$data['summary']??null,'source'=>'admin','visibility'=>'internal','order_id'=>$record->id,'dispatch_assignment_id'=>$assignment?->id,'worker_profile_id'=>$assignment?->assignedUser?->workerProfile?->id],auth()->user());if(filled($data['internal_note']??null))app(SupportTicketService::class)->addMessage($ticket,['body'=>$data['internal_note'],'message_type'=>'internal_note','visibility'=>'internal'],auth()->user());redirect(SupportTicketResource::getUrl('view',['record'=>$ticket]));}), EditAction::make()]);
     }
 
     public static function infolist(Schema $schema): Schema
@@ -116,6 +120,7 @@ class OrderResource extends Resource
                     ->label('Latest real GPS ping')
                     ->state(fn (Order $record) => $record->workerLocationPings()->first()?->captured_at?->format('Y-m-d H:i:s') ?? 'No real GPS ping yet'),
             ])->columns(2),
+            Section::make('Support')->schema([TextEntry::make('support_open')->label('Open tickets')->state(fn(Order $record)=>$record->supportTickets()->whereNotIn('status',['resolved','closed'])->count()),TextEntry::make('support_total')->label('Total tickets')->state(fn(Order $record)=>$record->supportTickets()->count()),TextEntry::make('support_latest')->label('Latest ticket')->state(fn(Order $record)=>optional($record->supportTickets()->first(),fn($t)=>$t->ticket_number.' · '.str($t->status)->replace('_',' ')->title().' · '.str($t->priority)->title())??'No support tickets')])->columns(3),
             Section::make('Latest worker location')
                 ->description('Read-only Leaflet map from the latest real worker_location_pings record.')
                 ->schema([
