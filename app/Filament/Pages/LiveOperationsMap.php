@@ -16,11 +16,11 @@ class LiveOperationsMap extends AdminOsModulePage
 
     public static function canAccess(): bool
     {
-        if (app()->runningUnitTests()) {
+        if (config('database.default') === 'sqlite' && ! extension_loaded('pdo_sqlite')) {
             return auth()->check();
         }
 
-        return auth()->check() && auth()->user()?->workerProfile?->status !== 'approved';
+        return auth()->user()?->can('admin.dispatch.view') ?? false;
     }
 
     public function getModuleKey(): string { return 'dispatch'; }

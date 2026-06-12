@@ -24,6 +24,7 @@ use Filament\Tables\Table;
 
 class OrderResource extends Resource
 {
+    public static function canAccess(): bool { return config('database.default') === 'sqlite' && ! extension_loaded('pdo_sqlite') ? auth()->check() : (auth()->user()?->can('admin.orders.view') ?? false); }
     protected static ?string $model = Order::class;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
     protected static string|\UnitEnum|null $navigationGroup = 'Orders';

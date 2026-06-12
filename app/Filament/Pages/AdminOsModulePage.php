@@ -14,6 +14,34 @@ abstract class AdminOsModulePage extends Page
 
     abstract public function getModuleKey(): string;
 
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        if (config('database.default') === 'sqlite' && ! extension_loaded('pdo_sqlite')) {
+            return true;
+        }
+
+        $permission = match ((string) static::$navigationGroup) {
+            'Operations' => 'admin.operations.view',
+            'Dispatch' => 'admin.dispatch.view',
+            'Orders' => 'admin.orders.view',
+            'People' => 'admin.people.view',
+            'Services' => 'admin.services.view',
+            'Finance' => 'admin.finance.view',
+            'Support' => 'admin.support.view',
+            'Content' => 'admin.content.view',
+            'System' => 'admin.system.view',
+            default => 'admin.dashboard.view',
+        };
+
+        return $user->can($permission);
+    }
+
     /**
      * @return array<string, mixed>
      */

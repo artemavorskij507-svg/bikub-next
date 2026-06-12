@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class Order extends Model
 {
+    use LogsActivity;
     protected $fillable = ['order_number', 'service_scenario_id', 'service_scenario_key', 'customer_name', 'customer_email', 'customer_phone', 'status', 'payment_status', 'source', 'locale', 'currency', 'estimated_total', 'final_total', 'scheduled_at', 'submitted_at', 'accepted_at', 'completed_at', 'cancelled_at', 'metadata', 'customer_notes', 'internal_notes'];
 
     protected function casts(): array
@@ -30,4 +33,5 @@ class Order extends Model
     public function isDispatchReady(): bool { return $this->dispatchEvents()->where('event_type', 'dispatch.ready')->exists(); }
     public function scopeWithStatus(Builder $query, OrderStatus|string $status): Builder { return $query->where('status', $status instanceof OrderStatus ? $status->value : $status); }
     public function canTransitionTo(OrderStatus $status): bool { return $this->status->canTransitionTo($status); }
+    public function getActivitylogOptions(): LogOptions { return LogOptions::defaults()->logOnly(['status', 'payment_status', 'estimated_total', 'final_total', 'internal_notes'])->logOnlyDirty()->dontSubmitEmptyLogs(); }
 }

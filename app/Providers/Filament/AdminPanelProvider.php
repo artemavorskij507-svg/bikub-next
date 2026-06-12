@@ -46,6 +46,7 @@ class AdminPanelProvider extends PanelProvider
                 fn (): HtmlString => new HtmlString(view('filament.admin-top-nav')->render()),
             )
             ->spa()
+            ->globalSearch(false)
  	    ->plugin(LocaleSwitchPlugin::make())
 	    ->plugin(BenriadhFilamentTranslationManagerPlugin::make())
             ->maxContentWidth(Width::Full)

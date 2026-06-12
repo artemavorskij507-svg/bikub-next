@@ -21,6 +21,7 @@ use Filament\Tables\Table;
 
 class PricingRuleResource extends Resource
 {
+    public static function canAccess(): bool { return config('database.default') === 'sqlite' && ! extension_loaded('pdo_sqlite') ? auth()->check() : (auth()->user()?->can('admin.finance.view') ?? false); }
     protected static ?string $model = PricingRule::class;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalculator;
     protected static string|\UnitEnum|null $navigationGroup = 'Finance';

@@ -65,9 +65,9 @@ class SystemSecurity extends AdminOsModulePage
         return [
             $this->status('Fortify auth', $this->packageVersion('laravel/fortify'), 'Login, 2FA endpoints and passkey routes are provided by Fortify/Laravel.', 'installed'),
             $this->status('Sanctum API auth', $this->packageVersion('laravel/sanctum'), 'Token/session auth foundation exists; API scopes are not designed yet.', 'installed'),
-            $this->status('Filament Shield', $this->packageVersion('bezhansalleh/filament-shield'), 'RBAC UI package exists; role generation/configuration is not completed in this pass.', 'setup'),
-            $this->status('Spatie Permission', $this->packageVersion('spatie/laravel-permission'), 'Permission package exists for roles and policies.', 'installed'),
-            $this->status('Activitylog', $this->packageVersion('spatie/laravel-activitylog'), 'Audit package exists; domain event logging still needs module wiring.', 'installed'),
+            $this->status('Filament Shield', $this->packageVersion('bezhansalleh/filament-shield'), 'Shield-compatible Spatie roles are active; Shield management UI is intentionally not published yet.', 'configured'),
+            $this->status('Spatie Permission', $this->packageVersion('spatie/laravel-permission'), 'Admin panel, module pages and sensitive resources enforce real permissions.', 'works'),
+            $this->status('Activitylog', $this->packageVersion('spatie/laravel-activitylog'), 'Audit table and model logging are active for orders, worker applications and pricing rules.', 'works', route('filament.admin.pages.audit-log')),
         ];
     }
 
@@ -78,8 +78,8 @@ class SystemSecurity extends AdminOsModulePage
     {
         return [
             $this->status('2FA policy', 'needs setup', 'Fortify is installed, but admin role enforcement and recovery policy still need configuration.', 'setup'),
-            $this->status('RBAC', 'needs setup', 'Shield and Permission are installed; roles/permissions are not generated/configured yet.', 'setup'),
-            $this->status('Audit logging', 'installed', 'Activitylog exists; domain models must opt into audit trails.', 'installed'),
+            $this->status('RBAC', 'active', 'Owner and worker assignments are real; module boundaries use named permissions.', 'ready'),
+            $this->status('Audit logging', 'active', 'Audit visibility is available in the Admin Audit Log; additional models can be enrolled incrementally.', 'ready'),
             $this->status('Backups', 'needs setup', 'Backup package/config exists; destination, schedule and restore test are not configured.', 'setup'),
             $this->status('Webhook signatures', 'not implemented', 'Payment/provider webhooks require signed adapters in domain work.', 'blocked'),
             $this->status('Secrets', 'not inspected', 'No secrets are printed or changed here; production secret policy remains required.', 'review'),

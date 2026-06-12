@@ -9,6 +9,10 @@ class AdminOsTopNavigationTest extends TestCase
 {
     public function test_admin_os_top_navigation_renders_on_core_pages(): void
     {
+        if (! extension_loaded('pdo_sqlite')) {
+            $this->markTestSkipped('pdo_sqlite is required now that Admin OS navigation enforces database-backed RBAC.');
+        }
+
         config(['app.env' => 'local']);
 
         $user = new User([

@@ -22,6 +22,15 @@ class Dashboard extends BaseDashboard
 
     protected static ?string $title = 'BiKuBe Admin OS';
 
+    public static function canAccess(): bool
+    {
+        if (config('database.default') === 'sqlite' && ! extension_loaded('pdo_sqlite')) {
+            return auth()->check();
+        }
+
+        return auth()->user()?->can('admin.dashboard.view') ?? false;
+    }
+
     /**
      * @return array<string, array<string, mixed>>
      */

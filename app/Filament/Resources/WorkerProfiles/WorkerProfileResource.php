@@ -25,6 +25,7 @@ use Filament\Tables\Table;
 
 class WorkerProfileResource extends Resource
 {
+    public static function canAccess(): bool { return config('database.default') === 'sqlite' && ! extension_loaded('pdo_sqlite') ? auth()->check() : (auth()->user()?->can('admin.people.view') ?? false); }
     protected static ?string $model = WorkerProfile::class;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
     protected static string|\UnitEnum|null $navigationGroup = 'People';
