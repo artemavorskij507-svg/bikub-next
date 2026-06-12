@@ -4,6 +4,7 @@ namespace App\Services\Workers;
 
 use App\Models\{Order, User, WorkerLocationPing};
 use Illuminate\Validation\ValidationException;
+use App\Settings\MapSettings;
 
 class WorkerLocationService
 {
@@ -23,7 +24,8 @@ class WorkerLocationService
         if ($latitude === 0.0 && $longitude === 0.0) {
             throw ValidationException::withMessages(['location' => 'Empty 0,0 coordinates are not accepted as a real location.']);
         }
-        if ($accuracy === null || $accuracy <= 0 || $accuracy > self::MAX_ACCURACY_METERS) {
+        $maxAccuracy = rescue(fn () => app(MapSettings::class)->max_gps_accuracy_meters, self::MAX_ACCURACY_METERS, report: false);
+        if ($accuracy === null || $accuracy <= 0 || $accuracy > $maxAccuracy) {
             throw ValidationException::withMessages(['accuracy_meters' => 'Location accuracy is too low. Enable precise location and try again.']);
         }
         if (! in_array($user->workerAvailability?->status, ['online', 'available'], true)) {

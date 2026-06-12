@@ -54,6 +54,8 @@ class SystemSecurity extends AdminOsModulePage
             $this->status('Pulse', $pulseWorks ? 'WORKS' : 'NEEDS SETUP', $pulseWorks ? 'Route exists and required Pulse tables exist; /pulse returned HTTP 200 in validation.' : 'Route exists but required Pulse tables/config are missing or not verified.', $pulseWorks ? 'works' : 'setup', $this->routeAvailable('pulse') ? url('/pulse') : ''),
             $this->status('Reverb', $this->packageVersion('laravel/reverb'), 'Realtime package is installed; production broadcasting config is still a separate setup task.', config('broadcasting.default') === 'reverb' ? 'configured' : 'setup'),
             $this->status('Environment indicator', $this->packageVersion('pxlrbt/filament-environment-indicator'), 'Package assets are present; panel plugin wiring can be refined in a later shell pass.', $this->packageInstalled('pxlrbt/filament-environment-indicator') ? 'installed' : 'blocked'),
+            $this->status('Typed settings', $this->packageVersion('spatie/laravel-settings'), 'Platform, operations and map settings are persisted and exposed through permission-protected pages.', $this->tableExists('settings') ? 'configured' : 'blocked', route('filament.admin.pages.platform-settings')),
+            $this->status('Media Library', $this->packageVersion('spatie/laravel-medialibrary'), 'Private worker-document uploads and optional CMS hero uploads are wired. Upload never auto-approves a document.', $this->tableExists('media') ? 'configured' : 'blocked', route('filament.admin.resources.worker-documents.index')),
         ];
     }
 

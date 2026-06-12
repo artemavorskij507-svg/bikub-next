@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class ServicePage extends Model
+class ServicePage extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     public const STATUSES = ['draft', 'published', 'archived'];
 
     protected $fillable = [
@@ -41,5 +44,10 @@ class ServicePage extends Model
     public function seoMetadata(): MorphOne
     {
         return $this->morphOne(SeoMetadata::class, 'owner');
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('hero')->useDisk('public')->singleFile();
     }
 }

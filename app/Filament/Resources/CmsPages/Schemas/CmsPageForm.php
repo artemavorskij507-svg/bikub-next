@@ -7,6 +7,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -26,6 +27,7 @@ class CmsPageForm
                     ]),
                 Section::make('Content')
                     ->schema([
+                        SpatieMediaLibraryFileUpload::make('hero_image')->collection('hero')->disk('public')->image()->maxSize(5120)->helperText('Optional real hero image. No placeholder is generated.'),
                         TextInput::make('title')->required()->maxLength(255),
                         TextInput::make('subtitle')->maxLength(255),
                         Textarea::make('body')->rows(16)->columnSpanFull(),

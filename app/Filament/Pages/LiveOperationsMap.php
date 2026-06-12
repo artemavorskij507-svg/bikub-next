@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\WorkerLocationPing;
 use App\Models\DispatchAssignment;
+use App\Settings\MapSettings;
 
 class LiveOperationsMap extends AdminOsModulePage
 {
@@ -34,5 +35,13 @@ class LiveOperationsMap extends AdminOsModulePage
             ->whereIn('status', ['assigned', 'accepted'])
             ->latest('assigned_at')
             ->first();
+    }
+    public function getMapDefaults(): array
+    {
+        return rescue(fn () => [
+            'lat' => app(MapSettings::class)->map_center_lat,
+            'lng' => app(MapSettings::class)->map_center_lng,
+            'zoom' => app(MapSettings::class)->map_default_zoom,
+        ], ['lat' => 68.4385, 'lng' => 17.4272, 'zoom' => 10], report: false);
     }
 }
