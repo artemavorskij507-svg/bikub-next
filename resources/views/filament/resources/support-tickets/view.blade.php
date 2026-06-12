@@ -33,9 +33,20 @@
                 <span class="bkb-ticket-eyebrow">Linked context</span>
                 <div class="bkb-ticket-links">
                     @if($ticket->order)<a href="{{ \App\Filament\Resources\Orders\OrderResource::getUrl('view',['record'=>$ticket->order]) }}">Order {{ $ticket->order->order_number }} <span>Open order</span></a>@endif
+                    @if($ticket->customer)<p>Customer: {{ $ticket->customer->name }} · {{ $ticket->customer->email }}</p>@endif
+                    @if($ticket->workerProfile)<a href="{{ \App\Filament\Resources\WorkerProfiles\WorkerProfileResource::getUrl('view',['record'=>$ticket->workerProfile]) }}">Worker {{ $ticket->workerProfile->display_name ?? '#'.$ticket->worker_profile_id }} <span>Open profile</span></a>@endif
                     @if($ticket->workerDocument)<a href="{{ \App\Filament\Resources\WorkerDocuments\WorkerDocumentResource::getUrl('edit',['record'=>$ticket->workerDocument]) }}">Worker document #{{ $ticket->worker_document_id }} <span>Review document</span></a>@endif
                     @if(!$ticket->order && !$ticket->workerDocument)<p>No linked operational record.</p>@endif
                 </div>
+            </section>
+
+            <section class="bkb-ticket-panel">
+                <span class="bkb-ticket-eyebrow">Attachments</span>
+                @forelse($ticket->getMedia('support_ticket_attachments') as $media)
+                    <p>{{ $media->file_name }} · {{ $media->human_readable_size }}</p>
+                @empty
+                    <p class="bkb-ticket-empty">No ticket attachments.</p>
+                @endforelse
             </section>
 
             <section class="bkb-ticket-panel">
@@ -61,6 +72,9 @@
                         </header>
                         <span>{{ $row['kind'] === 'message' ? ($item->author?->name ?? 'System') : ($item->actor?->name ?? 'System') }}</span>
                         <p>{{ $row['kind'] === 'message' ? $item->body : ($item->description ?: 'No event note.') }}</p>
+                        @if($row['kind'] === 'message' && $item->getMedia('support_message_attachments')->isNotEmpty())
+                            <small>{{ $item->getMedia('support_message_attachments')->pluck('file_name')->join(', ') }}</small>
+                        @endif
                     </div>
                 </article>
             @empty

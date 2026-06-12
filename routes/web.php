@@ -8,6 +8,8 @@ use App\Http\Controllers\PublicWorkerInvitationController;
 use App\Http\Controllers\WorkerCockpitController;
 use App\Http\Controllers\AdminLiveOperationsMapDataController;
 use App\Http\Controllers\AdminWorkerDocumentDownloadController;
+use App\Http\Controllers\AccountSupportController;
+use App\Http\Controllers\WorkerSupportController;
 
 Route::pattern('order', '[0-9]+');
 
@@ -40,7 +42,18 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
     Route::post('/presence/online', [WorkerCockpitController::class, 'online'])->name('presence.online');
     Route::post('/presence/offline', [WorkerCockpitController::class, 'offline'])->name('presence.offline');
     Route::post('/location-pings', [WorkerCockpitController::class, 'location'])->name('location-pings.store');
+    Route::get('/support', [WorkerSupportController::class, 'index'])->name('support.index');
+    Route::get('/support/{ticket}', [WorkerSupportController::class, 'show'])->name('support.show');
+    Route::post('/support/{ticket}/reply', [WorkerSupportController::class, 'reply'])->name('support.reply');
 })->whereNumber('order');
+
+Route::middleware('auth')->prefix('account')->name('account.')->group(function () {
+    Route::get('/support', [AccountSupportController::class, 'index'])->name('support.index');
+    Route::get('/support/create', [AccountSupportController::class, 'create'])->name('support.create');
+    Route::post('/support', [AccountSupportController::class, 'store'])->name('support.store');
+    Route::get('/support/{ticket}', [AccountSupportController::class, 'show'])->name('support.show');
+    Route::post('/support/{ticket}/reply', [AccountSupportController::class, 'reply'])->name('support.reply');
+});
 
 Route::get('/admin/live-operations-map/data', AdminLiveOperationsMapDataController::class)
     ->middleware(['auth', 'admin.operator'])
