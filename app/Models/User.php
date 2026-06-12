@@ -39,6 +39,7 @@ class User extends Authenticatable implements FilamentUser
     public function workerApplications() { return $this->hasMany(WorkerApplication::class); }
     public function workerDocuments() { return $this->hasMany(WorkerDocument::class); }
     public function locationPings() { return $this->hasMany(WorkerLocationPing::class); }
+    public function customerOrders() { return $this->hasMany(Order::class, 'customer_id'); }
     public function isEligibleWorker(): bool
     {
         return $this->workerProfile?->status === 'approved'

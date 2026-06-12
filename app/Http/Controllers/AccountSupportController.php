@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SupportTicket;
+use App\Services\Account\CustomerOwnershipService;
 use App\Services\Support\SupportTicketService;
 use Illuminate\Http\Request;
 
@@ -17,14 +18,14 @@ class AccountSupportController extends Controller
         $service->addMessage($ticket, ['body' => $data['summary'], 'message_type' => 'public_reply', 'visibility' => 'customer_visible', 'author_type' => 'customer'], $request->user());
         return redirect()->route('account.support.show', $ticket);
     }
-    public function show(Request $request, SupportTicket $ticket)
+    public function show(Request $request, SupportTicket $ticket, CustomerOwnershipService $ownership)
     {
-        abort_unless($ticket->customer_id === $request->user()->id, 403);
+        abort_unless($ownership->canViewSupportTicket($request->user(), $ticket), 403);
         return view('support.show', ['ticket' => $ticket->load(['messages' => fn ($query) => $query->whereIn('visibility', ['customer_visible'])->orWhere(fn ($q) => $q->where('is_system', true)->where('visibility', 'customer_visible'))]), 'portal' => 'account']);
     }
-    public function reply(Request $request, SupportTicket $ticket, SupportTicketService $service)
+    public function reply(Request $request, SupportTicket $ticket, SupportTicketService $service, CustomerOwnershipService $ownership)
     {
-        abort_unless($ticket->customer_id === $request->user()->id, 403);
+        abort_unless($ownership->canViewSupportTicket($request->user(), $ticket), 403);
         $data = $request->validate(['body' => 'required|string|max:10000']);
         $service->addMessage($ticket, [...$data, 'message_type' => 'public_reply', 'visibility' => 'customer_visible', 'author_type' => 'customer'], $request->user());
         return back();

@@ -12,6 +12,7 @@ use App\Http\Controllers\AccountSupportController;
 use App\Http\Controllers\WorkerSupportController;
 use App\Http\Controllers\AdminSupportActivityController;
 use App\Http\Controllers\AdminSupportAttachmentDownloadController;
+use App\Http\Controllers\AccountOrderController;
 
 Route::pattern('order', '[0-9]+');
 
@@ -50,6 +51,8 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
 })->whereNumber('order');
 
 Route::middleware('auth')->prefix('account')->name('account.')->group(function () {
+    Route::get('/orders', [AccountOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [AccountOrderController::class, 'show'])->whereNumber('order')->name('orders.show');
     Route::get('/support', [AccountSupportController::class, 'index'])->name('support.index');
     Route::get('/support/create', [AccountSupportController::class, 'create'])->name('support.create');
     Route::post('/support', [AccountSupportController::class, 'store'])->name('support.store');

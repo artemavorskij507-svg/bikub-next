@@ -6,6 +6,8 @@ use App\Filament\Resources\Orders\Pages\EditOrder;
 use App\Filament\Resources\Orders\Pages\ListOrders;
 use App\Filament\Resources\Orders\Pages\ViewOrder;
 use App\Models\Order;
+use App\Models\User;
+use App\Services\Account\CustomerOwnershipService;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\Action;
@@ -120,7 +122,13 @@ class OrderResource extends Resource
                     ->label('Latest real GPS ping')
                     ->state(fn (Order $record) => $record->workerLocationPings()->first()?->captured_at?->format('Y-m-d H:i:s') ?? 'No real GPS ping yet'),
             ])->columns(2),
-            Section::make('Support')->description('Customer ownership not linked yet; order tickets remain admin-operational until a safe customer relation exists.')->schema([TextEntry::make('support_open')->label('Open tickets')->state(fn(Order $record)=>$record->supportTickets()->whereNotIn('status',['resolved','closed'])->count()),TextEntry::make('support_total')->label('Total tickets')->state(fn(Order $record)=>$record->supportTickets()->count()),TextEntry::make('support_latest')->label('Latest ticket')->state(fn(Order $record)=>optional($record->supportTickets()->first(),fn($t)=>$t->ticket_number.' · '.str($t->status)->replace('_',' ')->title().' · '.str($t->priority)->title().' · '.($t->assignee?->name??'Unassigned').' · '.($t->last_message_at?->diffForHumans()??'No messages'))??'No support tickets')->url(function(Order $record){$ticket=$record->supportTickets()->first();return $ticket?SupportTicketResource::getUrl('view',['record'=>$ticket]):null;}),TextEntry::make('support_all')->label('All linked tickets')->state(fn(Order $record)=>$record->supportTickets()->get()->map(fn($ticket)=>$ticket->ticket_number.' · '.str($ticket->status)->replace('_',' ')->title())->join(' | ')?:'No support tickets')])->columns(2),
+            Section::make('Customer Ownership')->description('Account access is granted only through this explicit ownership relation.')->schema([
+                TextEntry::make('ownership_status')->label('Ownership status')->state(fn (Order $record) => $record->customer_id ? 'Linked' : 'Unlinked')->badge(),
+                TextEntry::make('customer.name')->label('Account owner')->placeholder('Ownership not linked'),
+                TextEntry::make('customer.email')->label('Owner email')->placeholder('Ownership not linked'),
+                TextEntry::make('account_visibility')->label('Account visibility')->state(fn (Order $record) => $record->customer_id ? 'Visible to linked account' : 'Admin-only'),
+            ])->columns(2),
+            Section::make('Support')->description('Customer-linked support visibility follows the explicit order owner.')->schema([TextEntry::make('support_open')->label('Open tickets')->state(fn(Order $record)=>$record->supportTickets()->whereNotIn('status',['resolved','closed'])->count()),TextEntry::make('support_total')->label('Total tickets')->state(fn(Order $record)=>$record->supportTickets()->count()),TextEntry::make('support_latest')->label('Latest ticket')->state(fn(Order $record)=>optional($record->supportTickets()->first(),fn($t)=>$t->ticket_number.' · '.str($t->status)->replace('_',' ')->title().' · '.str($t->priority)->title().' · '.($t->assignee?->name??'Unassigned').' · '.($t->last_message_at?->diffForHumans()??'No messages'))??'No support tickets')->url(function(Order $record){$ticket=$record->supportTickets()->first();return $ticket?SupportTicketResource::getUrl('view',['record'=>$ticket]):null;}),TextEntry::make('support_all')->label('All linked tickets')->state(fn(Order $record)=>$record->supportTickets()->get()->map(fn($ticket)=>$ticket->ticket_number.' · '.str($ticket->status)->replace('_',' ')->title())->join(' | ')?:'No support tickets')])->columns(2),
             Section::make('Latest worker location')
                 ->description('Read-only Leaflet map from the latest real worker_location_pings record.')
                 ->schema([
@@ -141,5 +149,26 @@ class OrderResource extends Resource
     public static function getPages(): array
     {
         return ['index' => ListOrders::route('/'), 'view' => ViewOrder::route('/{record}'), 'edit' => EditOrder::route('/{record}/edit')];
+    }
+
+    public static function ownershipActions(): array
+    {
+        return [
+            Action::make('link_customer')
+                ->label('Link customer account')
+                ->schema([
+                    Select::make('customer_id')->label('Customer account')->options(User::query()->orderBy('name')->pluck('email', 'id'))->searchable()->required(),
+                    Textarea::make('reason')->helperText('This account will be able to view this order in /account.')->required(),
+                ])
+                ->action(fn (Order $record, array $data) => app(CustomerOwnershipService::class)->linkOrderToCustomer($record, User::findOrFail($data['customer_id']), auth()->user(), $data['reason']))
+                ->visible(fn (Order $record) => ! $record->customer_id),
+            Action::make('unlink_customer')
+                ->label('Unlink customer account')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->schema([Textarea::make('reason')->required()])
+                ->action(fn (Order $record, array $data) => app(CustomerOwnershipService::class)->unlinkOrderFromCustomer($record, auth()->user(), $data['reason']))
+                ->visible(fn (Order $record) => (bool) $record->customer_id),
+        ];
     }
 }
