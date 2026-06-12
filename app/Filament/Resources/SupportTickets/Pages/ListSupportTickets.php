@@ -2,7 +2,7 @@
 namespace App\Filament\Resources\SupportTickets\Pages;
 use App\Filament\Resources\SupportTickets\SupportTicketResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Components\Tab;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 class ListSupportTickets extends ListRecords {
