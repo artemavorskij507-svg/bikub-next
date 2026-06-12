@@ -63,9 +63,13 @@
 
                     if (initialized && previous && (
                         current.latest_ticket_id > previous.latest_ticket_id ||
-                        current.latest_message_id > previous.latest_message_id
+                        current.latest_message_id > previous.latest_message_id ||
+                        current.unread_notifications > previous.unread_notifications
                     )) {
-                        audio?.play().catch(() => {});
+                        await audio?.play().catch(() => {});
+                        localStorage.setItem(storageKey, JSON.stringify(current));
+                        window.setTimeout(() => window.location.reload(), 700);
+                        return;
                     }
 
                     localStorage.setItem(storageKey, JSON.stringify(current));
