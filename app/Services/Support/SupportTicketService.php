@@ -3,6 +3,7 @@ namespace App\Services\Support;
 use App\Models\{SupportMessage,SupportTicket,User};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class SupportTicketService {
  private const STATUSES=['open','pending_customer','pending_worker','pending_internal','escalated','resolved','closed'];
  private const PRIORITIES=['low','normal','high','urgent'];
@@ -14,5 +15,6 @@ class SupportTicketService {
  public function changePriority(SupportTicket $ticket,string $priority,User $actor,?string $note=null):SupportTicket{if(!in_array($priority,self::PRIORITIES,true))throw ValidationException::withMessages(['priority'=>'Unsupported priority.']);if($priority==='urgent'&&blank($note))throw ValidationException::withMessages(['note'=>'A note is required for urgent priority.']);$from=$ticket->priority;$ticket->update(['priority'=>$priority]);$this->event($ticket,$actor,'priority_changed',$from,$priority,$note);return $ticket;}
  public function resolveTicket(SupportTicket $ticket,User $actor,string $note):SupportTicket{if(blank($note))throw ValidationException::withMessages(['resolution_note'=>'Resolution note is required.']);$ticket->update(['status'=>'resolved','resolved_by_id'=>$actor->id,'resolved_at'=>now()]);$this->event($ticket,$actor,'resolved',null,'resolved',$note);return $ticket;}
  public function reopenTicket(SupportTicket $ticket,User $actor,string $reason):SupportTicket{if(blank($reason))throw ValidationException::withMessages(['reason'=>'Reopen reason is required.']);$from=$ticket->status;$ticket->update(['status'=>'open','resolved_by_id'=>null,'resolved_at'=>null,'closed_at'=>null]);$this->event($ticket,$actor,'reopened',$from,'open',$reason);return $ticket;}
+ public function attachFile(SupportTicket $ticket,string $path,User $actor):Media{return DB::transaction(function()use($ticket,$path,$actor){$media=$ticket->addMedia($path)->toMediaCollection('support_ticket_attachments','local');$this->event($ticket,$actor,'attachment_added',null,(string)$media->id,'Attachment added',['media_id'=>$media->id,'filename'=>$media->file_name]);activity()->performedOn($ticket)->causedBy($actor)->withProperties(['media_id'=>$media->id,'filename'=>$media->file_name])->log('support_ticket.attachment_added');return $media;});}
  private function event(SupportTicket $ticket,User $actor,string $type,?string $from,?string $to,?string $description=null,array $metadata=[]):void{$ticket->events()->create(['actor_id'=>$actor->id,'event_type'=>$type,'from_value'=>$from,'to_value'=>$to,'description'=>$description,'metadata'=>$metadata,'created_at'=>now()]);}
 }

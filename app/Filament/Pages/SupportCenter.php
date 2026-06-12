@@ -4,6 +4,8 @@ namespace App\Filament\Pages;
 
 use App\Models\SupportTicket;
 use Filament\Pages\Page;
+use App\Services\Support\SupportTicketService;
+use Filament\Notifications\Notification;
 
 class SupportCenter extends Page
 {
@@ -51,5 +53,11 @@ class SupportCenter extends Page
             ],
             'latestTicketAt' => SupportTicket::query()->latest('updated_at')->value('updated_at'),
         ];
+    }
+
+    public function assignToMe(int $ticketId): void
+    {
+        app(SupportTicketService::class)->assignTicket(SupportTicket::findOrFail($ticketId), auth()->user(), auth()->user());
+        Notification::make()->title('Ticket assigned to you')->success()->send();
     }
 }

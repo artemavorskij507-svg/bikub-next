@@ -31,6 +31,10 @@
                                 <span>{{ $ticket->assignee?->name ?? 'Unassigned' }}</span>
                                 <span>{{ $ticket->last_message_at?->diffForHumans() ?? $ticket->updated_at?->diffForHumans() }}</span>
                             </div>
+                            <div class="mt-3 flex gap-3 text-sm">
+                                <span>View / add note / resolve</span>
+                                @if($ticket->assigned_to_id !== auth()->id())<button type="button" wire:click.prevent="assignToMe({{ $ticket->id }})">Assign to me</button>@endif
+                            </div>
                         </a>
                     @empty
                         <p class="px-4 py-6 text-sm text-gray-500">No {{ str($title)->lower() }} tickets.</p>

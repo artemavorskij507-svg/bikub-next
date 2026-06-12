@@ -43,7 +43,7 @@
             <section class="bkb-ticket-panel">
                 <span class="bkb-ticket-eyebrow">Attachments</span>
                 @forelse($ticket->getMedia('support_ticket_attachments') as $media)
-                    <p>{{ $media->file_name }} · {{ $media->human_readable_size }}</p>
+                    <p><a href="{{ route('admin.support.attachments.download', $media) }}">{{ $media->file_name }}</a> · {{ $media->human_readable_size }}</p>
                 @empty
                     <p class="bkb-ticket-empty">No ticket attachments.</p>
                 @endforelse

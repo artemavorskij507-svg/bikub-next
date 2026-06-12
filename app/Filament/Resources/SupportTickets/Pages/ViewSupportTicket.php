@@ -4,7 +4,7 @@ use App\Filament\Resources\SupportTickets\SupportTicketResource;
 use App\Models\User;
 use App\Services\Support\SupportTicketService;
 use Filament\Actions\Action;
-use Filament\Forms\Components\{Select,Textarea};
+use Filament\Forms\Components\{FileUpload,Select,Textarea};
 use Filament\Resources\Pages\ViewRecord;
 class ViewSupportTicket extends ViewRecord {
  protected static string $resource=SupportTicketResource::class;
@@ -18,5 +18,6 @@ class ViewSupportTicket extends ViewRecord {
   Action::make('change_priority')->schema([Select::make('priority')->options(SupportTicketResource::priorities())->required(),Textarea::make('note')])->action(fn(array $data)=>app(SupportTicketService::class)->changePriority($this->record,$data['priority'],auth()->user(),$data['note']??null)),
   Action::make('resolve')->schema([Textarea::make('note')->required()])->action(fn(array $data)=>app(SupportTicketService::class)->resolveTicket($this->record,auth()->user(),$data['note'])),
   Action::make('reopen')->schema([Textarea::make('reason')->required()])->action(fn(array $data)=>app(SupportTicketService::class)->reopenTicket($this->record,auth()->user(),$data['reason']))->visible(fn()=>in_array($this->record->status,['resolved','closed'],true)),
+  Action::make('attach')->label('Attach file')->schema([FileUpload::make('file')->disk('local')->directory('support-uat')->acceptedFileTypes(['application/pdf','image/png','image/jpeg','image/webp','text/plain'])->maxSize(10240)->required()])->action(fn(array $data)=>app(SupportTicketService::class)->attachFile($this->record,storage_path('app/private/'.$data['file']),auth()->user())),
  ]; }
 }

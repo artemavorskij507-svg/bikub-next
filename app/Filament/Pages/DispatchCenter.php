@@ -46,10 +46,10 @@ class DispatchCenter extends AdminOsModulePage
         catch (ValidationException $e) { Notification::make()->title(collect($e->errors())->flatten()->first())->warning()->send(); }
     }
 
-    public function createSupportTicket(int $orderId): void
+    public function createSupportTicket(int $orderId, bool $confirmedDuplicate = false): void
     {
         $order = Order::findOrFail($orderId);
-        if (SupportTicket::where('order_id', $order->id)->whereNotIn('status', ['resolved', 'closed'])->exists()) {
+        if (! $confirmedDuplicate && SupportTicket::where('order_id', $order->id)->whereNotIn('status', ['resolved', 'closed'])->exists()) {
             Notification::make()->title('An open support ticket already exists for this order')->warning()->send();
             return;
         }
