@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->databaseNotifications()
             ->brandName('BiKuBe Admin OS')
             ->brandLogo(fn (): HtmlString => new HtmlString(view('filament.brand-logo')->render()))
             ->brandLogoHeight('2.75rem')
