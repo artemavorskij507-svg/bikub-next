@@ -8,6 +8,7 @@ use App\Services\Support\SupportTicketService;
 use Filament\Notifications\Notification;
 use App\Models\SupportMessage;
 use App\Models\User;
+use Illuminate\Contracts\Support\Htmlable;
 
 class SupportCenter extends Page
 {
@@ -28,6 +29,11 @@ class SupportCenter extends Page
     public static function canAccess(): bool
     {
         return auth()->user()?->can('admin.support.view') ?? false;
+    }
+
+    public function getHeading(): string|Htmlable
+    {
+        return '';
     }
 
     public function getViewData(): array
