@@ -1,68 +1,10 @@
 <?php
-
-return array (
-  'admin' => 
-  array (
-    'dashboard' => 'Dashboard',
-    'operations' => 'Operations',
-    'dispatch' => 'Dispatch',
-    'orders' => 'Orders',
-    'people' => 'People',
-    'services' => 'Services',
-    'finance' => 'Finance',
-    'support' => 'Support',
-    'content' => 'Content',
-    'system' => 'System',
-    'module_foundation' => 'BiKuBe Next module foundation',
-  ),
-  'system_security' => 
-  array (
-    'title' => 'System & Security',
-    'back_to_admin' => 'Back to Admin OS',
-    'kicker' => 'BiKuBe Next / System',
-    'description' => 'Real runtime and package readiness for the Admin OS foundation. This page shows installed, configured and missing setup states only.',
-    'application_environment' => 'Application environment',
-    'debug_mode' => 'Debug mode',
-    'database_driver' => 'Database driver',
-    'cache_driver' => 'Cache driver',
-    'queue_driver' => 'Queue driver',
-    'operational_modules' => 'Operational modules',
-    'installed_foundation_status' => 'Installed foundation status',
-    'security_foundation' => 'Security foundation',
-    'auth_rbac_audit' => 'Auth, RBAC and audit packages',
-    'security_checklist' => 'Security checklist',
-  ),
-  'delivery' => 
-  array (
-    'headline' => 'Everything you need, delivered fast',
-    'subtitle' => 'Groceries, ready meals and bulky deliveries — delivered home quickly and safely.',
-    'add_to_cart' => 'Add',
-    'cart' => 'Cart',
-    'checkout' => 'Go to checkout',
-  ),
-  'common' => 
-  array (
-    'back_to_admin' => 'Back to Admin OS',
-    'current_state' => 'Current state',
-    'skeleton_only' => 'skeleton only',
-    'safe_foundation_only' => 'Safe foundation only',
-    'blocked_until_domain_work' => 'Blocked until domain work',
-    'not_implemented_yet' => 'Not implemented yet',
-    'open_real_route' => 'Open real route',
-    'implementation_checklist' => 'Implementation checklist',
-    'next_production_safe_steps' => 'Next production-safe steps',
-    'approval_boundaries' => 'Approval boundaries',
-    'module' => 'Module',
-    'module_status' => 'Module status',
-    'module_placeholder' => 'Module placeholder awaiting domain implementation.',
-    'no_fake_operational_data' => 'No legacy data, fake metrics, or production actions are connected.',
-    'owning_context' => 'Owning context',
-    'unassigned' => 'Unassigned',
-    'bounded_context_shell_notice' => 'This page is a clean shell for the bounded context. Domain models, policies and services are intentionally not guessed.',
-    'what_is_real_now' => 'What is real now',
-    'navigation_route_and_skeleton_are_real' => 'Navigation route and skeleton context are real.',
-    'no_production_action_wired_yet' => 'No production action wired yet.',
-    'needs_real_module_pass' => 'Needs real module pass',
-    'approval_boundaries_notice' => 'Backend writes, migrations, provider configuration, legacy database connections and operational actions require a separate approved task.',
-  ),
-);
+return [
+'admin'=>['dashboard'=>'Dashboard','operations'=>'Operations','dispatch'=>'Dispatch','orders'=>'Orders','people'=>'People','services'=>'Services','finance'=>'Finance','support'=>'Support','content'=>'Content','system'=>'System'],
+'modules'=>['operations'=>'Operations Command Center','dispatch'=>'Dispatch Center','live_map'=>'Live Operations Map','orders'=>'Orders Hub','people'=>'People & Workforce','services'=>'Service Catalog','finance'=>'Finance Control','support'=>'Support Center','content'=>'CMS & SEO','system'=>'System & Security','translations'=>'Translation Manager'],
+'descriptions'=>['operations'=>'Operational readiness cockpit','dispatch'=>'Assignment and dispatch operations','live_map'=>'Real worker GPS pings only','orders'=>'Order lifecycle and action queue','people'=>'Workers, applications and compliance','services'=>'Service scenarios and intake fields','finance'=>'Pricing and payment readiness','support'=>'Tickets and operational incidents','content'=>'Public content and SEO','system'=>'Security, settings and audit','translations'=>'Manage admin and product translations'],
+'common'=>['module_switcher'=>'BiKuBe Admin OS module switcher','status'=>'Status','action'=>'Action','actions'=>'Actions','save'=>'Save','edit'=>'Edit','open'=>'Open','download'=>'Download','approve'=>'Approve','reject'=>'Reject','pending'=>'Pending','approved'=>'Approved','rejected'=>'Rejected','expired'=>'Expired','not_connected'=>'Not connected','not_exposed'=>'Not exposed','no_data'=>'No data','back_to_admin'=>'Back to Admin OS','open_real_route'=>'Open real route'],
+'documents'=>['title'=>'Worker Documents','document_type'=>'Document type','required'=>'Required','compliance_status'=>'Compliance status','risk_level'=>'Risk level','evidence'=>'Evidence','manually_verified'=>'Manually verified','expires_at'=>'Expires at','missing_evidence'=>'Missing evidence','ready_for_review'=>'Ready for review','private_download'=>'Private audited download','verification_note'=>'Verification note','rejection_reason'=>'Rejection reason'],
+'settings'=>['platform'=>'Platform Settings','operations'=>'Operations Settings','map'=>'Map Settings','payment_disabled'=>'Payment provider adapter is not connected yet.','tracking_disabled'=>'Customer tracking is not exposed yet.'],
+'system_security'=>['title'=>'System & Security','back_to_admin'=>'Back to Admin OS','kicker'=>'BiKuBe Next / System','description'=>'Real runtime, security and package readiness.','operational_modules'=>'Operational modules','installed_foundation_status'=>'Installed foundation status','security_foundation'=>'Security foundation','auth_rbac_audit'=>'Auth, RBAC and audit packages','security_checklist'=>'Security checklist'],
+];

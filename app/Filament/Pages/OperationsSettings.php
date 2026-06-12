@@ -16,6 +16,8 @@ class OperationsSettings extends SettingsPage
     protected static ?int $navigationSort = 30;
 
     public static function canAccess(): bool { return auth()->user()?->can('admin.system.manage') ?? false; }
+    public static function getNavigationLabel(): string { return __('bikube.settings.operations'); }
+    public function getTitle(): string { return __('bikube.settings.operations'); }
 
     public function form(Schema $schema): Schema
     {

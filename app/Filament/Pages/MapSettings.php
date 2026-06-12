@@ -16,6 +16,8 @@ class MapSettings extends SettingsPage
     protected static ?int $navigationSort = 31;
 
     public static function canAccess(): bool { return auth()->user()?->can('admin.system.manage') ?? false; }
+    public static function getNavigationLabel(): string { return __('bikube.settings.map'); }
+    public function getTitle(): string { return __('bikube.settings.map'); }
 
     public function form(Schema $schema): Schema
     {

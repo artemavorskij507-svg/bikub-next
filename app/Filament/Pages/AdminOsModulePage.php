@@ -14,6 +14,33 @@ abstract class AdminOsModulePage extends Page
 
     abstract public function getModuleKey(): string;
 
+    public static function getNavigationLabel(): string
+    {
+        return __("bikube.modules.".static::translationModuleKey());
+    }
+
+    public function getTitle(): string
+    {
+        return __("bikube.modules.".static::translationModuleKey());
+    }
+
+    protected static function translationModuleKey(): string
+    {
+        return match (static::class) {
+            OperationsCommandCenter::class => 'operations',
+            DispatchCenter::class => 'dispatch',
+            LiveOperationsMap::class => 'live_map',
+            OrdersHub::class => 'orders',
+            PeopleWorkforce::class => 'people',
+            ServicesCatalog::class => 'services',
+            FinanceControl::class => 'finance',
+            SupportCenter::class => 'support',
+            ContentCms::class => 'content',
+            SystemSecurity::class => 'system',
+            default => 'operations',
+        };
+    }
+
     public static function canAccess(): bool
     {
         $user = auth()->user();

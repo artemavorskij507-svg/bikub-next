@@ -1,68 +1,10 @@
 <?php
-
-return array (
-  'admin' => 
-  array (
-    'dashboard' => 'Панель',
-    'operations' => 'Операции',
-    'dispatch' => 'Диспетчерская',
-    'orders' => 'Заказы',
-    'people' => 'Люди',
-    'services' => 'Услуги',
-    'finance' => 'Финансы',
-    'support' => 'Поддержка',
-    'content' => 'Контент',
-    'system' => 'Система',
-    'module_foundation' => 'Фундамент модуля BiKuBe Next',
-  ),
-  'system_security' => 
-  array (
-    'title' => 'Система и безопасность',
-    'back_to_admin' => 'Назад в Admin OS',
-    'kicker' => 'BiKuBe Next / Система',
-    'description' => 'Реальный статус среды, пакетов и готовности основы Admin OS. Эта страница показывает только установленные, настроенные и отсутствующие элементы.',
-    'application_environment' => 'Среда приложения',
-    'debug_mode' => 'Режим отладки',
-    'database_driver' => 'Драйвер базы данных',
-    'cache_driver' => 'Драйвер кэша',
-    'queue_driver' => 'Драйвер очередей',
-    'operational_modules' => 'Операционные модули',
-    'installed_foundation_status' => 'Статус установленной основы',
-    'security_foundation' => 'Основа безопасности',
-    'auth_rbac_audit' => 'Авторизация, RBAC и аудит',
-    'security_checklist' => 'Чеклист безопасности',
-  ),
-  'delivery' => 
-  array (
-    'headline' => 'Всё, что нужно, с быстрой доставкой',
-    'subtitle' => 'Продукты, готовая еда и крупные доставки — быстро и безопасно домой.',
-    'add_to_cart' => 'Добавить',
-    'cart' => 'Корзина',
-    'checkout' => 'Перейти к оформлению',
-  ),
-  'common' => 
-  array (
-    'back_to_admin' => 'Назад в Admin OS',
-    'current_state' => 'Текущее состояние',
-    'skeleton_only' => 'только каркас',
-    'safe_foundation_only' => 'только безопасный фундамент',
-    'blocked_until_domain_work' => 'заблокировано до доменной доработки',
-    'not_implemented_yet' => 'ещё не реализовано',
-    'open_real_route' => 'Открыть реальный маршрут',
-    'implementation_checklist' => 'Чеклист внедрения',
-    'next_production_safe_steps' => 'Следующие production-safe шаги',
-    'approval_boundaries' => 'Границы согласования',
-    'module' => 'Модуль',
-    'module_status' => 'Статус модуля',
-    'module_placeholder' => 'Заглушка модуля ожидает доменной реализации.',
-    'no_fake_operational_data' => 'Legacy-данные, фейковые метрики и production-действия не подключены.',
-    'owning_context' => 'Ответственный контекст',
-    'unassigned' => 'Не назначено',
-    'bounded_context_shell_notice' => 'Эта страница — чистый shell для bounded context. Доменные модели, политики и сервисы намеренно не угадываются.',
-    'what_is_real_now' => 'Что реально сейчас',
-    'navigation_route_and_skeleton_are_real' => 'Навигационный маршрут и skeleton-контекст реальны.',
-    'no_production_action_wired_yet' => 'Production-действие ещё не подключено.',
-    'needs_real_module_pass' => 'Нужен реальный проход по модулю',
-    'approval_boundaries_notice' => 'Backend-записи, миграции, конфигурация провайдеров, legacy-подключения к базе и операционные действия требуют отдельной утверждённой задачи.',
-  ),
-);
+return [
+'admin'=>['dashboard'=>'Панель','operations'=>'Операции','dispatch'=>'Диспетчерская','orders'=>'Заказы','people'=>'Персонал','services'=>'Услуги','finance'=>'Финансы','support'=>'Поддержка','content'=>'Контент','system'=>'Система'],
+'modules'=>['operations'=>'Операционный центр','dispatch'=>'Диспетчерский центр','live_map'=>'Карта операций','orders'=>'Центр заказов','people'=>'Персонал и исполнители','services'=>'Каталог услуг','finance'=>'Финансовый контроль','support'=>'Центр поддержки','content'=>'CMS и SEO','system'=>'Система и безопасность','translations'=>'Менеджер переводов'],
+'descriptions'=>['operations'=>'Контроль операционной готовности','dispatch'=>'Назначения и диспетчерские операции','live_map'=>'Только реальные GPS-сигналы исполнителей','orders'=>'Жизненный цикл и очередь действий по заказам','people'=>'Исполнители, заявки и комплаенс','services'=>'Сценарии услуг и поля заявки','finance'=>'Ценообразование и готовность платежей','support'=>'Тикеты и операционные инциденты','content'=>'Публичный контент и SEO','system'=>'Безопасность, настройки и аудит','translations'=>'Управление переводами админки и продукта'],
+'common'=>['module_switcher'=>'Переключатель модулей BiKuBe Admin OS','status'=>'Статус','action'=>'Действие','actions'=>'Действия','save'=>'Сохранить','edit'=>'Изменить','open'=>'Открыть','download'=>'Скачать','approve'=>'Одобрить','reject'=>'Отклонить','pending'=>'Ожидает','approved'=>'Одобрено','rejected'=>'Отклонено','expired'=>'Истёк','not_connected'=>'Не подключено','not_exposed'=>'Не опубликовано','no_data'=>'Нет данных','back_to_admin'=>'Назад в Admin OS','open_real_route'=>'Открыть рабочий маршрут'],
+'documents'=>['title'=>'Документы исполнителей','document_type'=>'Тип документа','required'=>'Обязательный','compliance_status'=>'Статус комплаенса','risk_level'=>'Уровень риска','evidence'=>'Подтверждение','manually_verified'=>'Проверено вручную','expires_at'=>'Срок действия','missing_evidence'=>'Нет подтверждения','ready_for_review'=>'Готово к проверке','private_download'=>'Приватное скачивание с аудитом','verification_note'=>'Примечание проверки','rejection_reason'=>'Причина отклонения'],
+'settings'=>['platform'=>'Настройки платформы','operations'=>'Настройки операций','map'=>'Настройки карты','payment_disabled'=>'Платёжный провайдер ещё не подключён.','tracking_disabled'=>'Отслеживание для клиента ещё не опубликовано.'],
+'system_security'=>['title'=>'Система и безопасность','back_to_admin'=>'Назад в Admin OS','kicker'=>'BiKuBe Next / Система','description'=>'Реальный статус среды, безопасности и пакетов.','operational_modules'=>'Операционные модули','installed_foundation_status'=>'Статус установленной основы','security_foundation'=>'Основа безопасности','auth_rbac_audit'=>'Авторизация, RBAC и аудит','security_checklist'=>'Чеклист безопасности'],
+];

@@ -1,68 +1,10 @@
 <?php
-
-return array (
-  'admin' => 
-  array (
-    'dashboard' => 'Панель',
-    'operations' => 'Операції',
-    'dispatch' => 'Диспетчерська',
-    'orders' => 'Замовлення',
-    'people' => 'Люди',
-    'services' => 'Послуги',
-    'finance' => 'Фінанси',
-    'support' => 'Підтримка',
-    'content' => 'Контент',
-    'system' => 'Система',
-    'module_foundation' => 'Фундамент модуля BiKuBe Next',
-  ),
-  'system_security' => 
-  array (
-    'title' => 'Система і безпека',
-    'back_to_admin' => 'Назад до Admin OS',
-    'kicker' => 'BiKuBe Next / Система',
-    'description' => 'Реальний статус середовища, пакетів і готовності основи Admin OS. Ця сторінка показує лише встановлені, налаштовані та відсутні елементи.',
-    'application_environment' => 'Середовище застосунку',
-    'debug_mode' => 'Режим налагодження',
-    'database_driver' => 'Драйвер бази даних',
-    'cache_driver' => 'Драйвер кешу',
-    'queue_driver' => 'Драйвер черг',
-    'operational_modules' => 'Операційні модулі',
-    'installed_foundation_status' => 'Статус встановленої основи',
-    'security_foundation' => 'Основа безпеки',
-    'auth_rbac_audit' => 'Авторизація, RBAC і аудит',
-    'security_checklist' => 'Чеклист безпеки',
-  ),
-  'delivery' => 
-  array (
-    'headline' => 'Усе, що потрібно, з швидкою доставкою',
-    'subtitle' => 'Продукти, готова їжа та великі доставки — швидко й безпечно додому.',
-    'add_to_cart' => 'Додати',
-    'cart' => 'Кошик',
-    'checkout' => 'Перейти до оформлення',
-  ),
-  'common' => 
-  array (
-    'back_to_admin' => 'Назад до Admin OS',
-    'current_state' => 'Поточний стан',
-    'skeleton_only' => 'тільки каркас',
-    'safe_foundation_only' => 'тільки безпечна основа',
-    'blocked_until_domain_work' => 'заблоковано до доменної доробки',
-    'not_implemented_yet' => 'ще не реалізовано',
-    'open_real_route' => 'Відкрити реальний маршрут',
-    'implementation_checklist' => 'Чеклист впровадження',
-    'next_production_safe_steps' => 'Наступні production-safe кроки',
-    'approval_boundaries' => 'Межі погодження',
-    'module' => 'Модуль',
-    'module_status' => 'Статус модуля',
-    'module_placeholder' => 'Заглушка модуля очікує доменної реалізації.',
-    'no_fake_operational_data' => 'Legacy-дані, фейкові метрики та production-дії не підключені.',
-    'owning_context' => 'Відповідальний контекст',
-    'unassigned' => 'Не призначено',
-    'bounded_context_shell_notice' => 'Ця сторінка — чистий shell для bounded context. Доменні моделі, політики та сервіси навмисно не вигадуються.',
-    'what_is_real_now' => 'Що реально зараз',
-    'navigation_route_and_skeleton_are_real' => 'Навігаційний маршрут і skeleton-контекст реальні.',
-    'no_production_action_wired_yet' => 'Production-дію ще не підключено.',
-    'needs_real_module_pass' => 'Потрібен реальний прохід по модулю',
-    'approval_boundaries_notice' => 'Backend-записи, міграції, конфігурація провайдерів, legacy-підключення до бази та операційні дії потребують окремо затвердженої задачі.',
-  ),
-);
+return [
+'admin'=>['dashboard'=>'Панель','operations'=>'Операції','dispatch'=>'Диспетчерська','orders'=>'Замовлення','people'=>'Персонал','services'=>'Послуги','finance'=>'Фінанси','support'=>'Підтримка','content'=>'Контент','system'=>'Система'],
+'modules'=>['operations'=>'Операційний центр','dispatch'=>'Диспетчерський центр','live_map'=>'Карта операцій','orders'=>'Центр замовлень','people'=>'Персонал і виконавці','services'=>'Каталог послуг','finance'=>'Фінансовий контроль','support'=>'Центр підтримки','content'=>'CMS і SEO','system'=>'Система і безпека','translations'=>'Менеджер перекладів'],
+'descriptions'=>['operations'=>'Контроль операційної готовності','dispatch'=>'Призначення та диспетчерські операції','live_map'=>'Лише реальні GPS-сигнали виконавців','orders'=>'Життєвий цикл і черга дій замовлень','people'=>'Виконавці, заявки та комплаєнс','services'=>'Сценарії послуг і поля заявки','finance'=>'Ціноутворення та готовність платежів','support'=>'Тікети й операційні інциденти','content'=>'Публічний контент і SEO','system'=>'Безпека, налаштування та аудит','translations'=>'Керування перекладами адмінки та продукту'],
+'common'=>['module_switcher'=>'Перемикач модулів BiKuBe Admin OS','status'=>'Статус','action'=>'Дія','actions'=>'Дії','save'=>'Зберегти','edit'=>'Змінити','open'=>'Відкрити','download'=>'Завантажити','approve'=>'Схвалити','reject'=>'Відхилити','pending'=>'Очікує','approved'=>'Схвалено','rejected'=>'Відхилено','expired'=>'Прострочено','not_connected'=>'Не підключено','not_exposed'=>'Не оприлюднено','no_data'=>'Немає даних','back_to_admin'=>'Назад до Admin OS','open_real_route'=>'Відкрити робочий маршрут'],
+'documents'=>['title'=>'Документи виконавців','document_type'=>'Тип документа','required'=>'Обов’язковий','compliance_status'=>'Статус комплаєнсу','risk_level'=>'Рівень ризику','evidence'=>'Підтвердження','manually_verified'=>'Перевірено вручну','expires_at'=>'Термін дії','missing_evidence'=>'Немає підтвердження','ready_for_review'=>'Готово до перевірки','private_download'=>'Приватне завантаження з аудитом','verification_note'=>'Примітка перевірки','rejection_reason'=>'Причина відхилення'],
+'settings'=>['platform'=>'Налаштування платформи','operations'=>'Налаштування операцій','map'=>'Налаштування карти','payment_disabled'=>'Платіжний провайдер ще не підключено.','tracking_disabled'=>'Відстеження для клієнта ще не оприлюднено.'],
+'system_security'=>['title'=>'Система і безпека','back_to_admin'=>'Назад до Admin OS','kicker'=>'BiKuBe Next / Система','description'=>'Реальний статус середовища, безпеки та пакетів.','operational_modules'=>'Операційні модулі','installed_foundation_status'=>'Статус встановленої основи','security_foundation'=>'Основа безпеки','auth_rbac_audit'=>'Авторизація, RBAC та аудит','security_checklist'=>'Чекліст безпеки'],
+];
