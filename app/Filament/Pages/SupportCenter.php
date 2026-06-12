@@ -6,6 +6,8 @@ use App\Models\SupportTicket;
 use Filament\Pages\Page;
 use App\Services\Support\SupportTicketService;
 use Filament\Notifications\Notification;
+use App\Models\SupportMessage;
+use App\Models\User;
 
 class SupportCenter extends Page
 {
@@ -31,6 +33,21 @@ class SupportCenter extends Page
     public function getViewData(): array
     {
         $open = SupportTicket::query()->whereNotIn('status', ['resolved', 'closed']);
+        $selectedTicket = SupportTicket::query()
+            ->with(['order', 'customer', 'workerProfile', 'workerDocument', 'dispatchAssignment', 'assignee', 'messages.author', 'events.actor'])
+            ->whereNotIn('status', ['resolved', 'closed'])
+            ->orderByRaw("CASE WHEN priority = 'urgent' THEN 0 WHEN status = 'escalated' THEN 1 ELSE 2 END")
+            ->latest('updated_at')
+            ->first();
+        $firstResponses = SupportMessage::query()
+            ->whereIn('author_type', ['admin', 'support'])
+            ->selectRaw('support_ticket_id, MIN(created_at) as first_response_at')
+            ->groupBy('support_ticket_id')
+            ->get()
+            ->map(function ($response) {
+                $ticket = SupportTicket::find($response->support_ticket_id);
+                return $ticket ? $ticket->created_at->diffInMinutes($response->first_response_at) : null;
+            })->filter();
 
         return [
             'metrics' => [
@@ -42,6 +59,7 @@ class SupportCenter extends Page
                 'waiting_customer' => (clone $open)->where('status', 'pending_customer')->count(),
                 'waiting_worker' => (clone $open)->where('status', 'pending_worker')->count(),
                 'resolved_today' => SupportTicket::query()->whereDate('resolved_at', today())->count(),
+                'avg_first_response' => $firstResponses->isNotEmpty() ? round($firstResponses->average()).' min' : 'Not enough data',
             ],
             'queues' => [
                 'Urgent / escalated' => SupportTicket::query()->where(fn ($query) => $query->where('priority', 'urgent')->orWhere('status', 'escalated'))->latest('updated_at')->limit(6)->get(),
@@ -52,6 +70,13 @@ class SupportCenter extends Page
                 'Recently updated' => SupportTicket::query()->latest('updated_at')->limit(8)->get(),
             ],
             'latestTicketAt' => SupportTicket::query()->latest('updated_at')->value('updated_at'),
+            'selectedTicket' => $selectedTicket,
+            'activeQueue' => SupportTicket::query()
+                ->with(['order', 'assignee'])
+                ->whereNotIn('status', ['resolved', 'closed'])
+                ->orderByRaw("CASE WHEN priority = 'urgent' THEN 0 WHEN status = 'escalated' THEN 1 WHEN assigned_to_id IS NULL THEN 2 ELSE 3 END")
+                ->latest('updated_at')->limit(15)->get(),
+            'supportAgents' => User::role(['owner', 'admin', 'support'])->withCount(['assignedSupportTickets' => fn ($query) => $query->whereNotIn('status', ['resolved', 'closed'])])->get(),
         ];
     }
 
