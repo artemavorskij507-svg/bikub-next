@@ -58,24 +58,24 @@
             @else
                 <p>No active assignment is available.</p>
             @endif
-            <hr>
-            <p class="bkb-card-eyebrow">Required action</p>
-            <p>Worker must open the assigned order on mobile HTTPS and allow precise location.</p>
-            <p class="bkb-card-eyebrow">Mobile GPS UAT still required. Browser geolocation may require HTTPS and explicit user permission.</p>
+            <div class="bkb-required-action">
+                <span>Required action</span>
+                <strong>Send first real GPS ping</strong>
+                <p>Worker must open the assigned order on mobile HTTPS and allow precise location.</p>
+            </div>
             @if($assignment?->order)
-                <hr>
-                <h2>Mobile GPS UAT</h2>
-                <p class="bkb-card-eyebrow">Server currently listens on PC localhost only. LAN access requires an approved listener/proxy change; mobile GPS normally requires HTTPS.</p>
-                <label class="bkb-card-eyebrow" for="mobile-uat-url">Detected LAN candidate</label>
-                <input id="mobile-uat-url" class="bkb-uat-url" readonly value="http://192.168.11.138:8090/worker/orders/{{ $assignment->order->id }}">
-                <button id="copy-mobile-uat-url" class="bkb-card-link" type="button">Copy URL</button>
-                <ol class="bkb-uat-steps">
-                    <li>Expose the app through approved HTTPS staging or tunnel.</li>
-                    <li>Open the worker order URL on the phone.</li>
-                    <li>Login as the assigned worker and tap Send real GPS ping now.</li>
-                    <li>Allow precise location.</li>
-                    <li>Wait up to 12 seconds for the real marker.</li>
-                </ol>
+                <details class="bkb-uat-details">
+                    <summary>Mobile GPS UAT instructions</summary>
+                    <p>Current server is localhost-only. Use approved HTTPS staging or tunnel before opening this URL on a phone.</p>
+                    <label for="mobile-uat-url">Detected LAN candidate</label>
+                    <input id="mobile-uat-url" class="bkb-uat-url" readonly value="http://192.168.11.138:8090/worker/orders/{{ $assignment->order->id }}">
+                    <button id="copy-mobile-uat-url" class="bkb-card-link" type="button">Copy URL</button>
+                    <ol class="bkb-uat-steps">
+                        <li>Open worker order on phone through HTTPS.</li>
+                        <li>Login and tap Send real GPS ping now.</li>
+                        <li>Allow precise location and wait up to 12 seconds.</li>
+                    </ol>
+                </details>
             @endif
         </aside>
     </section>
@@ -83,7 +83,7 @@
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
-.bkb-live-map-workbench{display:grid;gap:1rem}.bkb-live-map-stage{position:relative;min-height:32rem;overflow:hidden;border:1px solid rgba(148,163,184,.2);border-radius:.75rem;background:#07111f}.bkb-live-map-stage #live-operations-map{height:min(68vh,720px);min-height:32rem}.bkb-live-map-empty{position:absolute;inset:0;display:grid;place-items:center;padding:2rem;background:radial-gradient(circle at center,rgba(16,185,129,.08),transparent 52%),#07111f;text-align:center}.bkb-live-map-empty>div{max-width:36rem}.bkb-live-map-empty h2{margin:.5rem 0;font-size:1.75rem;color:#fff}.bkb-live-map-empty p{color:#a9b8ce}.bkb-live-map-status{position:absolute;left:1rem;bottom:1rem;z-index:500;margin:0;border:1px solid rgba(148,163,184,.2);border-radius:.45rem;background:rgba(7,17,31,.9);padding:.55rem .75rem;color:#b8c6d9;font-size:.75rem}.bkb-uat-url{width:100%;margin:.4rem 0 .65rem;border:1px solid rgba(148,163,184,.25);border-radius:.4rem;background:#07111f;padding:.6rem;color:#d8e4f2;font-size:.75rem}.bkb-uat-steps{display:grid;gap:.45rem;margin:1rem 0 0;padding-left:1.2rem;color:#a9b8ce;font-size:.78rem}@media(min-width:1100px){.bkb-live-map-workbench{grid-template-columns:minmax(0,1fr) 21rem}.bkb-live-map-workbench aside{align-self:start}}
+.bkb-operator-head{padding-block:.35rem .8rem}.bkb-operator-head h1{font-size:1.8rem}.bkb-foundation-strip{grid-template-columns:repeat(5,minmax(0,1fr));gap:.65rem;margin-block:.75rem}.bkb-foundation-strip article{min-height:4.5rem;padding:.75rem 1rem}.bkb-live-map-workbench{display:grid;align-items:start;gap:1rem}.bkb-live-map-stage{position:relative;height:clamp(32rem,calc(100vh - 19rem),48rem);overflow:hidden;border:1px solid rgba(148,163,184,.2);border-radius:.75rem;background:#07111f}.bkb-live-map-stage #live-operations-map{height:100%;min-height:0}.bkb-live-map-empty{position:absolute;z-index:450;top:1rem;left:50%;width:min(34rem,calc(100% - 2rem));transform:translateX(-50%);padding:1rem 1.25rem;border:1px solid rgba(52,211,153,.25);border-radius:.65rem;background:rgba(7,17,31,.9);box-shadow:0 18px 50px rgba(0,0,0,.28);text-align:left;backdrop-filter:blur(10px)}.bkb-live-map-empty>div{max-width:none}.bkb-live-map-empty h2{margin:.2rem 0;font-size:1.1rem;color:#fff}.bkb-live-map-empty p{margin:.25rem 0 .7rem;color:#a9b8ce;font-size:.82rem}.bkb-live-map-empty .bkb-action-row{gap:.45rem}.bkb-live-map-status{position:absolute;left:1rem;bottom:1rem;z-index:500;margin:0;border:1px solid rgba(148,163,184,.2);border-radius:.45rem;background:rgba(7,17,31,.9);padding:.55rem .75rem;color:#b8c6d9;font-size:.75rem}.bkb-live-map-workbench aside{max-height:clamp(32rem,calc(100vh - 19rem),48rem);overflow:auto;padding:1rem}.bkb-live-map-workbench aside h2{font-size:1.05rem}.bkb-module-meta{gap:.25rem}.bkb-module-meta div{padding:.55rem 0}.bkb-required-action{margin-top:1rem;padding:.85rem;border:1px solid rgba(52,211,153,.22);border-radius:.55rem;background:rgba(16,185,129,.07)}.bkb-required-action span{display:block;color:#6ee7b7;font-size:.68rem;font-weight:800;text-transform:uppercase}.bkb-required-action strong{display:block;margin-top:.2rem;color:#fff}.bkb-required-action p{margin:.35rem 0 0;color:#a9b8ce;font-size:.78rem}.bkb-uat-details{margin-top:.75rem;border-top:1px solid rgba(148,163,184,.18);padding-top:.75rem;color:#a9b8ce;font-size:.78rem}.bkb-uat-details summary{cursor:pointer;color:#d8e4f2;font-weight:800}.bkb-uat-details label{display:block;margin-top:.75rem;color:#6ee7b7;font-size:.68rem;font-weight:800;text-transform:uppercase}.bkb-uat-url{width:100%;margin:.35rem 0 .55rem;border:1px solid rgba(148,163,184,.25);border-radius:.4rem;background:#07111f;padding:.55rem;color:#d8e4f2;font-size:.72rem}.bkb-uat-steps{display:grid;gap:.35rem;margin:.75rem 0 0;padding-left:1.1rem;color:#a9b8ce;font-size:.75rem}@media(min-width:1100px){.bkb-live-map-workbench{grid-template-columns:minmax(0,1fr) 22rem}}@media(max-width:900px){.bkb-foundation-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.bkb-live-map-stage{height:32rem}.bkb-live-map-workbench aside{max-height:none;overflow:visible}}
 </style>
 @endpush
 @push('scripts')
