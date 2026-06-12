@@ -39,4 +39,40 @@
             </section>
         @endforeach
     </div>
+
+    <audio id="bkb-support-alert" preload="auto" src="{{ asset('audio/support/support-alert.mp3') }}"></audio>
+    <script>
+        (() => {
+            const storageKey = 'bkb-support-activity';
+            const audio = document.getElementById('bkb-support-alert');
+            let initialized = false;
+
+            async function checkSupportActivity() {
+                try {
+                    const response = await fetch('{{ route('admin.support.activity') }}', {
+                        headers: { 'Accept': 'application/json' },
+                        credentials: 'same-origin',
+                    });
+                    if (!response.ok) return;
+                    const current = await response.json();
+                    const previous = JSON.parse(localStorage.getItem(storageKey) || 'null');
+
+                    if (initialized && previous && (
+                        current.latest_ticket_id > previous.latest_ticket_id ||
+                        current.latest_message_id > previous.latest_message_id
+                    )) {
+                        audio?.play().catch(() => {});
+                    }
+
+                    localStorage.setItem(storageKey, JSON.stringify(current));
+                    initialized = true;
+                } catch (_) {
+                    // Polling failure stays silent; the dashboard remains usable.
+                }
+            }
+
+            checkSupportActivity();
+            window.setInterval(checkSupportActivity, 15000);
+        })();
+    </script>
 </x-filament-panels::page>

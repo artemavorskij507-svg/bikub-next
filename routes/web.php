@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminLiveOperationsMapDataController;
 use App\Http\Controllers\AdminWorkerDocumentDownloadController;
 use App\Http\Controllers\AccountSupportController;
 use App\Http\Controllers\WorkerSupportController;
+use App\Http\Controllers\AdminSupportActivityController;
 
 Route::pattern('order', '[0-9]+');
 
@@ -61,3 +62,7 @@ Route::get('/admin/live-operations-map/data', AdminLiveOperationsMapDataControll
 
 Route::get('/admin/worker-documents/{workerDocument}/download', AdminWorkerDocumentDownloadController::class)
     ->middleware('auth')->whereNumber('workerDocument')->name('admin.worker-documents.download');
+
+Route::get('/admin/support-activity', AdminSupportActivityController::class)
+    ->middleware('auth')
+    ->name('admin.support.activity');
