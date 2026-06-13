@@ -25,6 +25,11 @@ class LiveOperationsMap extends AdminOsModulePage
     public int $zoneRadius = 500;
     public string $zoneNote = '';
     public string $zoneDeactivateReason = '';
+    public string $dispatchLocationNote = '';
+    public string $supportSubject = '';
+    public string $supportPriority = 'normal';
+    public string $supportCategory = 'delivery_issue';
+    public string $supportInternalNote = '';
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map';
 
     protected static ?string $navigationLabel = 'Live Operations Map';
@@ -142,6 +147,7 @@ class LiveOperationsMap extends AdminOsModulePage
             ], auth()->user());
             $this->reset(['zoneName', 'zoneNote']);
             Notification::make()->title('Operation zone created')->success()->send();
+            $this->dispatch('liveops-action-completed', message: 'Operation zone created and map refreshed.');
         } catch (ValidationException $exception) {
             Notification::make()->title((string) collect($exception->errors())->flatten()->first())->warning()->send();
         }
@@ -162,8 +168,11 @@ class LiveOperationsMap extends AdminOsModulePage
             Notification::make()->title('Select an active order first')->warning()->send();
             return;
         }
-        app(DispatchEngine::class)->recordDispatchEvent($assignment->order, 'dispatch.location_note', ['latitude' => $this->contextLat, 'longitude' => $this->contextLng], $this->zoneNote ?: 'Map location noted by dispatcher.', $assignment);
+        $this->validate(['dispatchLocationNote' => ['required', 'string', 'max:2000']]);
+        app(DispatchEngine::class)->recordDispatchEvent($assignment->order, 'dispatch.location_note', ['latitude' => $this->contextLat, 'longitude' => $this->contextLng], $this->dispatchLocationNote, $assignment);
+        $this->dispatchLocationNote = '';
         Notification::make()->title('Dispatch location note recorded')->success()->send();
+        $this->dispatch('liveops-action-completed', message: 'Dispatch location note recorded.');
     }
 
     public function createSupportAtLocation(): void
@@ -173,14 +182,28 @@ class LiveOperationsMap extends AdminOsModulePage
             Notification::make()->title('Select an active order first')->warning()->send();
             return;
         }
-        app(SupportTicketService::class)->createTicket([
-            'subject' => 'Map incident: '.$assignment->order->order_number,
-            'category' => 'delivery_issue', 'priority' => 'normal', 'source' => 'admin', 'visibility' => 'internal',
+        $this->validate([
+            'supportSubject' => ['required', 'string', 'max:255'],
+            'supportPriority' => ['required', 'in:low,normal,high,urgent'],
+            'supportCategory' => ['required', 'in:order_issue,delivery_issue,worker_issue,payment_issue,document_issue,customer_question,system_issue,other'],
+            'supportInternalNote' => ['nullable', 'string', 'max:5000'],
+        ]);
+        $service = app(SupportTicketService::class);
+        $ticket = $service->createTicket([
+            'subject' => $this->supportSubject,
+            'category' => $this->supportCategory, 'priority' => $this->supportPriority, 'source' => 'admin', 'visibility' => 'internal',
             'order_id' => $assignment->order_id, 'dispatch_assignment_id' => $assignment->id,
             'worker_profile_id' => $assignment->assignedUser?->workerProfile?->id, 'customer_id' => $assignment->order->customer_id,
             'metadata' => ['location' => ['latitude' => $this->contextLat, 'longitude' => $this->contextLng]],
         ], auth()->user());
+        if ($this->supportInternalNote !== '') {
+            $service->addMessage($ticket, ['body' => $this->supportInternalNote, 'author_type' => 'admin', 'message_type' => 'internal_note', 'visibility' => 'internal'], auth()->user());
+        }
+        $this->reset(['supportSubject', 'supportInternalNote']);
+        $this->supportPriority = 'normal';
+        $this->supportCategory = 'delivery_issue';
         Notification::make()->title('Location support ticket created')->success()->send();
+        $this->dispatch('liveops-action-completed', message: "Support ticket {$ticket->ticket_number} created.");
     }
 
     private function currentAssignment(): ?DispatchAssignment
