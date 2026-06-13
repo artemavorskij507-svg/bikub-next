@@ -31,6 +31,16 @@ Every major Admin OS module ships with an operational command-center page. A CRU
 - Keep destructive or irreversible actions behind confirmation and domain validation.
 - View-only roles must not receive action controls that their permissions cannot execute.
 
+## Dispatch And Map Pattern
+
+- Dispatch queues separate waiting, unassigned, assigned, active, operational-risk, payment-issue, support-issue, and completed states using persisted order data.
+- The selected-entity panel combines lifecycle, assignment, customer ownership, quote/payment readiness, support signals, GPS state, blockers, next action, and the real event timeline.
+- Worker eligibility must explain both eligibility and ineligibility from profile approval, real availability, scenario capability, active assignments, and real GPS telemetry.
+- Actions call domain services and record events/audit. When an action is unsafe or unavailable, disable it and state the exact reason.
+- Integration panels must distinguish configured, disabled, deferred, and missing states for support, payments, GPS, and customer tracking.
+- A map cockpit always renders the configured real map center, but creates worker markers only from persisted accepted GPS pings. Never use the map center as a worker marker and never draw an inferred route.
+- Map data endpoints remain authenticated and permission-protected. The visible cockpit must give operators actionable context rather than linking them to raw JSON.
+
 ## Acceptance
 
 - Browser UAT covers the command center, deep resource, selected record, empty states, and permission boundaries.
