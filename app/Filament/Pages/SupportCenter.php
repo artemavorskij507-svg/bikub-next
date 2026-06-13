@@ -24,6 +24,8 @@ class SupportCenter extends Page
 
     public string $messageBody = '';
 
+    public string $decisionNote = '';
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
     protected static ?string $navigationLabel = 'Support Center';
@@ -67,7 +69,8 @@ class SupportCenter extends Page
             ->when($this->queueFilter === 'unassigned', fn ($query) => $query->whereNull('assigned_to_id'))
             ->when($this->queueFilter === 'waiting_customer', fn ($query) => $query->where('status', 'pending_customer'))
             ->when($this->queueFilter === 'waiting_worker', fn ($query) => $query->where('status', 'pending_worker'))
-            ->when($this->queueFilter === 'resolved', fn ($query) => $query->where('status', 'resolved'), fn ($query) => $query->whereNotIn('status', ['resolved', 'closed']))
+            ->when($this->queueFilter === 'resolved', fn ($query) => $query->where('status', 'resolved'))
+            ->when(! in_array($this->queueFilter, ['all', 'resolved'], true), fn ($query) => $query->whereNotIn('status', ['resolved', 'closed']))
             ->when($this->categoryFilter !== 'all', fn ($query) => $query->where('category', $this->categoryFilter))
             ->when(filled($this->search), function ($query) {
                 $term = '%'.trim($this->search).'%';
@@ -86,6 +89,7 @@ class SupportCenter extends Page
             ->find($this->selectedTicketId ?? $activeQueue->first()?->id);
         $firstResponses = SupportMessage::query()
             ->whereIn('author_type', ['admin', 'support'])
+            ->whereIn('visibility', ['customer_visible', 'worker_visible'])
             ->selectRaw('support_ticket_id, MIN(created_at) as first_response_at')
             ->groupBy('support_ticket_id')
             ->get()
@@ -109,7 +113,7 @@ class SupportCenter extends Page
             'latestTicketAt' => SupportTicket::query()->latest('updated_at')->value('updated_at'),
             'selectedTicket' => $selectedTicket,
             'activeQueue' => $activeQueue,
-            'supportAgents' => User::role(['owner', 'admin', 'support'])->withCount(['assignedSupportTickets' => fn ($query) => $query->whereNotIn('status', ['resolved', 'closed'])])->get(),
+            'supportAgents' => User::permission('admin.support.view')->withCount(['assignedSupportTickets' => fn ($query) => $query->whereNotIn('status', ['resolved', 'closed'])])->get(),
             'attentionTickets' => SupportTicket::query()->where(fn ($query) => $query->where('priority', 'urgent')->orWhere('status', 'escalated'))->whereNotIn('status', ['resolved', 'closed'])->latest('updated_at')->limit(5)->get(),
         ];
     }
@@ -119,12 +123,13 @@ class SupportCenter extends Page
         abort_unless(auth()->user()?->can('admin.support.view'), 403);
         $this->selectedTicketId = SupportTicket::findOrFail($ticketId)->id;
         $this->messageBody = '';
+        $this->decisionNote = '';
         $this->composerMode = 'internal';
     }
 
     public function setQueueFilter(string $filter): void
     {
-        abort_unless(in_array($filter, ['incoming', 'mine', 'urgent', 'unassigned', 'waiting_customer', 'waiting_worker', 'resolved'], true), 422);
+        abort_unless(in_array($filter, ['incoming', 'all', 'mine', 'urgent', 'unassigned', 'waiting_customer', 'waiting_worker', 'resolved'], true), 422);
         $this->queueFilter = $filter;
         $this->selectedTicketId = null;
         $this->selectedTicketId = $this->getViewData()['activeQueue']->first()?->id;
@@ -146,6 +151,7 @@ class SupportCenter extends Page
 
     public function sendMessage(): void
     {
+        abort_unless(auth()->user()?->can('admin.support.manage'), 403);
         $this->validate(['messageBody' => ['required', 'string', 'max:10000']]);
         $ticket = SupportTicket::findOrFail($this->selectedTicketId);
         abort_if($this->composerMode === 'customer' && ! $ticket->customer_id, 422, 'No linked customer account.');
@@ -166,7 +172,39 @@ class SupportCenter extends Page
 
     public function assignToMe(int $ticketId): void
     {
+        abort_unless(auth()->user()?->can('admin.support.assign'), 403);
         app(SupportTicketService::class)->assignTicket(SupportTicket::findOrFail($ticketId), auth()->user(), auth()->user());
         Notification::make()->title('Ticket assigned to you')->success()->send();
+    }
+
+    public function escalateSelected(): void
+    {
+        abort_unless(auth()->user()?->can('admin.support.manage'), 403);
+        $this->validate(['decisionNote' => ['required', 'string', 'max:2000']]);
+
+        app(SupportTicketService::class)->changeStatus(
+            SupportTicket::findOrFail($this->selectedTicketId),
+            'escalated',
+            auth()->user(),
+            $this->decisionNote,
+        );
+
+        $this->decisionNote = '';
+        Notification::make()->title('Ticket escalated')->warning()->send();
+    }
+
+    public function resolveSelected(): void
+    {
+        abort_unless(auth()->user()?->can('admin.support.resolve'), 403);
+        $this->validate(['decisionNote' => ['required', 'string', 'max:2000']]);
+
+        app(SupportTicketService::class)->resolveTicket(
+            SupportTicket::findOrFail($this->selectedTicketId),
+            auth()->user(),
+            $this->decisionNote,
+        );
+
+        $this->decisionNote = '';
+        Notification::make()->title('Ticket resolved')->success()->send();
     }
 }
