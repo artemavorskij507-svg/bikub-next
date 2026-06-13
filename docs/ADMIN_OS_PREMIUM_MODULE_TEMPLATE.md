@@ -50,6 +50,15 @@ Every major Admin OS module ships with an operational command-center page. A CRU
 - Polling is an honest near-real-time mechanism. Do not claim WebSocket or live streaming when the page polls a protected endpoint.
 - Animated active, warning, and role states remain subtle, avoid flashing, and respect `prefers-reduced-motion`.
 
+## Fleetbase-Inspired Operations Patterns
+
+- Service Zones combine a persisted registry, map overlay, selected-zone context, event history, and service-backed actions.
+- Fleet Map combines real marker layers with active-order and worker sidebars; entities without coordinates remain visible in sidebars but never become map markers.
+- Order Board groups real lifecycle and dispatch state. Drag/drop is prohibited unless it calls validated lifecycle services.
+- Order Tracking combines a single order, assignment, support/payment/GPS context, and event timeline without inferred routes.
+- Scenario Flow Config visualizes persisted scenarios, intake fields, pricing and capability flags. It remains read-only until a real workflow editor domain exists.
+- A major Admin OS module is not accepted as CRUD-only; it requires an operational overview, context and safe actions.
+
 ## Acceptance
 
 - Browser UAT covers the command center, deep resource, selected record, empty states, and permission boundaries.

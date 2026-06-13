@@ -49,6 +49,15 @@
                     @endforelse
                 </div>
             </section>
+
+            <section class="mx-panel">
+                <header><div><span>Fleet queue</span><h2>Active orders</h2></div><b>{{ $activeOrders->count() }}</b></header>
+                <div class="mx-zone-list">
+                    @forelse($activeOrders as $activeOrder)
+                        <article><i style="--zone:#38d9ff"></i><div><strong>{{ $activeOrder->order_number }}</strong><span>{{ str($activeOrder->status->value)->replace('_',' ')->title() }} · {{ $activeOrder->activeDispatchAssignment()?->assignedUser?->name ?? 'Unassigned' }} · {{ $activeOrder->workerLocationPings->isNotEmpty() ? 'GPS received' : 'Coordinates/GPS missing' }}</span></div></article>
+                    @empty <p>No active orders.</p> @endforelse
+                </div>
+            </section>
         </aside>
 
         <main class="mx-map-panel live-processing-glow">
@@ -99,6 +108,15 @@
                     <div><dt>Stale threshold</dt><dd>{{ $mapDefaults['stale_seconds'] }} sec</dd></div>
                     <div><dt>Customer tracking</dt><dd class="muted">{{ $metrics['customer_tracking']?'Enabled':'Disabled' }}</dd></div>
                 </dl>
+            </section>
+
+            <section class="mx-panel">
+                <header><div><span>Fleet roster</span><h2>Approved workers</h2></div><b>{{ $fleetWorkers->count() }}</b></header>
+                <div class="mx-zone-list">
+                    @forelse($fleetWorkers as $profile)
+                        <article><i style="--zone:{{ in_array($profile->user?->workerAvailability?->status,['online','available'],true) ? '#10b981' : '#64748b' }}"></i><div><strong>{{ $profile->display_name ?: $profile->user?->name ?: 'Unlinked worker' }}</strong><span>{{ str($profile->user?->workerAvailability?->status ?? 'offline')->title() }} · {{ $profile->user?->locationPings?->isNotEmpty() ? 'Real GPS received' : 'No GPS ping yet' }}</span></div></article>
+                    @empty <p>No approved worker profiles.</p> @endforelse
+                </div>
             </section>
 
             <section id="mx-zone-editor" class="mx-panel mx-editor">

@@ -5,6 +5,8 @@ namespace App\Filament\Pages;
 use App\Models\DispatchAssignment;
 use App\Models\WorkerLocationPing;
 use App\Models\OperationZone;
+use App\Models\Order;
+use App\Models\WorkerProfile;
 use App\Services\Dispatch\DispatchEngine;
 use App\Services\Operations\OperationZoneService;
 use App\Services\Support\SupportTicketService;
@@ -86,6 +88,9 @@ class LiveOperationsMap extends AdminOsModulePage
             ],
             'gpsTrackingEnabled' => (bool) ($operations?->gps_tracking_enabled ?? true),
             'activeZones' => OperationZone::with(['creator', 'events'])->where('status', 'active')->latest()->limit(20)->get(),
+            'activeOrders' => Order::with(['scenario', 'dispatchAssignments.assignedUser', 'supportTickets', 'workerLocationPings'])
+                ->whereIn('status', ['submitted', 'accepted', 'in_progress'])->latest('updated_at')->limit(20)->get(),
+            'fleetWorkers' => WorkerProfile::with(['user.workerAvailability', 'user.locationPings'])->where('status', 'approved')->get(),
         ];
     }
 
