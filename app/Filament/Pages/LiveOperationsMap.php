@@ -126,6 +126,40 @@ class LiveOperationsMap extends AdminOsModulePage
         $this->contextLng = $lng;
     }
 
+    public function handleMapContextAction(string $action, float $lat, float $lng): array
+    {
+        abort_unless(auth()->user()?->can('admin.dispatch.view'), 403);
+        $this->setMapContext($lat, $lng);
+
+        $zoneTypes = [
+            'create_service_zone' => 'service_area',
+            'create_no_go_zone' => 'no_go_area',
+            'create_priority_zone' => 'priority_area',
+            'create_support_incident' => 'support_incident',
+        ];
+        if (isset($zoneTypes[$action])) {
+            $this->zoneType = $zoneTypes[$action];
+            $this->zoneRadius = 500;
+            $this->activeContextEditor = 'zone';
+            return ['status' => 'opened', 'message' => 'Opened zone form.'];
+        }
+        if ($action === 'add_dispatch_note') {
+            if (! $this->currentAssignment()?->order) return ['status' => 'disabled', 'message' => 'Disabled: Select an active order first.'];
+            $this->activeContextEditor = 'dispatch';
+            return ['status' => 'opened', 'message' => 'Opened dispatch note form.'];
+        }
+        if ($action === 'create_support_ticket') {
+            $assignment = $this->currentAssignment();
+            if (! $assignment?->order) return ['status' => 'disabled', 'message' => 'Disabled: Select an order first or create a support incident zone.'];
+            $this->supportSubject = 'Map incident: '.$assignment->order->order_number;
+            $this->activeContextEditor = 'support';
+            return ['status' => 'opened', 'message' => 'Opened support ticket form.'];
+        }
+        if ($action === 'search_nearby') return ['status' => 'disabled', 'message' => 'Disabled: Nearby search requires real order or worker coordinates.'];
+
+        return ['status' => 'error', 'message' => 'Error: action unavailable.'];
+    }
+
     public function openContextEditor(string $editor, float $lat, float $lng, ?string $zoneType = null): void
     {
         abort_unless(auth()->user()?->can('admin.dispatch.view'), 403);
