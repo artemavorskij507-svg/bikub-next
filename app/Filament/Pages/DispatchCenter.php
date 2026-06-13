@@ -7,6 +7,7 @@ use App\Filament\Resources\Orders\OrderResource;
 use App\Models\DispatchAssignment;
 use App\Models\DispatchEvent;
 use App\Models\Order;
+use App\Models\OperationZone;
 use App\Models\SupportTicket;
 use App\Models\User;
 use App\Models\WorkerLocationPing;
@@ -15,6 +16,7 @@ use App\Services\Dispatch\DispatchEngine;
 use App\Services\Support\SupportTicketService;
 use App\Services\Workers\WorkerEligibilityService;
 use App\Settings\OperationsSettings;
+use App\Settings\MapSettings;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
@@ -178,6 +180,7 @@ class DispatchCenter extends AdminOsModulePage
         $activeAssignments = DispatchAssignment::query()->whereIn('status', ['assigned', 'accepted']);
         $latestPing = $selectedOrder?->workerLocationPings->first()
             ?? $selectedOrder?->activeDispatchAssignment()?->assignedUser?->locationPings()->latest('captured_at')->first();
+        $mapSettings = rescue(fn () => app(MapSettings::class), null, report: false);
 
         return [
             'metrics' => [
@@ -189,6 +192,10 @@ class DispatchCenter extends AdminOsModulePage
                 'payment_not_ready' => Order::query()->whereIn('status', $activeStatuses)->whereIn('payment_status', ['pending', 'failed'])->count(),
                 'orders_with_ping' => WorkerLocationPing::query()->whereNotNull('order_id')->distinct('order_id')->count('order_id'),
                 'completed_today' => Order::query()->whereDate('completed_at', today())->count(),
+                'active_zones' => OperationZone::query()->where('status', 'active')->count(),
+                'stale_gps' => WorkerLocationPing::query()
+                    ->where('captured_at', '<', now()->subSeconds((int) ($mapSettings?->stale_gps_seconds ?? 120)))
+                    ->count(),
             ],
             'queue' => $this->dispatchQueue()->get(),
             'selectedOrder' => $selectedOrder,
@@ -201,6 +208,7 @@ class DispatchCenter extends AdminOsModulePage
             'paymentProviderEnabled' => (bool) ($operations?->payment_provider_enabled ?? false),
             'customerTrackingEnabled' => (bool) ($operations?->customer_tracking_enabled ?? false),
             'gpsTrackingEnabled' => (bool) ($operations?->gps_tracking_enabled ?? true),
+            'defaultMapLayer' => $mapSettings?->default_map_layer ?? 'standard',
         ];
     }
 

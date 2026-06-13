@@ -1,120 +1,141 @@
 <x-filament-panels::page>
-<x-admin-os.module-shell class="lm" label="Live operations map command workspace">
-    <header class="lm-command">
-        <div class="lm-brand">
-            <span><i></i> Real GPS operations</span>
-            <h1>Live Operations Map</h1>
-            <p>Verified browser telemetry only. No ping means no worker marker.</p>
-        </div>
-        <nav class="lm-command-links" aria-label="Live map quick links">
+<x-admin-os.module-shell class="mx" label="BiKuBe LiveOps Matrix">
+    <header class="mx-head">
+        <div><span class="mx-kicker"><i></i> LiveOps Matrix · polling {{ $mapDefaults['refresh_seconds'] }}s</span><h1>Live Operations Map</h1><p>Real GPS, active zones and operational context. No inferred markers or routes.</p></div>
+        <nav aria-label="LiveOps quick links">
             <x-admin-os.action-button :href="route('filament.admin.pages.dispatch-center')" tone="primary">Dispatch Center</x-admin-os.action-button>
             @if($assignment?->order)<x-admin-os.action-button :href="\App\Filament\Resources\Orders\OrderResource::getUrl('view',['record'=>$assignment->order])">Active order</x-admin-os.action-button>@endif
-            @can('admin.support.view')@if($latestSupportTicket)<x-admin-os.action-button :href="\App\Filament\Resources\SupportTickets\SupportTicketResource::getUrl('view',['record'=>$latestSupportTicket])">Support ticket</x-admin-os.action-button>@endif@endcan
+            <button type="button" id="mx-refresh">Refresh map</button>
         </nav>
     </header>
 
-    <section class="lm-kpis" aria-label="Map telemetry metrics">
+    <section class="mx-kpis" aria-label="Live operations metrics">
         @foreach([
-            ['pings','Real GPS pings','cyan'], ['active_assignments','Active assignments','success'],
-            ['workers_with_ping','Workers with ping','cyan'], ['orders_with_ping','Orders with ping','cyan'],
-            ['stale_pings','Stale pings > 2 min','warning'],
+            ['pings','Real GPS pings','cyan'],['active_assignments','Active assignments','green'],
+            ['workers_with_ping','Workers with ping','green'],['orders_with_ping','Orders with ping','cyan'],
+            ['stale_pings','Stale GPS','amber'],['zones','Active zones','purple'],
         ] as [$key,$label,$tone])
-            <article class="lm-kpi is-{{ $tone }}"><span>{{ $label }}</span><strong>{{ $metrics[$key] }}</strong><i></i></article>
+            <article class="mx-kpi is-{{ $tone }}"><span>{{ $label }}</span><strong>{{ $metrics[$key] }}</strong><i></i></article>
         @endforeach
-        <article class="lm-kpi {{ $metrics['customer_tracking'] ? 'is-success' : 'is-muted' }}"><span>Customer tracking</span><strong>{{ $metrics['customer_tracking'] ? 'Enabled' : 'Disabled' }}</strong><i></i></article>
     </section>
 
-    <div class="lm-grid">
-        <main class="lm-map-panel">
-            <header>
-                <div><span>Operations map</span><h2>Real worker telemetry</h2></div>
-                <div class="lm-map-legend"><b><i class="is-live"></i> Real ping</b><b><i class="is-stale"></i> Stale &gt; 2 min</b></div>
-            </header>
-            <div class="lm-map-stage">
-                <div id="live-operations-map" aria-label="Live operations map"></div>
-                <div id="live-map-empty" class="lm-map-empty">
-                    <span>No real GPS ping yet</span>
-                    <strong>Map center only — no worker marker.</strong>
-                    <p>Worker must open the assigned order on mobile HTTPS, stay online and send a real location ping.</p>
-                    <div>
-                        @if($assignment?->order)<a href="{{ route('worker.orders.show',$assignment->order) }}">Open worker order</a>@endif
-                        <a href="{{ route('filament.admin.pages.dispatch-center') }}">Open Dispatch Center</a>
-                    </div>
+    <div class="mx-workspace">
+        <aside class="mx-left">
+            <section class="mx-panel">
+                <header><div><span>Map layers</span><h2>Basemap provider</h2></div><b id="mx-layer-state">{{ str($mapDefaults['default_layer'])->title() }}</b></header>
+                <div id="mx-layers" class="mx-layer-grid" role="radiogroup" aria-label="Basemap layer">
+                    @foreach(['standard'=>'Standard','satellite'=>'Satellite','hybrid'=>'Hybrid','terrain'=>'Terrain'] as $key=>$label)
+                        <button type="button" data-layer="{{ $key }}" role="radio" aria-checked="{{ $mapDefaults['default_layer']===$key?'true':'false' }}" @disabled(!in_array($key,$mapDefaults['enabled_layers'],true))>{{ $label }}<small>{{ $key === 'standard' ? 'OpenStreetMap' : ($key === 'terrain' ? 'OpenTopoMap' : 'Esri') }}</small></button>
+                    @endforeach
                 </div>
-                <p id="live-map-status" class="lm-map-status">Loading real telemetry...</p>
+            </section>
+
+            <section class="mx-panel">
+                <header><div><span>Visibility</span><h2>Entity filters</h2></div><b id="mx-visible-count">0</b></header>
+                <div class="mx-filters">
+                    @foreach(['workers'=>'Workers','orders'=>'Active orders','customers'=>'Customers','support'=>'Support issues','payment_issues'=>'Payment issues','stale_gps'=>'Stale GPS','zones'=>'Zones'] as $key=>$label)
+                        <label><input type="checkbox" data-filter="{{ $key }}" checked><span>{{ $label }}</span><b data-count="{{ $key }}">0</b></label>
+                    @endforeach
+                </div>
+            </section>
+
+            <section class="mx-panel">
+                <header><div><span>Active geofences</span><h2>Operation zones</h2></div><b>{{ $activeZones->count() }}</b></header>
+                <div class="mx-zone-list">
+                    @forelse($activeZones as $zone)
+                        <article><i style="--zone:{{ $zone->color }}"></i><div><strong>{{ $zone->name }}</strong><span>{{ str($zone->type)->replace('_',' ')->title() }} · {{ $zone->radius_meters ? number_format($zone->radius_meters).' m' : 'Point' }}</span></div></article>
+                    @empty
+                        <p>No active operation zones. Right-click the map to create a real zone.</p>
+                    @endforelse
+                </div>
+            </section>
+        </aside>
+
+        <main class="mx-map-panel live-processing-glow">
+            <div class="mx-mapbar">
+                <div><span>Verified operations surface</span><strong id="mx-map-summary">Loading real map data...</strong></div>
+                <div class="mx-legend"><b><i class="worker"></i> Worker GPS</b><b><i class="stale"></i> Stale</b><b><i class="zone"></i> Zone</b></div>
             </div>
-            <footer>
-                <span>OSM map center: {{ number_format($mapDefaults['lat'],4) }}, {{ number_format($mapDefaults['lng'],4) }} · zoom {{ $mapDefaults['zoom'] }}</span>
-                <strong>Auto-refresh every 12 seconds</strong>
-            </footer>
+            <div class="mx-stage">
+                <div id="live-operations-map" aria-label="Interactive LiveOps operations map"></div>
+                <div id="mx-empty" class="mx-empty"><strong>No real GPS ping yet</strong><span>Map center only. Worker must open the assigned order on HTTPS/mobile and send location.</span></div>
+                <div id="mx-change" class="mx-change" role="status" aria-live="polite">Live data updated</div>
+                <div id="mx-context" class="mx-context" role="menu" aria-label="Map actions">
+                    <header><span>Map context</span><strong id="mx-coordinates">—</strong></header>
+                    <button type="button" data-action="zone" data-zone="service_area">Create service zone here</button>
+                    <button type="button" data-action="zone" data-zone="no_go_area">Create no-go zone here</button>
+                    <button type="button" data-action="zone" data-zone="priority_area">Create priority zone here</button>
+                    <button type="button" data-action="zone" data-zone="support_incident">Create support incident here</button>
+                    <button type="button" data-action="dispatch-note" @disabled(!$assignment?->order)>Add dispatch note at location</button>
+                    <button type="button" data-action="support" @disabled(!$assignment?->order)>Create support ticket at location</button>
+                    <button type="button" disabled title="Nearby spatial search requires persisted coordinates for orders and workers.">Search nearby orders/workers</button>
+                    <button type="button" data-action="copy">Copy coordinates</button>
+                    <a id="mx-external-map" href="#" target="_blank" rel="noopener">Open in external map</a>
+                </div>
+            </div>
+            <footer><span id="mx-status">Loading protected map endpoint...</span><strong>Right-click map for operational actions</strong></footer>
         </main>
 
-        <aside class="lm-rail">
-            <section class="lm-panel">
+        <aside class="mx-right">
+            <section class="mx-panel live-processing-glow">
                 <header><div><span>Current operation</span><h2>{{ $assignment?->order?->order_number ?? 'No active assignment' }}</h2></div>@if($assignment)<x-admin-os.status-badge :value="$assignment->status" />@endif</header>
                 @if($assignment?->order)
-                    <dl class="lm-details">
-                        <div><dt>Worker</dt><dd>{{ $assignment->assignedUser?->name ?? $assignment->assignedUser?->email ?? 'Worker missing' }}</dd></div>
+                    <dl>
+                        <div><dt>Worker</dt><dd>{{ $assignment->assignedUser?->name ?? 'Worker missing' }}</dd></div>
                         <div><dt>Presence</dt><dd>{{ str($assignment->assignedUser?->workerAvailability?->status ?? 'offline')->title() }}</dd></div>
-                        <div><dt>Worker profile</dt><dd>{{ str($assignment->assignedUser?->workerProfile?->status ?? 'missing')->title() }}</dd></div>
                         <div><dt>Order status</dt><dd>{{ str($assignment->order->status->value)->replace('_',' ')->title() }}</dd></div>
-                        <div><dt>Support tickets</dt><dd>{{ $assignment->order->supportTickets->whereNotIn('status',['resolved','closed'])->count() }} open</dd></div>
-                        <div><dt>Order GPS pings</dt><dd>{{ $assignment->order->workerLocationPings->count() }}</dd></div>
+                        <div><dt>Real GPS</dt><dd class="{{ $latestPing?'good':'warn' }}">{{ $latestPing?->captured_at?->diffForHumans() ?? 'No ping' }}</dd></div>
+                        <div><dt>Support</dt><dd>{{ $assignment->order->supportTickets->whereNotIn('status',['resolved','closed'])->count() }} open</dd></div>
                     </dl>
-                    <div class="lm-links">
-                        <a href="{{ \App\Filament\Resources\Orders\OrderResource::getUrl('view',['record'=>$assignment->order]) }}">Open order <span>Inspect</span></a>
-                        <a href="{{ route('worker.orders.show',$assignment->order) }}">Worker order URL <span>Open</span></a>
-                    </div>
-                @else
-                    <x-admin-os.empty-state title="No active assignment." body="Open Dispatch Center to review waiting and unassigned orders." />
-                @endif
+                    <div class="mx-actions"><a href="{{ \App\Filament\Resources\Orders\OrderResource::getUrl('view',['record'=>$assignment->order]) }}">Open order</a><a href="{{ route('worker.orders.show',$assignment->order) }}">Worker cockpit</a></div>
+                @else <x-admin-os.empty-state title="No active assignment." body="Open Dispatch Center to select an operational order." /> @endif
             </section>
 
-            <section class="lm-panel">
-                <header><div><span>GPS state</span><h2>{{ $latestPing ? 'Real telemetry received' : 'Waiting for first ping' }}</h2></div></header>
-                <dl class="lm-details">
-                    <div><dt>GPS tracking flow</dt><dd class="{{ $gpsTrackingEnabled ? 'is-good' : 'is-warning' }}">{{ $gpsTrackingEnabled ? 'Enabled' : 'Disabled' }}</dd></div>
-                    <div><dt>Latest ping</dt><dd>{{ $latestPing?->captured_at?->diffForHumans() ?? 'No real GPS ping' }}</dd></div>
-                    <div><dt>Accuracy</dt><dd>{{ $latestPing?->accuracy_meters !== null ? number_format((float)$latestPing->accuracy_meters,0).' m' : 'Unavailable' }}</dd></div>
-                    <div><dt>Max accepted accuracy</dt><dd>{{ number_format($mapDefaults['max_accuracy']) }} m</dd></div>
-                    <div><dt>Customer visibility</dt><dd class="{{ $metrics['customer_tracking'] ? 'is-good' : 'is-muted' }}">{{ $metrics['customer_tracking'] ? 'Enabled by settings' : 'Disabled' }}</dd></div>
+            <section class="mx-panel">
+                <header><div><span>GPS readiness</span><h2>{{ $latestPing ? 'Telemetry received' : 'Awaiting real ping' }}</h2></div></header>
+                <dl>
+                    <div><dt>Tracking flow</dt><dd class="{{ $gpsTrackingEnabled?'good':'warn' }}">{{ $gpsTrackingEnabled?'Enabled':'Disabled' }}</dd></div>
+                    <div><dt>Accepted accuracy</dt><dd>{{ number_format($mapDefaults['max_accuracy']) }} m</dd></div>
+                    <div><dt>Stale threshold</dt><dd>{{ $mapDefaults['stale_seconds'] }} sec</dd></div>
+                    <div><dt>Customer tracking</dt><dd class="muted">{{ $metrics['customer_tracking']?'Enabled':'Disabled' }}</dd></div>
                 </dl>
-                <div class="lm-required">
-                    <span>Required action</span>
-                    <strong>{{ $latestPing ? 'Monitor real telemetry freshness.' : 'Complete mobile HTTPS GPS UAT.' }}</strong>
-                    <p>{{ $latestPing ? 'Markers refresh from the protected database endpoint.' : 'Location permission, online presence and acceptable accuracy are required.' }}</p>
-                </div>
             </section>
 
-            @if($latestSupportTicket)
-                <section class="lm-panel">
-                    <header><div><span>Support signal</span><h2>{{ $latestSupportTicket->ticket_number }}</h2></div><x-admin-os.status-badge :value="$latestSupportTicket->priority" /></header>
-                    <div class="lm-support"><strong>{{ $latestSupportTicket->subject }}</strong><p>{{ str($latestSupportTicket->status)->replace('_',' ')->title() }} · {{ $latestSupportTicket->assignee?->name ?? 'Unassigned' }}</p>@can('admin.support.view')<a href="{{ \App\Filament\Resources\SupportTickets\SupportTicketResource::getUrl('view',['record'=>$latestSupportTicket]) }}">Open support ticket</a>@else<p>Support view permission is required.</p>@endcan</div>
-                </section>
-            @endif
-
-            @if($assignment?->order)
-                <section class="lm-panel lm-uat">
-                    <header><div><span>Mobile GPS UAT</span><h2>Secure browser required</h2></div></header>
-                    <p>Phone browsers normally require HTTPS and explicit location permission. Localhost on this PC is not a phone-access URL.</p>
-                    <label for="mobile-uat-url">LAN candidate — HTTPS may still be required</label>
-                    <input id="mobile-uat-url" readonly value="http://192.168.11.138:8090/worker/orders/{{ $assignment->order->id }}">
-                    <button id="copy-mobile-uat-url" type="button">Copy URL</button>
-                </section>
-            @endif
+            <section id="mx-zone-editor" class="mx-panel mx-editor">
+                <header><div><span>Context action</span><h2>Create persisted zone</h2></div><button type="button" id="mx-close-editor" aria-label="Close zone editor">×</button></header>
+                <form wire:submit="createZone">
+                    <label>Name<input wire:model="zoneName" required maxlength="150" placeholder="Operational zone name"></label>
+                    <label>Type<select wire:model="zoneType">@foreach(['service_area','priority_area','no_go_area','temporary_busy_area','pickup_hotspot','support_incident'] as $type)<option value="{{ $type }}">{{ str($type)->replace('_',' ')->title() }}</option>@endforeach</select></label>
+                    <label>Radius meters<input wire:model="zoneRadius" type="number" min="25" max="50000"></label>
+                    <label>Operational note<textarea wire:model="zoneNote" rows="2" placeholder="Reason and operating instruction"></textarea></label>
+                    <button type="submit">Create real zone</button>
+                    <p>Circle/point zones are supported. Polygon drawing is deferred because no approved drawing plugin is installed.</p>
+                </form>
+            </section>
         </aside>
     </div>
 </x-admin-os.module-shell>
+
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
-.fi-page-header{display:none}.lm{--line:rgba(121,158,194,.17);--panel:#071525;--muted:#7891ae;--text:#ecf5ff;display:grid;gap:.68rem;color:var(--text);font-size:.8rem}.lm-command,.lm-panel,.lm-map-panel,.lm-kpi{border:1px solid var(--line);border-radius:7px;background:linear-gradient(145deg,rgba(10,27,45,.97),rgba(4,16,29,.98));box-shadow:0 18px 46px rgba(0,0,0,.18)}.lm-command{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.78rem .9rem}.lm-brand span,.lm-panel>header span,.lm-map-panel>header span,.lm-required span,.lm-uat label{color:#34e79a;font-size:.58rem;font-weight:950;text-transform:uppercase}.lm-brand span i{display:inline-block;width:.42rem;height:.42rem;margin-right:.3rem;border-radius:50%;background:#28e296;box-shadow:0 0 12px #28e296;animation:lm-pulse 2s ease-in-out infinite}.lm-brand h1{font-size:1.35rem;font-weight:950}.lm-brand p{color:#8299b4;font-size:.64rem}.lm-command-links{display:flex;flex-wrap:wrap;gap:.35rem}.bkb-cc-action{display:inline-flex;align-items:center;justify-content:center;min-height:2.25rem;border:1px solid rgba(51,218,167,.3);border-radius:5px;padding:.42rem .62rem;background:#0b2637;color:#dcf8ed;font-size:.64rem;font-weight:850}.bkb-cc-action:hover,.bkb-cc-action:focus-visible,.lm a:focus-visible,.lm button:focus-visible{border-color:#2ce49c;outline:none;box-shadow:0 0 0 2px rgba(44,228,156,.2)}.bkb-cc-action.is-primary{background:linear-gradient(135deg,#0a9168,#087251)}.lm-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem}.lm-kpi{position:relative;overflow:hidden;min-height:5.2rem;padding:.65rem .7rem}.lm-kpi span{color:#7c95b2;font-size:.56rem;font-weight:950;text-transform:uppercase}.lm-kpi strong{display:block;margin-top:.42rem;font-size:1.25rem}.lm-kpi i{position:absolute;right:.55rem;bottom:.55rem;width:2.3rem;border-bottom:2px solid #38d9ff;opacity:.4;transform:skewX(-32deg)}.lm-kpi.is-warning strong{color:#f5bd54}.lm-kpi.is-success strong{color:#42e6a0}.lm-kpi.is-cyan strong{color:#62dbff}.lm-kpi.is-muted strong{color:#91a3b8}.lm-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(19rem,.3fr);gap:.58rem;align-items:start}.lm-map-panel{overflow:hidden}.lm-map-panel>header,.lm-panel>header{display:flex;align-items:start;justify-content:space-between;gap:.7rem;border-bottom:1px solid var(--line);padding:.66rem .72rem;background:rgba(11,32,51,.63)}.lm-map-panel>header h2,.lm-panel>header h2{margin-top:.1rem;font-size:.84rem;font-weight:900}.lm-map-legend{display:flex;gap:.55rem;color:#8ea4bd;font-size:.53rem}.lm-map-legend b{display:flex;align-items:center;gap:.25rem}.lm-map-legend i{width:.45rem;height:.45rem;border-radius:50%;background:#42e6a0;box-shadow:0 0 8px rgba(66,230,160,.6)}.lm-map-legend i.is-stale{background:#f5bd54;box-shadow:0 0 8px rgba(245,189,84,.5)}.lm-map-stage{position:relative;height:clamp(36rem,calc(100vh - 18rem),54rem);background:#06111f}.lm-map-stage #live-operations-map{height:100%}.lm-map-empty{position:absolute;z-index:450;top:1rem;left:50%;width:min(34rem,calc(100% - 2rem));transform:translateX(-50%);border:1px solid rgba(52,211,153,.28);border-radius:6px;padding:.8rem .9rem;background:rgba(5,17,31,.93);box-shadow:0 18px 50px rgba(0,0,0,.3);backdrop-filter:blur(10px)}.lm-map-empty span{color:#42e6a0;font-size:.57rem;font-weight:950;text-transform:uppercase}.lm-map-empty strong{display:block;margin-top:.18rem;font-size:.78rem}.lm-map-empty p{margin-top:.18rem;color:#91a7bf;font-size:.6rem}.lm-map-empty div{display:flex;gap:.35rem;margin-top:.5rem}.lm-map-empty a{border:1px solid rgba(51,218,167,.3);border-radius:4px;padding:.35rem .45rem;color:#dcf8ed;font-size:.57rem;font-weight:850}.lm-map-status{position:absolute;z-index:500;bottom:.75rem;left:.75rem;border:1px solid var(--line);border-radius:4px;padding:.4rem .5rem;background:rgba(5,17,31,.92);color:#a5b8cd;font-size:.55rem}.lm-map-panel>footer{display:flex;justify-content:space-between;gap:.8rem;border-top:1px solid var(--line);padding:.42rem .65rem;color:#718aa8;font-size:.53rem}.lm-map-panel>footer strong{color:#51dda7}.lm-rail{display:grid;gap:.58rem}.lm-panel{overflow:hidden}.lm-details{display:grid;gap:.36rem;padding:.58rem .62rem}.lm-details div{display:flex;justify-content:space-between;gap:.6rem;border-bottom:1px solid rgba(121,158,194,.09);padding-bottom:.32rem}.lm-details dt{color:#718aa8;font-size:.56rem}.lm-details dd{max-width:62%;font-size:.57rem;text-align:right}.lm-details dd.is-good{color:#42e6a0}.lm-details dd.is-warning{color:#f5bd54}.lm-details dd.is-muted{color:#849ab3}.lm-links{display:grid;gap:.3rem;border-top:1px solid var(--line);padding:.55rem}.lm-links a{display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:4px;padding:.36rem .42rem;color:#c9daea;font-size:.56rem}.lm-links span{color:#46dda5}.lm-required{margin:.2rem .6rem .6rem;border:1px solid rgba(245,189,84,.24);border-radius:5px;padding:.55rem;background:rgba(245,189,84,.06)}.lm-required strong{display:block;margin-top:.18rem;font-size:.61rem}.lm-required p,.lm-support p,.lm-uat p{margin-top:.2rem;color:#7891ae;font-size:.55rem;line-height:1.45}.lm-support{padding:.58rem}.lm-support strong{font-size:.61rem}.lm-support a{display:block;margin-top:.45rem;border:1px solid var(--line);border-radius:4px;padding:.35rem .42rem;color:#d7eee4;font-size:.56rem}.lm-uat{padding-bottom:.58rem}.lm-uat>p,.lm-uat label,.lm-uat input,.lm-uat button{margin:.52rem .58rem 0}.lm-uat label{display:block}.lm-uat input{width:calc(100% - 1.16rem);border:1px solid var(--line);border-radius:4px;padding:.38rem .44rem;background:#06111f;color:#d7e5f2;font-size:.55rem}.lm-uat button{border:1px solid rgba(51,218,167,.3);border-radius:4px;padding:.35rem .48rem;color:#dcf8ed;font-size:.56rem}.bkb-cc-badge{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:.12rem .32rem;color:#b9cbe0;font-size:.49rem;font-weight:950;text-transform:uppercase}.bkb-cc-empty{padding:1.5rem .8rem;text-align:center}.bkb-cc-empty p{color:#91a5c0}@keyframes lm-pulse{0%,100%{opacity:.65;transform:scale(.88)}50%{opacity:1;transform:scale(1.12)}}@media(prefers-reduced-motion:reduce){.lm *{animation:none!important;transition:none!important}}@media(max-width:1250px){.lm-kpis{grid-template-columns:repeat(3,1fr)}.lm-grid{grid-template-columns:1fr}.lm-rail{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){.lm-command{align-items:start;flex-direction:column}.lm-command-links{display:grid;width:100%;grid-template-columns:1fr}.lm-kpis,.lm-rail{grid-template-columns:1fr 1fr}.lm-map-stage{height:32rem}.lm-map-panel>footer{flex-direction:column}}@media(max-width:520px){.lm-kpis,.lm-rail{grid-template-columns:1fr}.lm-map-empty div{flex-direction:column}}
+.fi-page-header{display:none}.mx{--line:rgba(119,157,194,.18);--panel:rgba(5,18,32,.96);--muted:#7892ae;display:grid;gap:.55rem;color:#edf7ff;font-size:.75rem}.mx-head,.mx-panel,.mx-map-panel,.mx-kpi{border:1px solid var(--line);border-radius:7px;background:linear-gradient(145deg,rgba(9,28,45,.98),rgba(3,14,27,.98));box-shadow:0 16px 42px rgba(0,0,0,.25)}.mx-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.7rem .8rem}.mx-head nav,.mx-actions{display:flex;flex-wrap:wrap;gap:.3rem}.mx-head button,.mx-actions a,.mx-context button,.mx-context a,.mx-editor button{border:1px solid rgba(44,225,157,.32);border-radius:4px;padding:.38rem .5rem;background:#0b2738;color:#e2fff3;font-size:.57rem;font-weight:850}.mx-kicker,.mx-panel header span,.mx-mapbar span{color:#35e69b;font-size:.52rem;font-weight:950;text-transform:uppercase}.mx-kicker i{display:inline-block;width:.4rem;height:.4rem;margin-right:.25rem;border-radius:50%;background:#2be59b;box-shadow:0 0 12px #2be59b;animation:mxPulse 2s ease-in-out infinite}.mx-head h1{font-size:1.2rem;font-weight:950}.mx-head p{color:#839bb6;font-size:.58rem}.mx-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:.45rem}.mx-kpi{position:relative;min-height:4.5rem;overflow:hidden;padding:.55rem .62rem}.mx-kpi span{color:#7891ad;font-size:.5rem;font-weight:900;text-transform:uppercase}.mx-kpi strong{display:block;margin-top:.34rem;font-size:1.15rem}.mx-kpi i{position:absolute;right:.5rem;bottom:.45rem;width:2.2rem;border-bottom:2px solid #38d9ff;opacity:.38;transform:skewX(-30deg)}.mx-kpi.is-green strong{color:#3fe39b}.mx-kpi.is-cyan strong{color:#61dafa}.mx-kpi.is-amber strong{color:#f5bd54}.mx-kpi.is-purple strong{color:#c18aff}.mx-workspace{display:grid;grid-template-columns:15rem minmax(36rem,1fr) 18rem;gap:.5rem;align-items:start}.mx-left,.mx-right{display:grid;gap:.5rem}.mx-panel{overflow:hidden}.mx-panel header,.mx-mapbar{display:flex;align-items:start;justify-content:space-between;gap:.5rem;border-bottom:1px solid var(--line);padding:.55rem .6rem;background:rgba(11,33,52,.62)}.mx-panel h2,.mx-mapbar strong{font-size:.7rem;font-weight:900}.mx-panel header>b{color:#44e3a2;font-size:.62rem}.mx-layer-grid{display:grid;grid-template-columns:1fr 1fr;gap:.3rem;padding:.45rem}.mx-layer-grid button{display:grid;gap:.08rem;border:1px solid var(--line);border-radius:4px;padding:.4rem;background:#061421;color:#d8e7f5;text-align:left;font-size:.57rem}.mx-layer-grid button[aria-checked=true]{border-color:#2ce49c;background:rgba(44,228,156,.1);box-shadow:inset 0 0 18px rgba(44,228,156,.06)}.mx-layer-grid small{color:#7089a4;font-size:.47rem}.mx-filters{display:grid;padding:.35rem .45rem}.mx-filters label{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.35rem;border-bottom:1px solid rgba(119,157,194,.1);padding:.32rem .1rem;color:#b7c9da;font-size:.55rem}.mx-filters input{accent-color:#2ce49c}.mx-filters b{color:#5edca8}.mx-zone-list{display:grid;max-height:13rem;overflow:auto;padding:.35rem .45rem}.mx-zone-list article{display:grid;grid-template-columns:.3rem 1fr;gap:.35rem;border-bottom:1px solid rgba(119,157,194,.1);padding:.36rem 0}.mx-zone-list i{width:.22rem;border-radius:9px;background:var(--zone)}.mx-zone-list strong,.mx-zone-list span{display:block;font-size:.54rem}.mx-zone-list span,.mx-zone-list p{color:#728ca7}.mx-map-panel{overflow:hidden}.mx-mapbar{min-height:3.2rem}.mx-legend{display:flex;flex-wrap:wrap;gap:.45rem;color:#91a6bd;font-size:.48rem}.mx-legend b{display:flex;align-items:center;gap:.18rem}.mx-legend i{width:.42rem;height:.42rem;border-radius:50%;background:#3ce09c}.mx-legend .stale{background:#8b99aa}.mx-legend .zone{border:1px solid #f5bd54;background:transparent}.mx-stage{position:relative;height:clamp(40rem,calc(100vh - 13rem),62rem);background:#06111e}.mx-stage #live-operations-map{height:100%}.mx-empty,.mx-change{position:absolute;z-index:500;border:1px solid var(--line);border-radius:5px;background:rgba(4,16,29,.92);backdrop-filter:blur(12px)}.mx-empty{top:1rem;left:50%;width:min(31rem,calc(100% - 2rem));transform:translateX(-50%);padding:.65rem .75rem;text-align:center}.mx-empty strong,.mx-empty span{display:block}.mx-empty strong{color:#f2c35d}.mx-empty span{margin-top:.12rem;color:#9aafc5;font-size:.53rem}.mx-change{right:.65rem;bottom:.65rem;padding:.38rem .5rem;color:#50e5a7;font-size:.52rem;opacity:0;transform:translateY(5px);transition:.2s}.mx-change.show{opacity:1;transform:none}.mx-context{position:absolute;z-index:1000;display:none;width:14rem;border:1px solid rgba(58,224,166,.32);border-radius:5px;padding:.3rem;background:rgba(3,15,28,.98);box-shadow:0 18px 55px rgba(0,0,0,.5)}.mx-context.open{display:grid}.mx-context header{display:grid;gap:.1rem;border-bottom:1px solid var(--line);padding:.35rem}.mx-context header span{color:#35e69b;font-size:.47rem;text-transform:uppercase}.mx-context header strong{font-size:.55rem}.mx-context button,.mx-context a{border:0;border-bottom:1px solid rgba(119,157,194,.1);border-radius:0;background:transparent;text-align:left}.mx-context button:hover,.mx-context a:hover,.mx-context button:focus-visible,.mx-context a:focus-visible{background:rgba(44,228,156,.1);outline:none}.mx-context button:disabled{cursor:not-allowed;color:#657c95}.mx-map-panel footer{display:flex;justify-content:space-between;gap:.5rem;border-top:1px solid var(--line);padding:.4rem .55rem;color:#758da8;font-size:.5rem}.mx-map-panel footer strong{color:#43dfa2}.mx-panel dl{display:grid;padding:.45rem .55rem}.mx-panel dl div{display:flex;justify-content:space-between;gap:.5rem;border-bottom:1px solid rgba(119,157,194,.1);padding:.32rem 0}.mx-panel dt{color:#7690aa}.mx-panel dd{max-width:58%;text-align:right}.mx-panel dd.good{color:#3fe39b}.mx-panel dd.warn{color:#f5bd54}.mx-panel dd.muted{color:#8294a8}.mx-actions{padding:.45rem}.mx-actions a{flex:1;text-align:center}.mx-editor{display:none}.mx-editor.open{display:block}.mx-editor header button{border:0;background:transparent;font-size:1rem}.mx-editor form{display:grid;gap:.4rem;padding:.5rem}.mx-editor label{display:grid;gap:.15rem;color:#839bb5;font-size:.52rem}.mx-editor input,.mx-editor select,.mx-editor textarea{border:1px solid var(--line);border-radius:4px;padding:.38rem;background:#061421;color:#e5f2fc;font-size:.56rem}.mx-editor p{color:#718aa5;font-size:.49rem}.live-processing-glow{animation:mxBorder 4s ease-in-out infinite}.live-warning-glow{animation:mxWarn 2.4s ease-in-out infinite}@keyframes mxPulse{50%{opacity:.55;transform:scale(.78)}}@keyframes mxBorder{50%{border-color:rgba(48,220,169,.38);box-shadow:0 0 28px rgba(36,207,156,.08)}}@keyframes mxWarn{50%{border-color:rgba(245,189,84,.55);box-shadow:0 0 30px rgba(245,189,84,.1)}}@media(prefers-reduced-motion:reduce){.mx *{animation:none!important;transition:none!important}}@media(max-width:1450px){.mx-workspace{grid-template-columns:14rem minmax(35rem,1fr)}.mx-right{grid-column:1/-1;grid-template-columns:repeat(3,1fr)}}@media(max-width:1050px){.mx-kpis{grid-template-columns:repeat(3,1fr)}.mx-workspace{grid-template-columns:1fr}.mx-left,.mx-right{grid-template-columns:repeat(2,1fr)}.mx-map-panel{grid-row:1}.mx-stage{height:38rem}}@media(max-width:650px){.mx-head{align-items:start;flex-direction:column}.mx-kpis,.mx-left,.mx-right{grid-template-columns:1fr}.mx-stage{height:32rem}}
 </style>
 @endpush
+
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
-document.addEventListener('DOMContentLoaded',()=>{const defaults=@json($mapDefaults),status=document.getElementById('live-map-status'),empty=document.getElementById('live-map-empty'),el=document.getElementById('live-operations-map'),copy=document.getElementById('copy-mobile-uat-url'),url=document.getElementById('mobile-uat-url');const map=L.map(el,{center:[defaults.lat,defaults.lng],zoom:defaults.zoom});const markers=L.layerGroup().addTo(map);let previousCount=0;L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);async function refresh(){try{const response=await fetch(@json(route('admin.live-operations-map.data')),{headers:{Accept:'application/json'},cache:'no-store'});if(!response.ok)throw new Error('Telemetry endpoint returned '+response.status);const data=await response.json();markers.clearLayers();empty.style.display=data.count?'none':'block';if(!data.count){status.textContent='Map center only — no worker marker. Checking every 12 seconds.';previousCount=0;return}const bounds=[];data.markers.forEach(m=>{bounds.push([m.latitude,m.longitude]);const age=m.captured_at?Math.max(0,Math.round((Date.now()-new Date(m.captured_at).getTime())/60000)):null;const stale=age!==null&&age>2;const popup=[`<strong>${escapeHtml(m.worker.name||'Worker #'+m.worker.id)}</strong>`,escapeHtml(m.worker.email||''),`Order: ${escapeHtml(m.order_number||'No linked order')}`,`Order status: ${escapeHtml(m.order_status||'Unknown')}`,`Presence: ${escapeHtml(m.presence_status)}`,`Accuracy: ${m.accuracy_meters??'Unknown'} m`,`Captured: ${escapeHtml(m.captured_at||m.created_at||'Unknown')}`,stale?'Status: stale ping':'Status: current ping'].join('<br>');L.marker([m.latitude,m.longitude],{opacity:stale ? .68 : 1}).addTo(markers).bindPopup(popup)});if(previousCount===0)map.fitBounds(bounds,{padding:[32,32],maxZoom:16});previousCount=data.count;status.textContent=`Showing ${data.count} real marker(s). Auto-refresh: 12 seconds.`}catch(error){status.textContent='Live map unavailable: '+error.message}}copy?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(url.value);copy.textContent='Copied'}catch{url.select();copy.textContent='Select and copy URL'}});refresh();setInterval(refresh,12000)});function escapeHtml(value){const div=document.createElement('div');div.textContent=value;return div.innerHTML}
+document.addEventListener('DOMContentLoaded',()=>{const d=@json($mapDefaults),endpoint=@json(route('admin.live-operations-map.data')),map=L.map('live-operations-map',{center:[d.lat,d.lng],zoom:d.zoom,zoomControl:true}),groups={workers:L.layerGroup().addTo(map),zones:L.layerGroup().addTo(map)},filters={};let lastSignature='',ctx=null,currentLayer=null;
+const tiles={standard:L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}),satellite:L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles &copy; Esri'}),hybrid:L.layerGroup([L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles &copy; Esri'}),L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Labels &copy; Esri'})]),terrain:L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'Map data &copy; OpenStreetMap contributors, SRTM | Map style &copy; OpenTopoMap'})};
+function layer(name){if(currentLayer)map.removeLayer(currentLayer);currentLayer=tiles[name]||tiles.standard;currentLayer.addTo(map);document.querySelectorAll('[data-layer]').forEach(b=>{b.setAttribute('aria-checked',b.dataset.layer===name?'true':'false')});document.getElementById('mx-layer-state').textContent=name[0].toUpperCase()+name.slice(1);sessionStorage.setItem('bkb-map-layer',name)}
+layer(sessionStorage.getItem('bkb-map-layer')||d.default_layer||'standard');document.querySelectorAll('[data-layer]').forEach(b=>b.addEventListener('click',()=>!b.disabled&&layer(b.dataset.layer)));
+document.querySelectorAll('[data-filter]').forEach(i=>{filters[i.dataset.filter]=i.checked;i.addEventListener('change',()=>{filters[i.dataset.filter]=i.checked;applyVisibility()})});
+function applyVisibility(){filters.workers?map.addLayer(groups.workers):map.removeLayer(groups.workers);filters.zones?map.addLayer(groups.zones):map.removeLayer(groups.zones)}
+function esc(v){const e=document.createElement('div');e.textContent=v??'';return e.innerHTML}function zoneShape(z){const c=z.coordinates||{},opts={color:z.color||'#22d3ee',weight:2,fillOpacity:.16};return z.geometry_type==='circle'?L.circle([c.lat,c.lng],{...opts,radius:z.radius_meters}):L.circleMarker([c.lat,c.lng],{...opts,radius:8})}
+async function refresh(){try{const r=await fetch(endpoint,{headers:{Accept:'application/json'},cache:'no-store'});if(!r.ok)throw Error('protected endpoint '+r.status);const data=await r.json(),sig=JSON.stringify([data.count,data.zones?.length,data.refreshed_at?.slice(0,16)]);groups.workers.clearLayers();groups.zones.clearLayers();(data.markers||[]).forEach(m=>{const icon=L.divIcon({className:'',html:`<span style="display:grid;width:24px;height:24px;place-items:center;border:2px solid ${m.stale?'#8492a6':'#39e49e'};border-radius:50%;background:#071826;color:#fff;box-shadow:0 0 18px ${m.stale?'#8492a688':'#39e49e88'}">↗</span>`,iconSize:[24,24]});L.marker([m.latitude,m.longitude],{icon}).addTo(groups.workers).bindPopup(`<b>${esc(m.worker.name||m.worker.email)}</b><br>Order: ${esc(m.order_number||'Not linked')}<br>Presence: ${esc(m.presence_status)}<br>Accuracy: ${esc(m.accuracy_meters??'Unknown')} m<br>Captured: ${esc(m.captured_at||m.created_at)}`)});(data.zones||[]).forEach(z=>zoneShape(z).addTo(groups.zones).bindPopup(`<b>${esc(z.name)}</b><br>${esc(z.type.replaceAll('_',' '))}<br>${z.radius_meters?esc(z.radius_meters)+' m':'Point'}<br>Created by: ${esc(z.created_by||'System')}`));Object.entries(data.counts||{}).forEach(([k,v])=>document.querySelector(`[data-count="${k}"]`)?.replaceChildren(String(v)));document.getElementById('mx-visible-count').textContent=(data.count||0)+(data.zones?.length||0);document.getElementById('mx-empty').style.display=data.count?'none':'block';document.getElementById('mx-status').textContent=`${data.count} real worker marker(s), ${data.zones?.length||0} active zone(s). Refreshed ${new Date().toLocaleTimeString()}`;document.getElementById('mx-map-summary').textContent=`${data.count} verified marker(s) · ${data.zones?.length||0} active zone(s)`;if(lastSignature&&lastSignature!==sig){const x=document.getElementById('mx-change');x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}lastSignature=sig}catch(e){document.getElementById('mx-status').textContent='Live map unavailable: '+e.message}}
+map.on('contextmenu',e=>{ctx=e.latlng;window.Livewire?.find(@json($this->getId()))?.call('setMapContext',ctx.lat,ctx.lng);const menu=document.getElementById('mx-context'),p=map.latLngToContainerPoint(ctx);menu.style.left=Math.min(p.x,document.querySelector('.mx-stage').clientWidth-235)+'px';menu.style.top=Math.min(p.y,document.querySelector('.mx-stage').clientHeight-390)+'px';menu.classList.add('open');document.getElementById('mx-coordinates').textContent=`${ctx.lat.toFixed(6)}, ${ctx.lng.toFixed(6)}`;document.getElementById('mx-external-map').href=`https://www.openstreetmap.org/?mlat=${ctx.lat}&mlon=${ctx.lng}#map=16/${ctx.lat}/${ctx.lng}`});map.on('click',()=>document.getElementById('mx-context').classList.remove('open'));
+document.querySelectorAll('[data-action=zone]').forEach(b=>b.addEventListener('click',()=>{const type=b.dataset.zone;window.Livewire?.find(@json($this->getId()))?.set('zoneType',type);document.getElementById('mx-zone-editor').classList.add('open');document.getElementById('mx-context').classList.remove('open')}));document.querySelector('[data-action=copy]').addEventListener('click',()=>ctx&&navigator.clipboard.writeText(`${ctx.lat},${ctx.lng}`));document.querySelector('[data-action=dispatch-note]')?.addEventListener('click',()=>window.Livewire?.find(@json($this->getId()))?.call('addDispatchNoteAtLocation'));document.querySelector('[data-action=support]')?.addEventListener('click',()=>window.Livewire?.find(@json($this->getId()))?.call('createSupportAtLocation'));document.getElementById('mx-close-editor').addEventListener('click',()=>document.getElementById('mx-zone-editor').classList.remove('open'));document.getElementById('mx-refresh').addEventListener('click',refresh);refresh();setInterval(refresh,Math.max(10,d.refresh_seconds||12)*1000)});
 </script>
 @endpush
 </x-filament-panels::page>

@@ -32,6 +32,13 @@ class BiKuBeSettingsSeeder extends Seeder
                 'map_center_lng' => 17.4272,
                 'map_default_zoom' => 10,
                 'max_gps_accuracy_meters' => 5000,
+                'default_map_layer' => 'standard',
+                'enabled_map_layers' => ['standard', 'satellite', 'hybrid', 'terrain'],
+                'satellite_provider' => 'esri_world_imagery',
+                'terrain_provider' => 'opentopomap',
+                'hybrid_provider' => 'esri_world_imagery_reference',
+                'map_refresh_seconds' => 12,
+                'stale_gps_seconds' => 120,
             ],
         ];
 

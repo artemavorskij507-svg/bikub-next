@@ -4,12 +4,25 @@ namespace App\Filament\Pages;
 
 use App\Models\DispatchAssignment;
 use App\Models\WorkerLocationPing;
+use App\Models\OperationZone;
+use App\Services\Dispatch\DispatchEngine;
+use App\Services\Operations\OperationZoneService;
+use App\Services\Support\SupportTicketService;
+use Filament\Notifications\Notification;
 use App\Settings\MapSettings;
 use App\Settings\OperationsSettings;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Validation\ValidationException;
 
 class LiveOperationsMap extends AdminOsModulePage
 {
+    public float $contextLat = 68.4385;
+    public float $contextLng = 17.4272;
+    public string $zoneName = '';
+    public string $zoneType = 'priority_area';
+    public int $zoneRadius = 500;
+    public string $zoneNote = '';
+    public string $zoneDeactivateReason = '';
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map';
 
     protected static ?string $navigationLabel = 'Live Operations Map';
@@ -68,9 +81,11 @@ class LiveOperationsMap extends AdminOsModulePage
                 'workers_with_ping' => WorkerLocationPing::query()->distinct('user_id')->count('user_id'),
                 'orders_with_ping' => WorkerLocationPing::query()->whereNotNull('order_id')->distinct('order_id')->count('order_id'),
                 'stale_pings' => WorkerLocationPing::query()->where('captured_at', '<', now()->subMinutes(2))->count(),
+                'zones' => OperationZone::query()->where('status', 'active')->count(),
                 'customer_tracking' => (bool) ($operations?->customer_tracking_enabled ?? false),
             ],
             'gpsTrackingEnabled' => (bool) ($operations?->gps_tracking_enabled ?? true),
+            'activeZones' => OperationZone::with(['creator', 'events'])->where('status', 'active')->latest()->limit(20)->get(),
         ];
     }
 
@@ -81,6 +96,98 @@ class LiveOperationsMap extends AdminOsModulePage
             'lng' => app(MapSettings::class)->map_center_lng,
             'zoom' => app(MapSettings::class)->map_default_zoom,
             'max_accuracy' => app(MapSettings::class)->max_gps_accuracy_meters,
-        ], ['lat' => 68.4385, 'lng' => 17.4272, 'zoom' => 10, 'max_accuracy' => 5000], report: false);
+            'default_layer' => app(MapSettings::class)->default_map_layer,
+            'enabled_layers' => app(MapSettings::class)->enabled_map_layers,
+            'refresh_seconds' => app(MapSettings::class)->map_refresh_seconds,
+            'stale_seconds' => app(MapSettings::class)->stale_gps_seconds,
+        ], [
+            'lat' => 68.4385, 'lng' => 17.4272, 'zoom' => 10, 'max_accuracy' => 5000,
+            'default_layer' => 'standard', 'enabled_layers' => ['standard', 'satellite', 'hybrid', 'terrain'],
+            'refresh_seconds' => 12, 'stale_seconds' => 120,
+        ], report: false);
+    }
+
+    public function setMapContext(float $lat, float $lng): void
+    {
+        abort_unless(auth()->user()?->can('admin.dispatch.view'), 403);
+        if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180 || ($lat === 0.0 && $lng === 0.0)) abort(422, 'Invalid map coordinates.');
+        $this->contextLat = $lat;
+        $this->contextLng = $lng;
+    }
+
+    public function createZone(?string $type = null): void
+    {
+        abort_unless(auth()->user()?->can('admin.dispatch.view'), 403);
+        $type ??= $this->zoneType;
+        $this->zoneType = $type;
+        $this->validate([
+            'zoneName' => ['required', 'string', 'max:150'],
+            'zoneType' => ['required', 'in:service_area,priority_area,no_go_area,temporary_busy_area,pickup_hotspot,support_incident'],
+            'zoneRadius' => ['required', 'integer', 'min:25', 'max:50000'],
+        ]);
+        try {
+            app(OperationZoneService::class)->createZone([
+                'name' => $this->zoneName,
+                'type' => $this->zoneType,
+                'geometry_type' => $type === 'support_incident' ? 'point' : 'circle',
+                'coordinates' => ['lat' => $this->contextLat, 'lng' => $this->contextLng],
+                'radius_meters' => $type === 'support_incident' ? null : $this->zoneRadius,
+                'color' => $this->zoneColor($type),
+                'note' => $this->zoneNote ?: null,
+            ], auth()->user());
+            $this->reset(['zoneName', 'zoneNote']);
+            Notification::make()->title('Operation zone created')->success()->send();
+        } catch (ValidationException $exception) {
+            Notification::make()->title((string) collect($exception->errors())->flatten()->first())->warning()->send();
+        }
+    }
+
+    public function deactivateZone(int $zoneId): void
+    {
+        $this->validate(['zoneDeactivateReason' => ['required', 'string', 'max:2000']]);
+        app(OperationZoneService::class)->deactivateZone(OperationZone::findOrFail($zoneId), auth()->user(), $this->zoneDeactivateReason);
+        $this->zoneDeactivateReason = '';
+        Notification::make()->title('Operation zone deactivated')->success()->send();
+    }
+
+    public function addDispatchNoteAtLocation(): void
+    {
+        $assignment = $this->currentAssignment();
+        if (! $assignment?->order) {
+            Notification::make()->title('Select an active order first')->warning()->send();
+            return;
+        }
+        app(DispatchEngine::class)->recordDispatchEvent($assignment->order, 'dispatch.location_note', ['latitude' => $this->contextLat, 'longitude' => $this->contextLng], $this->zoneNote ?: 'Map location noted by dispatcher.', $assignment);
+        Notification::make()->title('Dispatch location note recorded')->success()->send();
+    }
+
+    public function createSupportAtLocation(): void
+    {
+        $assignment = $this->currentAssignment();
+        if (! $assignment?->order) {
+            Notification::make()->title('Select an active order first')->warning()->send();
+            return;
+        }
+        app(SupportTicketService::class)->createTicket([
+            'subject' => 'Map incident: '.$assignment->order->order_number,
+            'category' => 'delivery_issue', 'priority' => 'normal', 'source' => 'admin', 'visibility' => 'internal',
+            'order_id' => $assignment->order_id, 'dispatch_assignment_id' => $assignment->id,
+            'worker_profile_id' => $assignment->assignedUser?->workerProfile?->id, 'customer_id' => $assignment->order->customer_id,
+            'metadata' => ['location' => ['latitude' => $this->contextLat, 'longitude' => $this->contextLng]],
+        ], auth()->user());
+        Notification::make()->title('Location support ticket created')->success()->send();
+    }
+
+    private function currentAssignment(): ?DispatchAssignment
+    {
+        return DispatchAssignment::with(['order', 'assignedUser.workerProfile'])->whereIn('status', ['assigned', 'accepted'])->latest('assigned_at')->first();
+    }
+
+    private function zoneColor(string $type): string
+    {
+        return match ($type) {
+            'no_go_area' => '#ef4444', 'priority_area' => '#f59e0b', 'service_area' => '#22d3ee',
+            'temporary_busy_area' => '#a855f7', 'pickup_hotspot' => '#10b981', default => '#f97316',
+        };
     }
 }

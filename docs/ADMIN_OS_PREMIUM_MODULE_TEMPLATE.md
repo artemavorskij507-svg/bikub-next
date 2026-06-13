@@ -41,6 +41,15 @@ Every major Admin OS module ships with an operational command-center page. A CRU
 - A map cockpit always renders the configured real map center, but creates worker markers only from persisted accepted GPS pings. Never use the map center as a worker marker and never draw an inferred route.
 - Map data endpoints remain authenticated and permission-protected. The visible cockpit must give operators actionable context rather than linking them to raw JSON.
 
+## LiveOps Matrix Pattern
+
+- Basemap switching retains a keyless OSM fallback, displays provider attribution, and disables providers that require unavailable credentials.
+- Map context menus capture real coordinates and expose only working domain actions or disabled actions with an exact reason.
+- Operation zones are persisted domain records with validated geometry, lifecycle state, events, and audit. Never render an invented operational zone.
+- Marker taxonomy is semantic: worker telemetry, stale GPS, operational zones, support incidents, payment issues, and order/customer positions render only when real coordinates exist.
+- Polling is an honest near-real-time mechanism. Do not claim WebSocket or live streaming when the page polls a protected endpoint.
+- Animated active, warning, and role states remain subtle, avoid flashing, and respect `prefers-reduced-motion`.
+
 ## Acceptance
 
 - Browser UAT covers the command center, deep resource, selected record, empty states, and permission boundaries.
