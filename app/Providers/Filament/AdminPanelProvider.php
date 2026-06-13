@@ -40,8 +40,9 @@ class AdminPanelProvider extends PanelProvider
             ->defaultThemeMode(ThemeMode::Dark)
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
-                fn (): HtmlString => new HtmlString(view('filament.admin-theme')->render()),
+                fn (): HtmlString => new HtmlString(view('filament.admin-theme')->render().view('filament.theme-palette-assets')->render()),
             )
+            ->renderHook(PanelsRenderHook::TOPBAR_END, fn (): HtmlString => new HtmlString(view('filament.theme-palette-picker')->render()))
             ->renderHook(
                 PanelsRenderHook::TOPBAR_LOGO_AFTER,
                 fn (): HtmlString => new HtmlString(view('filament.admin-top-nav')->render()),

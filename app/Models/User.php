@@ -40,6 +40,7 @@ class User extends Authenticatable implements FilamentUser
     public function workerDocuments() { return $this->hasMany(WorkerDocument::class); }
     public function locationPings() { return $this->hasMany(WorkerLocationPing::class); }
     public function customerOrders() { return $this->hasMany(Order::class, 'customer_id'); }
+    public function themePreference(): HasOne { return $this->hasOne(UserThemePreference::class); }
     public function assignedSupportTickets() { return $this->hasMany(SupportTicket::class, 'assigned_to_id'); }
     public function isEligibleWorker(): bool
     {

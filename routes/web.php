@@ -13,6 +13,7 @@ use App\Http\Controllers\WorkerSupportController;
 use App\Http\Controllers\AdminSupportActivityController;
 use App\Http\Controllers\AdminSupportAttachmentDownloadController;
 use App\Http\Controllers\AccountOrderController;
+use App\Http\Controllers\ThemePaletteController;
 
 Route::pattern('order', '[0-9]+');
 
@@ -58,6 +59,12 @@ Route::middleware('auth')->prefix('account')->name('account.')->group(function (
     Route::post('/support', [AccountSupportController::class, 'store'])->name('support.store');
     Route::get('/support/{ticket}', [AccountSupportController::class, 'show'])->name('support.show');
     Route::post('/support/{ticket}/reply', [AccountSupportController::class, 'reply'])->name('support.reply');
+});
+
+Route::middleware(['auth', 'throttle:30,1'])->prefix('theme-palette')->name('theme-palette.')->group(function () {
+    Route::get('/config', [ThemePaletteController::class, 'config'])->name('config');
+    Route::post('/save', [ThemePaletteController::class, 'save'])->name('save');
+    Route::post('/reset', [ThemePaletteController::class, 'reset'])->name('reset');
 });
 
 Route::get('/admin/live-operations-map/data', AdminLiveOperationsMapDataController::class)
