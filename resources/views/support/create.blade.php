@@ -1,1 +1,5 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Create support ticket</title></head><body style="font:16px system-ui;max-width:720px;margin:auto;padding:24px"><h1>Create support ticket</h1><form method="post" action="{{ route('account.support.store') }}">@csrf<label>Subject<input name="subject" required maxlength="255" style="display:block;width:100%;margin:8px 0 16px"></label><label>Message<textarea name="summary" required rows="8" style="display:block;width:100%;margin:8px 0 16px"></textarea></label><button>Create ticket</button></form></body></html>
+@extends('layouts.account-shell')
+@section('title','Create support ticket')
+@section('content')
+<section class="shell-auth"><span class="shell-eyebrow">Account support</span><h1>Create support ticket</h1><form class="shell-form" method="post" action="{{ route('account.support.store') }}">@csrf<label>Subject<input name="subject" required maxlength="255"></label><label>Message<textarea name="summary" required rows="8"></textarea></label><button type="submit">Create ticket</button></form></section>
+@endsection

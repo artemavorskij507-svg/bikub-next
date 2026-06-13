@@ -1,1 +1,10 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My orders</title><style>body{font:16px system-ui;max-width:900px;margin:auto;padding:24px;background:#f4f7fb}.card{display:block;background:#fff;border:1px solid #dce3ec;padding:18px;margin:12px 0;border-radius:8px;color:#172033;text-decoration:none}.meta{color:#64748b}</style></head><body><h1>My orders</h1>@forelse($orders as $order)<a class="card" href="{{ route('account.orders.show',$order) }}"><strong>{{ $order->order_number }}</strong><p>{{ $order->scenario?->title ?? $order->service_scenario_key }}</p><span class="meta">{{ str($order->status->value)->replace('_',' ')->title() }}</span></a>@empty<div class="card">No orders are linked to this account.</div>@endforelse</body></html>
+@extends('layouts.account-shell')
+@section('title','My orders')
+@section('content')
+<header><span class="shell-eyebrow">Customer account</span><h1>My orders</h1><p>Orders linked to your verified account ownership.</p></header>
+<section class="shell-grid cards">
+@forelse($orders as $order)
+<article class="shell-card"><strong>{{ $order->order_number }}</strong><p>{{ $order->scenario?->title ?? $order->service_scenario_key }}</p><p>{{ str($order->status->value)->replace('_',' ')->title() }}</p><a href="{{ route('account.orders.show',$order) }}">Open order</a></article>
+@empty <div class="shell-card">No orders are linked to this account.</div> @endforelse
+</section>
+@endsection

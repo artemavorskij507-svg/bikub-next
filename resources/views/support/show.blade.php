@@ -1,11 +1,8 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $ticket->ticket_number }}</title><style>body{font:16px system-ui;max-width:900px;margin:auto;padding:24px;background:#f4f7fb}.card{background:#fff;border:1px solid #dce3ec;padding:18px;margin:12px 0;border-radius:8px}.meta{color:#64748b;font-size:14px}textarea{width:100%}</style></head><body>
-<a href="{{ route($portal.'.support.index') }}">Back to support</a><h1>{{ $ticket->ticket_number }}</h1><div class="card"><strong>{{ $ticket->subject }}</strong><p>{{ $ticket->summary }}</p><p class="meta">{{ str($ticket->status)->replace('_',' ')->title() }} · {{ str($ticket->priority)->title() }}</p></div>
-<h2>Messages</h2>@forelse($ticket->messages as $message)<div class="card"><strong>{{ ucfirst($portal) }} visible</strong><p>{{ $message->body }}</p><p class="meta">{{ $message->created_at }}</p></div>@empty<div class="card">No visible messages.</div>@endforelse
-<audio id="support-message-sent" preload="auto" src="{{ asset('audio/support/message-sent.mp3') }}"></audio>
-<form id="support-reply-form" class="card" method="post" action="{{ route($portal.'.support.reply', $ticket) }}">@csrf<label>Reply<textarea name="body" required rows="5"></textarea></label><button>Send reply</button></form>
-<script>
-document.getElementById('support-reply-form')?.addEventListener('submit', () => {
-    document.getElementById('support-message-sent')?.play().catch(() => {});
-});
-</script>
-</body></html>
+@extends($portal === 'account' ? 'layouts.account-shell' : 'worker.layout')
+@section('title',$ticket->ticket_number)
+@section('content')
+<a href="{{ route($portal.'.support.index') }}">Back to support</a><h1>{{ $ticket->ticket_number }}</h1><article class="shell-card"><strong>{{ $ticket->subject }}</strong><p>{{ $ticket->summary }}</p><p>{{ str($ticket->status)->replace('_',' ')->title() }} · {{ str($ticket->priority)->title() }}</p></article>
+<h2>Visible messages</h2><section class="shell-grid">@forelse($ticket->messages as $message)<article class="shell-card"><strong>{{ ucfirst($portal) }} visible</strong><p>{{ $message->body }}</p><small>{{ $message->created_at }}</small></article>@empty<div class="shell-card">No visible messages.</div>@endforelse</section>
+<audio id="support-message-sent" preload="auto" src="{{ asset('audio/support/message-sent.mp3') }}"></audio><form id="support-reply-form" class="shell-form shell-card" method="post" action="{{ route($portal.'.support.reply',$ticket) }}">@csrf<label>Reply<textarea name="body" required rows="5"></textarea></label><button type="submit">Send reply</button></form>
+<script>document.getElementById('support-reply-form')?.addEventListener('submit',()=>document.getElementById('support-message-sent')?.play().catch(()=>{}));</script>
+@endsection

@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $seo['title'] ?? 'BiKuBe' }}</title>
     @if (! empty($seo['description']))<meta name="description" content="{{ $seo['description'] }}">@endif
     @if (! empty($seo['canonical']))<link rel="canonical" href="{{ $seo['canonical'] }}">@endif
@@ -10,6 +11,9 @@
     @if (! empty($seo['og_title']))<meta property="og:title" content="{{ $seo['og_title'] }}">@endif
     @if (! empty($seo['og_description']))<meta property="og:description" content="{{ $seo['og_description'] }}">@endif
     @if (! empty($seo['og_image']))<meta property="og:image" content="{{ $seo['og_image'] }}">@endif
+    <link rel="stylesheet" href="{{ asset('css/theme-palette.css') }}">
+    <script>window.BKB_THEME_SURFACE='public'</script>
+    <script src="{{ asset('js/theme-palette.js') }}" defer></script>
     <style>
         :root{color-scheme:dark;--bg:#061019;--panel:#0b1924;--line:#1d3341;--text:#f2f7f8;--muted:#9db0bb;--accent:#25dc91}
         *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#103329 0,transparent 30%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,sans-serif;line-height:1.65}
@@ -25,6 +29,7 @@
     <header class="public-shell public-header">
         <a class="brand" href="/">BiKuBe<span>.</span></a>
         <span>Local services operating system for Norway</span>
+        @auth<x-theme-palette.picker surface="public" />@endauth
     </header>
     <main class="public-shell public-main">@yield('content')</main>
     <footer class="public-shell public-footer">BiKuBe Next · Narvik first</footer>
