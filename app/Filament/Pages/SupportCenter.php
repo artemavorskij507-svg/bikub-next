@@ -12,6 +12,18 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class SupportCenter extends Page
 {
+    public string $search = '';
+
+    public string $queueFilter = 'incoming';
+
+    public string $categoryFilter = 'all';
+
+    public ?int $selectedTicketId = null;
+
+    public string $composerMode = 'internal';
+
+    public string $messageBody = '';
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
     protected static ?string $navigationLabel = 'Support Center';
@@ -31,6 +43,15 @@ class SupportCenter extends Page
         return auth()->user()?->can('admin.support.view') ?? false;
     }
 
+    public function mount(): void
+    {
+        $this->selectedTicketId = SupportTicket::query()
+            ->whereNotIn('status', ['resolved', 'closed'])
+            ->orderByRaw("CASE WHEN priority = 'urgent' THEN 0 WHEN status = 'escalated' THEN 1 ELSE 2 END")
+            ->latest('updated_at')
+            ->value('id');
+    }
+
     public function getHeading(): string|Htmlable
     {
         return '';
@@ -39,12 +60,30 @@ class SupportCenter extends Page
     public function getViewData(): array
     {
         $open = SupportTicket::query()->whereNotIn('status', ['resolved', 'closed']);
+        $activeQueue = SupportTicket::query()
+            ->with(['order', 'customer', 'workerProfile', 'assignee'])
+            ->when($this->queueFilter === 'mine', fn ($query) => $query->where('assigned_to_id', auth()->id()))
+            ->when($this->queueFilter === 'urgent', fn ($query) => $query->where('priority', 'urgent'))
+            ->when($this->queueFilter === 'unassigned', fn ($query) => $query->whereNull('assigned_to_id'))
+            ->when($this->queueFilter === 'waiting_customer', fn ($query) => $query->where('status', 'pending_customer'))
+            ->when($this->queueFilter === 'waiting_worker', fn ($query) => $query->where('status', 'pending_worker'))
+            ->when($this->queueFilter === 'resolved', fn ($query) => $query->where('status', 'resolved'), fn ($query) => $query->whereNotIn('status', ['resolved', 'closed']))
+            ->when($this->categoryFilter !== 'all', fn ($query) => $query->where('category', $this->categoryFilter))
+            ->when(filled($this->search), function ($query) {
+                $term = '%'.trim($this->search).'%';
+                $query->where(fn ($search) => $search
+                    ->where('ticket_number', 'ilike', $term)
+                    ->orWhere('subject', 'ilike', $term)
+                    ->orWhereHas('order', fn ($order) => $order->where('order_number', 'ilike', $term))
+                    ->orWhereHas('customer', fn ($customer) => $customer->where('email', 'ilike', $term)));
+            })
+            ->orderByRaw("CASE WHEN priority = 'urgent' THEN 0 WHEN status = 'escalated' THEN 1 WHEN assigned_to_id IS NULL THEN 2 ELSE 3 END")
+            ->latest('updated_at')
+            ->limit(30)
+            ->get();
         $selectedTicket = SupportTicket::query()
             ->with(['order', 'customer', 'workerProfile', 'workerDocument', 'dispatchAssignment', 'assignee', 'messages.author', 'events.actor'])
-            ->whereNotIn('status', ['resolved', 'closed'])
-            ->orderByRaw("CASE WHEN priority = 'urgent' THEN 0 WHEN status = 'escalated' THEN 1 ELSE 2 END")
-            ->latest('updated_at')
-            ->first();
+            ->find($this->selectedTicketId ?? $activeQueue->first()?->id);
         $firstResponses = SupportMessage::query()
             ->whereIn('author_type', ['admin', 'support'])
             ->selectRaw('support_ticket_id, MIN(created_at) as first_response_at')
@@ -67,23 +106,62 @@ class SupportCenter extends Page
                 'resolved_today' => SupportTicket::query()->whereDate('resolved_at', today())->count(),
                 'avg_first_response' => $firstResponses->isNotEmpty() ? round($firstResponses->average()).' min' : 'Not enough data',
             ],
-            'queues' => [
-                'Urgent / escalated' => SupportTicket::query()->where(fn ($query) => $query->where('priority', 'urgent')->orWhere('status', 'escalated'))->latest('updated_at')->limit(6)->get(),
-                'Unassigned' => (clone $open)->whereNull('assigned_to_id')->latest('updated_at')->limit(6)->get(),
-                'Assigned to me' => (clone $open)->where('assigned_to_id', auth()->id())->latest('updated_at')->limit(6)->get(),
-                'Waiting customer' => (clone $open)->where('status', 'pending_customer')->latest('updated_at')->limit(6)->get(),
-                'Waiting worker' => (clone $open)->where('status', 'pending_worker')->latest('updated_at')->limit(6)->get(),
-                'Recently updated' => SupportTicket::query()->latest('updated_at')->limit(8)->get(),
-            ],
             'latestTicketAt' => SupportTicket::query()->latest('updated_at')->value('updated_at'),
             'selectedTicket' => $selectedTicket,
-            'activeQueue' => SupportTicket::query()
-                ->with(['order', 'assignee'])
-                ->whereNotIn('status', ['resolved', 'closed'])
-                ->orderByRaw("CASE WHEN priority = 'urgent' THEN 0 WHEN status = 'escalated' THEN 1 WHEN assigned_to_id IS NULL THEN 2 ELSE 3 END")
-                ->latest('updated_at')->limit(15)->get(),
+            'activeQueue' => $activeQueue,
             'supportAgents' => User::role(['owner', 'admin', 'support'])->withCount(['assignedSupportTickets' => fn ($query) => $query->whereNotIn('status', ['resolved', 'closed'])])->get(),
+            'attentionTickets' => SupportTicket::query()->where(fn ($query) => $query->where('priority', 'urgent')->orWhere('status', 'escalated'))->whereNotIn('status', ['resolved', 'closed'])->latest('updated_at')->limit(5)->get(),
         ];
+    }
+
+    public function selectTicket(int $ticketId): void
+    {
+        abort_unless(auth()->user()?->can('admin.support.view'), 403);
+        $this->selectedTicketId = SupportTicket::findOrFail($ticketId)->id;
+        $this->messageBody = '';
+        $this->composerMode = 'internal';
+    }
+
+    public function setQueueFilter(string $filter): void
+    {
+        abort_unless(in_array($filter, ['incoming', 'mine', 'urgent', 'unassigned', 'waiting_customer', 'waiting_worker', 'resolved'], true), 422);
+        $this->queueFilter = $filter;
+        $this->selectedTicketId = null;
+        $this->selectedTicketId = $this->getViewData()['activeQueue']->first()?->id;
+    }
+
+    public function setCategoryFilter(string $category): void
+    {
+        abort_unless(in_array($category, ['all', 'order_issue', 'payment_issue', 'worker_issue', 'document_issue', 'system_issue'], true), 422);
+        $this->categoryFilter = $category;
+        $this->selectedTicketId = null;
+        $this->selectedTicketId = $this->getViewData()['activeQueue']->first()?->id;
+    }
+
+    public function setComposerMode(string $mode): void
+    {
+        abort_unless(in_array($mode, ['internal', 'customer', 'worker'], true), 422);
+        $this->composerMode = $mode;
+    }
+
+    public function sendMessage(): void
+    {
+        $this->validate(['messageBody' => ['required', 'string', 'max:10000']]);
+        $ticket = SupportTicket::findOrFail($this->selectedTicketId);
+        abort_if($this->composerMode === 'customer' && ! $ticket->customer_id, 422, 'No linked customer account.');
+        abort_if($this->composerMode === 'worker' && ! $ticket->worker_profile_id, 422, 'No linked worker profile.');
+        $visibility = match ($this->composerMode) {
+            'customer' => 'customer_visible',
+            'worker' => 'worker_visible',
+            default => 'internal',
+        };
+        app(SupportTicketService::class)->addMessage($ticket, [
+            'body' => $this->messageBody,
+            'message_type' => $this->composerMode === 'internal' ? 'internal_note' : 'public_reply',
+            'visibility' => $visibility,
+        ], auth()->user());
+        $this->messageBody = '';
+        Notification::make()->title($this->composerMode === 'internal' ? 'Internal note added' : 'Reply recorded')->success()->send();
     }
 
     public function assignToMe(int $ticketId): void
