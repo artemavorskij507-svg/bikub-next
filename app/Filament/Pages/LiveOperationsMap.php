@@ -30,6 +30,7 @@ class LiveOperationsMap extends AdminOsModulePage
     public string $supportPriority = 'normal';
     public string $supportCategory = 'delivery_issue';
     public string $supportInternalNote = '';
+    public ?string $activeContextEditor = null;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map';
 
     protected static ?string $navigationLabel = 'Live Operations Map';
@@ -125,6 +126,23 @@ class LiveOperationsMap extends AdminOsModulePage
         $this->contextLng = $lng;
     }
 
+    public function openContextEditor(string $editor, float $lat, float $lng, ?string $zoneType = null): void
+    {
+        abort_unless(auth()->user()?->can('admin.dispatch.view'), 403);
+        $this->setMapContext($lat, $lng);
+        abort_unless(in_array($editor, ['zone', 'dispatch', 'support'], true), 422, 'Unsupported map action.');
+        if ($editor === 'zone') {
+            abort_unless(in_array($zoneType, ['service_area', 'priority_area', 'no_go_area', 'support_incident'], true), 422, 'Unsupported zone type.');
+            $this->zoneType = $zoneType;
+        }
+        $this->activeContextEditor = $editor;
+    }
+
+    public function closeContextEditor(): void
+    {
+        $this->activeContextEditor = null;
+    }
+
     public function createZone(?string $type = null): void
     {
         abort_unless(auth()->user()?->can('admin.dispatch.view'), 403);
@@ -145,7 +163,7 @@ class LiveOperationsMap extends AdminOsModulePage
                 'color' => $this->zoneColor($type),
                 'note' => $this->zoneNote ?: null,
             ], auth()->user());
-            $this->reset(['zoneName', 'zoneNote']);
+            $this->reset(['zoneName', 'zoneNote', 'activeContextEditor']);
             Notification::make()->title('Operation zone created')->success()->send();
             $this->dispatch('liveops-action-completed', message: 'Operation zone created and map refreshed.');
         } catch (ValidationException $exception) {
@@ -171,6 +189,7 @@ class LiveOperationsMap extends AdminOsModulePage
         $this->validate(['dispatchLocationNote' => ['required', 'string', 'max:2000']]);
         app(DispatchEngine::class)->recordDispatchEvent($assignment->order, 'dispatch.location_note', ['latitude' => $this->contextLat, 'longitude' => $this->contextLng], $this->dispatchLocationNote, $assignment);
         $this->dispatchLocationNote = '';
+        $this->activeContextEditor = null;
         Notification::make()->title('Dispatch location note recorded')->success()->send();
         $this->dispatch('liveops-action-completed', message: 'Dispatch location note recorded.');
     }
@@ -202,6 +221,7 @@ class LiveOperationsMap extends AdminOsModulePage
         $this->reset(['supportSubject', 'supportInternalNote']);
         $this->supportPriority = 'normal';
         $this->supportCategory = 'delivery_issue';
+        $this->activeContextEditor = null;
         Notification::make()->title('Location support ticket created')->success()->send();
         $this->dispatch('liveops-action-completed', message: "Support ticket {$ticket->ticket_number} created.");
     }
