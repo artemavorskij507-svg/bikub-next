@@ -1,0 +1,3 @@
+<?php
+namespace App\Services\Finance\VippsMobilePay;use App\Services\Finance\PaymentProviderSecretService;
+class VippsMobilePayWebhookVerifier{public function __construct(private PaymentProviderSecretService $secrets){}public function verify(array $payload,array $headers=[]):array{if(!$this->secrets->hasSecret('vipps_mobilepay','sandbox','webhook_secret'))return ['verified'=>false,'reason'=>'Webhook secret is missing. Provider event rejected.'];if(empty($headers))return ['verified'=>false,'reason'=>'Webhook signature headers are missing. Provider event rejected.'];return ['verified'=>false,'reason'=>'Webhook signature algorithm not confirmed. Provider event rejected.'];}}

@@ -1,19 +1,2 @@
 <?php
-
-namespace App\Settings;
-
-use Spatie\LaravelSettings\Settings;
-
-class OperationsSettings extends Settings
-{
-    public bool $dispatch_enabled;
-    public bool $gps_tracking_enabled;
-    public bool $payment_provider_enabled;
-    public bool $customer_tracking_enabled;
-    public bool $manual_review_required_default;
-
-    public static function group(): string
-    {
-        return 'operations';
-    }
-}
+namespace App\Settings;use Spatie\LaravelSettings\Settings;class OperationsSettings extends Settings{public bool $dispatch_enabled;public bool $gps_tracking_enabled;public bool $payment_provider_enabled;public bool $customer_tracking_enabled;public bool $manual_review_required_default;public string $payment_provider_key;public string $vipps_mobilepay_environment;public ?string $vipps_mobilepay_merchant_serial_number;public ?string $vipps_mobilepay_return_url;public ?string $vipps_mobilepay_callback_url;public string $vipps_mobilepay_capture_mode;public bool $vipps_mobilepay_outbound_http_allowed;public static function group():string{return 'operations';}}
