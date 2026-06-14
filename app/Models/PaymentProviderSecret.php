@@ -1,0 +1,2 @@
+<?php
+namespace App\Models;use Illuminate\Database\Eloquent\Model;class PaymentProviderSecret extends Model{protected $fillable=['provider','environment','key_name','encrypted_value','last_four','present','created_by_id','updated_by_id'];protected function casts():array{return ['present'=>'boolean'];}}
