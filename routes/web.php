@@ -13,6 +13,7 @@ use App\Http\Controllers\WorkerSupportController;
 use App\Http\Controllers\AdminSupportActivityController;
 use App\Http\Controllers\AdminSupportAttachmentDownloadController;
 use App\Http\Controllers\AccountBillingController;
+use App\Http\Controllers\AccountDashboardController;
 use App\Http\Controllers\AccountOrderController;
 use App\Http\Controllers\ThemePaletteController;
 
@@ -52,6 +53,7 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
     Route::post('/support/{ticket}/reply', [WorkerSupportController::class, 'reply'])->name('support.reply');
 })->whereNumber('order');
 
+Route::get('/account', AccountDashboardController::class)->middleware('auth')->name('account.dashboard');
 Route::middleware('auth')->prefix('account')->name('account.')->group(function () {
     Route::get('/orders', [AccountOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AccountOrderController::class, 'show'])->whereNumber('order')->name('orders.show');
