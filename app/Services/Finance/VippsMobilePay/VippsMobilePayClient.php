@@ -1,0 +1,3 @@
+<?php
+namespace App\Services\Finance\VippsMobilePay; use App\Data\Payments\PaymentProviderResult;
+class VippsMobilePayClient { public function baseUrl():string{return config('payment_providers.vipps_mobilepay.environment')==='production'?'https://api.vipps.no':'https://apitest.vipps.no';} public function send(string $operation,array $payload):PaymentProviderResult{return new PaymentProviderResult(false,config('payment_providers.vipps_mobilepay.external_requests_enabled',false)?'Vipps/MobilePay secure credential storage is not configured.':'Vipps/MobilePay external sandbox requests are not enabled.');}}

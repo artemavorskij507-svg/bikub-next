@@ -1,0 +1,4 @@
+<?php
+namespace App\Services\Finance;
+use App\Contracts\Payments\PaymentProviderInterface; use App\Services\Finance\Providers\VippsMobilePayPaymentProvider;
+class PaymentProviderManager { public function __construct(private DisabledPaymentProvider $disabled, private VippsMobilePayPaymentProvider $vipps){} public function provider():PaymentProviderInterface{return config('payment_providers.selected')==='vipps_mobilepay_sandbox'?$this->vipps:$this->disabled;} public function status():array{$p=$this->provider();return ['key'=>$p->providerKey(),'configured'=>$p->isConfigured(),'environment'=>config('payment_providers.vipps_mobilepay.environment','sandbox'),'webhook_verification_ready'=>(bool)config('payment_providers.vipps_mobilepay.webhook_secret_available',false),'reason'=>$p->isConfigured()?'Vipps/MobilePay sandbox adapter is configured.':'Vipps/MobilePay sandbox credentials are not configured.'];}}
