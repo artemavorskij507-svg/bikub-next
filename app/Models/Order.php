@@ -33,6 +33,7 @@ class Order extends Model
     public function workerLocationPings(): HasMany { return $this->hasMany(WorkerLocationPing::class)->orderByDesc('created_at'); }
     public function supportTickets(): HasMany { return $this->hasMany(SupportTicket::class)->orderByDesc('created_at'); }
     public function billingDocuments(): HasMany { return $this->hasMany(BillingDocument::class)->orderByDesc('created_at'); }
+    public function completionProofs(): HasMany { return $this->hasMany(OrderCompletionProof::class)->orderByDesc('created_at'); }
     public function paymentRecords(): HasMany { return $this->hasMany(PaymentRecord::class)->orderByDesc('created_at'); }
     public function isDispatchReady(): bool { return $this->dispatchEvents()->where('event_type', 'dispatch.ready')->exists(); }
     public function scopeWithStatus(Builder $query, OrderStatus|string $status): Builder { return $query->where('status', $status instanceof OrderStatus ? $status->value : $status); }

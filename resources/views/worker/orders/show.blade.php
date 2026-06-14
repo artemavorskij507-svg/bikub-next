@@ -4,6 +4,26 @@
 <section class="card"><h2>Intake</h2>@foreach(($order->metadata['intake'] ?? []) as $key=>$value)<div class="kv"><span>{{ str($key)->replace('_',' ')->title() }}</span><strong>{{ is_bool($value)?($value?'Yes':'No'):(is_array($value)?json_encode($value):$value) }}</strong></div>@endforeach</section></div>
 <section class="card" style="margin-top:14px"><h2>Next action</h2><div class="actions">@if($nextAction)<form method="post" action="{{ route('worker.orders.'.$nextAction['key'],$order) }}">@csrf<button class="btn primary">{{ $nextAction['label'] }}</button></form>@else<span class="muted">No further worker action is available.</span>@endif</div><p class="muted">Only the next valid delivery step is available. Every action is recorded in the order and dispatch audit trail.</p></section>
 <section class="card" style="margin-top:14px"><h2>Worker timeline</h2>@forelse($order->events->filter(fn($event)=>str_starts_with($event->event_type,'worker.')) as $event)<div class="kv"><span>{{ str($event->event_type)->replace(['worker.','_'],['',' '])->title() }}</span><strong>{{ $event->created_at?->format('Y-m-d H:i') }}</strong></div>@empty<p class="muted">No worker progress recorded.</p>@endforelse</section>
+@php($completionProof=$order->completionProofs->first())
+<section class="card" style="margin-top:14px">
+<h2>Completion proof</h2>
+@if($completionProof)
+<div class="kv"><span>Status</span><strong>{{ str($completionProof->status)->replace('_',' ')->title() }}</strong></div>
+<div class="kv"><span>Submitted</span><strong>{{ $completionProof->submitted_at?->format('Y-m-d H:i') }}</strong></div>
+<p>{{ $completionProof->worker_note }}</p>
+<p class="muted">{{ $completionProof->status === 'submitted' ? 'Waiting for customer confirmation. A duplicate proof cannot be submitted.' : 'This proof has been reviewed.' }}</p>
+@elseif($order->status->value === 'in_progress')
+<form method="post" action="{{ route('worker.orders.completion-proof.submit',$order) }}">
+@csrf
+<label for="worker-note">Completion note</label>
+<textarea id="worker-note" name="worker_note" required maxlength="5000" rows="4" placeholder="Describe the real completed work and handover.">{{ old('worker_note') }}</textarea>
+<button class="btn primary" onclick="return confirm('Submit this completion proof for customer review?')">Submit completion proof</button>
+</form>
+<p class="muted">Text proof is persisted and audited. Photo proof is unavailable until a customer-safe media policy is implemented.</p>
+@else
+<p class="muted">Completion proof is available only while the assigned order is in progress.</p>
+@endif
+</section>
 @php($intake=$order->metadata['intake']??[]) @php($pickup=$intake['pickup_address']??$intake['vehicle_location']??$intake['task_location']??null) @php($dropoff=$intake['dropoff_address']??$intake['destination_address']??null)
 <section class="card" style="margin-top:14px"><h2>External navigation</h2><p class="muted">Opens the selected navigation app using captured addresses. BiKuBe does not claim route optimization.</p><label for="navigation-app" class="muted">Navigation app</label><select id="navigation-app" class="btn"><option value="https://www.google.com/maps/search/?api=1&query=">Google Maps</option><option value="https://www.waze.com/ul?q=">Waze</option><option value="https://wego.here.com/directions/mix/">HERE WeGo</option><option value="https://maps.apple.com/?q=">Apple Maps</option><option value="https://yandex.com/maps/?text=">Yandex Maps</option><option value="https://2gis.com/search/">2GIS</option></select><div class="actions" style="margin-top:12px">@if($pickup)<a id="navigate-pickup" class="btn" target="_blank" rel="noopener" data-address="{{$pickup}}" href="#">Navigate to pickup</a>@else<span class="btn muted" aria-disabled="true">Pickup: No navigable destination captured</span>@endif @if($dropoff)<a id="navigate-dropoff" class="btn" target="_blank" rel="noopener" data-address="{{$dropoff}}" href="#">Navigate to dropoff</a>@else<span class="btn muted" aria-disabled="true">Dropoff: No navigable destination captured</span>@endif</div></section>
 <section class="card" style="margin-top:14px"><h2>Real GPS permission</h2><div class="kv"><span>Presence</span><strong>{{ str(auth()->user()->workerAvailability?->status ?? 'offline')->title() }}</strong></div><div class="kv"><span>Secure context</span><strong id="secure-context-state">Checking</strong></div><div class="kv"><span>Permission state</span><strong id="permission-state">Not requested</strong></div><p class="muted">Requires phone/browser location permission. HTTPS may be required. No fake or fallback coordinates are used. Accuracy above 5000 m is rejected.</p><button id="send-location" class="btn primary">Send real GPS ping now</button><div id="location-result" class="status" style="margin-top:12px">{{ $lastPing ? 'Last real ping: '.$lastPing->captured_at?->diffForHumans().' · accuracy '.$lastPing->accuracy_meters.' m' : 'No location ping recorded for this order.' }}</div></section>

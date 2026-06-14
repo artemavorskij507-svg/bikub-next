@@ -14,7 +14,7 @@ class WorkerCockpitController extends Controller
     public function show(Request $request, Order $order, WorkerOrderWorkflowService $workflow)
     {
         $workflow->assertOwnership($request->user(), $order);
-        return view('worker.orders.show', ['order' => $order->load(['scenario', 'events', 'dispatchEvents', 'priceQuotes']), 'lastPing' => WorkerLocationPing::where('user_id', $request->user()->id)->where('order_id', $order->id)->latest()->first(), 'nextAction' => $workflow->nextAction($order)]);
+        return view('worker.orders.show', ['order' => $order->load(['scenario', 'events', 'dispatchEvents', 'priceQuotes', 'completionProofs.events']), 'lastPing' => WorkerLocationPing::where('user_id', $request->user()->id)->where('order_id', $order->id)->latest()->first(), 'nextAction' => $workflow->nextAction($order)]);
     }
     public function online(Request $request, WorkerAvailabilityService $service) { $service->setOnline($request->user(), 'Worker enabled presence from cockpit. GPS is separate.'); return back()->with('status', 'You are online. Location is not shared until you explicitly enable it.'); }
     public function offline(Request $request, WorkerAvailabilityService $service) { $service->setOffline($request->user(), 'Worker disabled presence from cockpit.'); return back()->with('status', 'You are offline.'); }
@@ -36,7 +36,7 @@ class WorkerCockpitController extends Controller
     public function arrivedPickup(Request $r, Order $order, WorkerOrderWorkflowService $s) { return $this->run($r, $order, $s, 'markArrivedPickup'); }
     public function pickedUp(Request $r, Order $order, WorkerOrderWorkflowService $s) { return $this->run($r, $order, $s, 'markPickedUp'); }
     public function arrivedDropoff(Request $r, Order $order, WorkerOrderWorkflowService $s) { return $this->run($r, $order, $s, 'markArrivedDropoff'); }
-    public function complete(Request $r, Order $order, WorkerOrderWorkflowService $s) { return $this->run($r, $order, $s, 'completeOrder'); }
+    public function complete(Request $r, Order $order, WorkerOrderWorkflowService $s) { return back()->withErrors(['completion' => 'Submit completion proof and wait for customer confirmation before lifecycle completion.']); }
     private function run(Request $request, Order $order, WorkerOrderWorkflowService $service, string $method)
     {
         try { $service->{$method}($request->user(), $order); return back()->with('status', 'Worker action recorded.'); }

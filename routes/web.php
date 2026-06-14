@@ -15,6 +15,7 @@ use App\Http\Controllers\AdminSupportAttachmentDownloadController;
 use App\Http\Controllers\AccountBillingController;
 use App\Http\Controllers\AccountDashboardController;
 use App\Http\Controllers\AccountOrderController;
+use App\Http\Controllers\OrderCompletionController;
 use App\Http\Controllers\ThemePaletteController;
 
 Route::pattern('order', '[0-9]+');
@@ -45,6 +46,7 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
     Route::post('/orders/{order}/picked-up', [WorkerCockpitController::class, 'pickedUp'])->name('orders.picked-up');
     Route::post('/orders/{order}/arrived-dropoff', [WorkerCockpitController::class, 'arrivedDropoff'])->name('orders.arrived-dropoff');
     Route::post('/orders/{order}/complete', [WorkerCockpitController::class, 'complete'])->name('orders.complete');
+    Route::post('/orders/{order}/completion-proof', [OrderCompletionController::class, 'submit'])->name('orders.completion-proof.submit');
     Route::post('/presence/online', [WorkerCockpitController::class, 'online'])->name('presence.online');
     Route::post('/presence/offline', [WorkerCockpitController::class, 'offline'])->name('presence.offline');
     Route::post('/location-pings', [WorkerCockpitController::class, 'location'])->name('location-pings.store');
@@ -64,6 +66,8 @@ Route::middleware('auth')->prefix('account')->name('account.')->group(function (
     Route::post('/support', [AccountSupportController::class, 'store'])->name('support.store');
     Route::get('/support/{ticket}', [AccountSupportController::class, 'show'])->name('support.show');
     Route::post('/support/{ticket}/reply', [AccountSupportController::class, 'reply'])->name('support.reply');
+    Route::post('/completion-proofs/{proof}/accept', [OrderCompletionController::class, 'accept'])->whereNumber('proof')->name('completion-proofs.accept');
+    Route::post('/completion-proofs/{proof}/dispute', [OrderCompletionController::class, 'dispute'])->whereNumber('proof')->name('completion-proofs.dispute');
 });
 
 Route::middleware(['auth', 'throttle:30,1'])->prefix('theme-palette')->name('theme-palette.')->group(function () {
