@@ -15,6 +15,7 @@
             <article class="fc-card fc-card--{{ $tone }}"><span>{{ $label }}</span><strong>{{ $value }}</strong></article>
         @endforeach
     </section>
+    <section class="fc-kpis">@foreach([['Billing documents',$contractMetrics['documents'],'plain'],['Draft invoices',$contractMetrics['draft_documents'],'warn'],['Payment records',$contractMetrics['payment_records'],'plain'],['Provider blocked',$contractMetrics['provider_blocked'],'danger'],['Webhook events',$contractMetrics['webhooks'],'plain']] as [$label,$value,$tone])<article class="fc-card fc-card--{{ $tone }}"><span>{{ $label }}</span><strong>{{ $value }}</strong></article>@endforeach</section>
 
     <section class="fc-grid">
         <aside class="fc-panel fc-queue">

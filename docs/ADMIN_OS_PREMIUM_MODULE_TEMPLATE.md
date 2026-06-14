@@ -72,3 +72,5 @@ Orders are the central operational object connecting customer ownership, pricing
 ## Finance Control Pattern
 
 Finance Control is a readiness and exception cockpit until a signed payment-provider adapter exists. Quote, ownership, support issue and order-state evidence must come from persisted data. Payment intent, capture and refund controls remain visibly disabled with an exact blocker until provider contracts and audited services exist. Finance queues prioritize missing quotes, provider blockers, payment support issues, missing ownership and manual review.
+
+Billing and payment adapters preserve a strict separation between document state, internal payment records and external provider evidence. Draft invoices never imply payment. Receipts require captured evidence. Disabled providers record blocked attempts without claiming money movement.

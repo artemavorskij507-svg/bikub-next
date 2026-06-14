@@ -1,0 +1,1 @@
+<?php namespace App\Data\Payments; final readonly class PaymentWebhookResult{public function __construct(public bool $accepted,public string $status,public ?string $providerEventId=null,public array $metadata=[]){}}

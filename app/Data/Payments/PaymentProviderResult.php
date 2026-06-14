@@ -1,0 +1,1 @@
+<?php namespace App\Data\Payments; final readonly class PaymentProviderResult{public function __construct(public bool $successful,public string $message,public ?string $providerReference=null,public array $metadata=[]){}}

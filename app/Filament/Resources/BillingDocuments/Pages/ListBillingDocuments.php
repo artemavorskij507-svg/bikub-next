@@ -1,0 +1,1 @@
+<?php namespace App\Filament\Resources\BillingDocuments\Pages; use App\Filament\Resources\BillingDocuments\BillingDocumentResource; use Filament\Resources\Pages\ListRecords; class ListBillingDocuments extends ListRecords{protected static string $resource=BillingDocumentResource::class;}

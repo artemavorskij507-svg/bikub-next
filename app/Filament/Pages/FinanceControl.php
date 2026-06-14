@@ -6,6 +6,9 @@ use App\Filament\Resources\Orders\OrderResource;
 use App\Filament\Resources\PricingRules\PricingRuleResource;
 use App\Filament\Resources\SupportTickets\SupportTicketResource;
 use App\Models\Order;
+use App\Models\BillingDocument;
+use App\Models\PaymentRecord;
+use App\Models\PaymentWebhookEvent;
 use App\Services\Finance\PaymentReadinessService;
 use App\Services\Support\SupportTicketService;
 use Filament\Notifications\Notification;
@@ -78,6 +81,7 @@ class FinanceControl extends AdminOsModulePage
 
         return [
             'metrics' => $service->getFinanceMetrics(),
+            'contractMetrics' => ['documents'=>BillingDocument::count(),'draft_documents'=>BillingDocument::where('status','draft')->count(),'payment_records'=>PaymentRecord::count(),'provider_blocked'=>PaymentRecord::where('status','provider_disabled')->count(),'webhooks'=>PaymentWebhookEvent::count()],
             'provider' => $service->getProviderStatus(),
             'queue' => $this->queue()->get(),
             'selectedOrder' => $selected,

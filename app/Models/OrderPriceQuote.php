@@ -15,4 +15,5 @@ class OrderPriceQuote extends Model
     }
 
     public function order(): BelongsTo { return $this->belongsTo(Order::class); }
+    public function billingDocuments() { return $this->hasMany(BillingDocument::class); }
 }
