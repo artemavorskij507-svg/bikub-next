@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\{Order, WorkerLocationPing};
 use App\Services\Workers\{WorkerAvailabilityService, WorkerLocationService, WorkerOrderWorkflowService};
+use App\Services\Finance\WorkerSettlementService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class WorkerCockpitController extends Controller
 {
-    public function dashboard(Request $request) { return view('worker.dashboard', ['orders' => $this->orders($request)->take(3), 'availability' => $request->user()->workerAvailability]); }
+    public function dashboard(Request $request) { return view('worker.dashboard', ['orders' => $this->orders($request)->take(3), 'availability' => $request->user()->workerAvailability, 'earnings' => app(WorkerSettlementService::class)->getWorkerEarningsSummary($request->user())]); }
     public function index(Request $request) { return view('worker.orders.index', ['orders' => $this->orders($request)]); }
     public function show(Request $request, Order $order, WorkerOrderWorkflowService $workflow)
     {

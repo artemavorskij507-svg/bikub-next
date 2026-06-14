@@ -1,0 +1,1 @@
+<?php namespace App\Filament\Resources\WorkerSettlementEntries\Pages;use App\Filament\Resources\WorkerSettlementEntries\WorkerSettlementEntryResource;use Filament\Resources\Pages\ListRecords;class ListWorkerSettlementEntries extends ListRecords{protected static string $resource=WorkerSettlementEntryResource::class;}

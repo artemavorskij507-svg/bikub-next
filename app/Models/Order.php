@@ -35,6 +35,7 @@ class Order extends Model
     public function billingDocuments(): HasMany { return $this->hasMany(BillingDocument::class)->orderByDesc('created_at'); }
     public function completionProofs(): HasMany { return $this->hasMany(OrderCompletionProof::class)->orderByDesc('created_at'); }
     public function paymentRecords(): HasMany { return $this->hasMany(PaymentRecord::class)->orderByDesc('created_at'); }
+    public function workerSettlementEntries(): HasMany { return $this->hasMany(WorkerSettlementEntry::class)->orderByDesc('created_at'); }
     public function isDispatchReady(): bool { return $this->dispatchEvents()->where('event_type', 'dispatch.ready')->exists(); }
     public function scopeWithStatus(Builder $query, OrderStatus|string $status): Builder { return $query->where('status', $status instanceof OrderStatus ? $status->value : $status); }
     public function canTransitionTo(OrderStatus $status): bool { return $this->status->canTransitionTo($status); }

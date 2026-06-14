@@ -13,6 +13,7 @@ use App\Services\Finance\PaymentReadinessService;
 use App\Services\Finance\BillingDocumentService;
 use App\Services\Finance\QuoteCalculationService;
 use App\Services\Orders\OrderCompletionService;
+use App\Services\Finance\WorkerSettlementService;
 use App\Services\Support\SupportTicketService;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Htmlable;
@@ -100,6 +101,7 @@ class FinanceControl extends AdminOsModulePage
         $document = Order::findOrFail($id)->billingDocuments()->where('status', 'draft')->latest()->firstOrFail();
         $this->runFinanceAction(fn () => app(BillingDocumentService::class)->issueInvoice($document, auth()->user()), 'Invoice issued.');
     }
+    public function calculateSettlement(int $id): void { $this->runFinanceAction(fn()=>app(WorkerSettlementService::class)->calculateForOrder(Order::findOrFail($id),auth()->user()),'Settlement ledger calculated; payout blockers remain enforced.'); }
 
     public function getViewData(): array
     {
@@ -120,6 +122,7 @@ class FinanceControl extends AdminOsModulePage
             'readiness' => $selected ? $service->getOrderPaymentReadiness($selected) : null,
             'paymentTicket' => $paymentTicket,
             'completion' => $selected ? app(OrderCompletionService::class)->getCompletionState($selected) : null,
+            'settlement' => $selected ? app(WorkerSettlementService::class)->getSettlementReadiness($selected) : null,
             'orderUrl' => $selected ? OrderResource::getUrl('edit', ['record' => $selected]) : null,
             'pricingRulesUrl' => PricingRuleResource::getUrl(),
             'supportUrl' => $paymentTicket ? SupportTicketResource::getUrl('view', ['record' => $paymentTicket]) : null,
@@ -128,7 +131,7 @@ class FinanceControl extends AdminOsModulePage
 
     private function base(): Builder
     {
-        return Order::with(['customer', 'scenario', 'priceQuotes', 'billingDocuments', 'paymentRecords', 'dispatchAssignments', 'completionProofs.events', 'supportTickets.assignee', 'events']);
+        return Order::with(['customer', 'scenario', 'priceQuotes', 'billingDocuments', 'paymentRecords', 'workerSettlementEntries', 'dispatchAssignments', 'completionProofs.events', 'supportTickets.assignee', 'events']);
     }
 
     private function queue(): Builder
