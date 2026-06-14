@@ -98,7 +98,7 @@ class SupportTicketResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
+            ->persistFiltersInSession()->persistSortInSession()->persistSearchInSession()->persistColumnSearchesInSession()->persistColumnsInSession()->columns([
                 TextColumn::make('ticket_number')->searchable(),
                 TextColumn::make('status')->badge()->formatStateUsing(fn ($state) => str($state)->replace('_', ' ')->title()),
                 TextColumn::make('priority')->badge(),

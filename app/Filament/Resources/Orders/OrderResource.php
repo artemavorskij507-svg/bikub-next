@@ -91,7 +91,7 @@ class OrderResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table->columns([
+        return $table->persistFiltersInSession()->persistSortInSession()->persistSearchInSession()->persistColumnSearchesInSession()->persistColumnsInSession()->columns([
             TextColumn::make('order_number')->searchable()->copyable(),
             TextColumn::make('scenario.title')->label('Service')->searchable(),
             TextColumn::make('service_scenario_key')->label('Scenario key')->toggleable(),

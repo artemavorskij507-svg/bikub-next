@@ -51,7 +51,7 @@ class PricingRuleResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table->columns([
+        return $table->persistFiltersInSession()->persistSortInSession()->persistSearchInSession()->persistColumnSearchesInSession()->persistColumnsInSession()->columns([
             TextColumn::make('name')->searchable(), TextColumn::make('scenario_key')->searchable(),
             TextColumn::make('type')->badge(), TextColumn::make('status')->badge(),
             TextColumn::make('base_amount')->money('NOK')->placeholder('Manual review'),

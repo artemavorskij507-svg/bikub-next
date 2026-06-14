@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7d7a4b2857aa458a42a714ae39c3a15c",
+    "content-hash": "d8838b30bc17c03c521c06c8d81ab5d6",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2854,6 +2854,73 @@
                 "source": "https://github.com/kirschbaum-development/eloquent-power-joins/tree/4.3.2"
             },
             "time": "2026-05-28T20:35:55+00:00"
+        },
+        {
+            "name": "kisame76/filament-db-table-state",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kisame76/filament-db-table-state.git",
+                "reference": "572cb0f0c28f7e0c2fcb1b70c243dee7083c6858"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kisame76/filament-db-table-state/zipball/572cb0f0c28f7e0c2fcb1b70c243dee7083c6858",
+                "reference": "572cb0f0c28f7e0c2fcb1b70c243dee7083c6858",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "livewire/livewire": "^3.5|^4.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.9|^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Kisame76\\FilamentDbTableState\\FilamentDbTableStateServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Kisame76\\FilamentDbTableState\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kiyan Doguc",
+                    "email": "k.doguc@kisame-labs.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Persist Filament table state (filters, sort, search, column order & visibility) per user in the database, across devices and sessions.",
+            "homepage": "https://github.com/Kisame76/filament-db-table-state",
+            "keywords": [
+                "filament",
+                "filters",
+                "laravel",
+                "livewire",
+                "persistence",
+                "tables"
+            ],
+            "support": {
+                "issues": "https://github.com/Kisame76/filament-db-table-state/issues",
+                "source": "https://github.com/Kisame76/filament-db-table-state/tree/v1.0.1"
+            },
+            "time": "2026-06-10T08:30:55+00:00"
         },
         {
             "name": "laravel-notification-channels/webpush",
