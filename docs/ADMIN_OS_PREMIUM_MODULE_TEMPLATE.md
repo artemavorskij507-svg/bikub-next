@@ -64,3 +64,7 @@ Every major Admin OS module ships with an operational command-center page. A CRU
 - Browser UAT covers the command center, deep resource, selected record, empty states, and permission boundaries.
 - Screenshot-level review confirms hierarchy, density, overflow, and responsive behavior.
 - Validation includes PHP lint, routes, tests, Blade compilation, and fresh log review.
+
+## Orders Hub Pattern
+
+Orders are the central operational object connecting customer ownership, pricing, dispatch, worker execution, support and verified GPS. A production Orders Hub must provide real KPI queues, a selected-order command panel, integration context, an aggregated event timeline and an order-health panel derived only from persisted state. Lifecycle changes must use domain services; unavailable actions remain disabled with an exact reason. Standard CRUD remains available for deep management but is not the primary operations surface.
