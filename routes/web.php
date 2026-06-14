@@ -12,6 +12,7 @@ use App\Http\Controllers\AccountSupportController;
 use App\Http\Controllers\WorkerSupportController;
 use App\Http\Controllers\AdminSupportActivityController;
 use App\Http\Controllers\AdminSupportAttachmentDownloadController;
+use App\Http\Controllers\AccountBillingController;
 use App\Http\Controllers\AccountOrderController;
 use App\Http\Controllers\ThemePaletteController;
 
@@ -54,6 +55,8 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
 Route::middleware('auth')->prefix('account')->name('account.')->group(function () {
     Route::get('/orders', [AccountOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AccountOrderController::class, 'show'])->whereNumber('order')->name('orders.show');
+    Route::get('/billing', [AccountBillingController::class, 'index'])->name('billing.index');
+    Route::get('/billing/documents/{billingDocument}', [AccountBillingController::class, 'show'])->whereNumber('billingDocument')->name('billing.documents.show');
     Route::get('/support', [AccountSupportController::class, 'index'])->name('support.index');
     Route::get('/support/create', [AccountSupportController::class, 'create'])->name('support.create');
     Route::post('/support', [AccountSupportController::class, 'store'])->name('support.store');
