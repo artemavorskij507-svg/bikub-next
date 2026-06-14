@@ -10,16 +10,20 @@ use App\Models\BillingDocument;
 use App\Models\PaymentRecord;
 use App\Models\PaymentWebhookEvent;
 use App\Services\Finance\PaymentReadinessService;
+use App\Services\Finance\BillingDocumentService;
+use App\Services\Finance\QuoteCalculationService;
 use App\Services\Support\SupportTicketService;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\ValidationException;
 
 class FinanceControl extends AdminOsModulePage
 {
     public string $queueFilter = 'readiness';
     public ?int $selectedOrderId = null;
     public string $supportNote = '';
+    public string $quoteReason = '';
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
     protected static ?string $navigationLabel = 'Finance Control';
@@ -73,10 +77,34 @@ class FinanceControl extends AdminOsModulePage
         Notification::make()->title('Internal payment support note added')->success()->send();
     }
 
+    public function calculateQuote(int $id): void
+    {
+        $this->runFinanceAction(fn () => app(QuoteCalculationService::class)->calculateForOrder(Order::findOrFail($id), auth()->user()), 'Real quote calculated.');
+    }
+
+    public function recalculateQuote(int $id): void
+    {
+        $this->validate(['quoteReason' => ['required', 'string', 'max:1000']]);
+        $this->runFinanceAction(fn () => app(QuoteCalculationService::class)->recalculateForOrder(Order::findOrFail($id), auth()->user(), $this->quoteReason), 'Quote recalculated.');
+        $this->quoteReason = '';
+    }
+
+    public function createDraftInvoice(int $id): void
+    {
+        $this->runFinanceAction(fn () => app(BillingDocumentService::class)->createDraftInvoiceForOrder(Order::findOrFail($id), auth()->user()), 'Draft invoice created.');
+    }
+
+    public function issueLatestInvoice(int $id): void
+    {
+        $document = Order::findOrFail($id)->billingDocuments()->where('status', 'draft')->latest()->firstOrFail();
+        $this->runFinanceAction(fn () => app(BillingDocumentService::class)->issueInvoice($document, auth()->user()), 'Invoice issued.');
+    }
+
     public function getViewData(): array
     {
         $selected = $this->selected();
         $service = app(PaymentReadinessService::class);
+        $quoteService = app(QuoteCalculationService::class);
         $paymentTicket = $selected?->supportTickets->first(fn ($ticket) => $ticket->category === 'payment_issue' && ! in_array($ticket->status, ['resolved', 'closed'], true));
 
         return [
@@ -86,6 +114,8 @@ class FinanceControl extends AdminOsModulePage
             'queue' => $this->queue()->get(),
             'selectedOrder' => $selected,
             'quote' => $selected?->latestPriceQuote(),
+            'quotePreview' => $selected ? $quoteService->previewForOrder($selected) : null,
+            'latestInvoice' => $selected?->billingDocuments()->latest()->first(),
             'readiness' => $selected ? $service->getOrderPaymentReadiness($selected) : null,
             'paymentTicket' => $paymentTicket,
             'orderUrl' => $selected ? OrderResource::getUrl('edit', ['record' => $selected]) : null,
@@ -114,5 +144,16 @@ class FinanceControl extends AdminOsModulePage
     private function selected(): ?Order
     {
         return $this->selectedOrderId ? $this->base()->find($this->selectedOrderId) : null;
+    }
+
+    private function runFinanceAction(callable $action, string $success): void
+    {
+        abort_unless(auth()->user()?->can('admin.finance.manage'), 403);
+        try {
+            $action();
+            Notification::make()->title($success)->success()->send();
+        } catch (ValidationException $exception) {
+            Notification::make()->title(collect($exception->errors())->flatten()->first())->warning()->send();
+        }
     }
 }

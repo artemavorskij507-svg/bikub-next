@@ -42,6 +42,15 @@
                 <div class="fc-actions"><a href="{{ $orderUrl }}">Open order</a><a href="{{ route('filament.admin.pages.orders-hub') }}">Open Orders Hub</a>
                     @if($supportUrl)<a href="{{ $supportUrl }}">Open payment ticket</a>@else<button wire:click="createPaymentSupportTicket({{ $selectedOrder->id }})">Create payment support ticket</button>@endif
                 </div>
+                <div class="fc-section"><span>QUOTE & INVOICE ACTIONS</span><div class="fc-actions">
+                    @if($quote)<button wire:click="recalculateQuote({{ $selectedOrder->id }})">Recalculate quote</button>@else<button wire:click="calculateQuote({{ $selectedOrder->id }})">Calculate quote</button>@endif
+                    @if($quote && $quote->status === 'estimated' && (float)$quote->total > 0)<button wire:click="createDraftInvoice({{ $selectedOrder->id }})">Create draft invoice</button>@else<button disabled title="Create a real quote before invoice issuance.">Create draft invoice</button>@endif
+                    @if($latestInvoice?->status === 'draft')<button wire:click="issueLatestInvoice({{ $selectedOrder->id }})">Issue invoice</button>@else<button disabled title="A draft invoice is required.">Issue invoice</button>@endif
+                </div>
+                @if($quote)<label class="fc-reason">Recalculation reason<input wire:model="quoteReason" placeholder="Required before recalculation"></label>@endif
+                @if(!$quotePreview['ready'])<div class="fc-blocker"><strong>Quote blocked</strong><p>{{ $quotePreview['blockers'][0]['reason'] }}</p></div>@endif
+                @if($latestInvoice)<p>Latest invoice: <strong>{{ $latestInvoice->document_number }}</strong> · {{ str($latestInvoice->status)->title() }} · {{ number_format((float)$latestInvoice->total_amount,2) }} {{ $latestInvoice->currency }}</p>@endif
+                </div>
                 <div class="fc-disabled"><button disabled>Create payment intent</button><button disabled>Capture payment</button><button disabled>Refund payment</button><p>{{ $readiness['disabled_reason'] ?? 'Payment provider not connected yet.' }}</p></div>
                 <div class="fc-section"><span>QUOTE BREAKDOWN</span>
                     @if($quote)<dl><div><dt>Quote</dt><dd>{{ $quote->quote_number }}</dd></div><div><dt>Subtotal</dt><dd>{{ number_format((float)$quote->subtotal,2) }} {{ $quote->currency }}</dd></div><div><dt>Fees</dt><dd>{{ number_format((float)$quote->fees_total,2) }} {{ $quote->currency }}</dd></div><div><dt>Total</dt><dd>{{ number_format((float)$quote->total,2) }} {{ $quote->currency }}</dd></div><div><dt>Status</dt><dd>{{ str($quote->status)->replace('_',' ')->title() }}</dd></div></dl>
