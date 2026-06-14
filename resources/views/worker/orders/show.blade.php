@@ -11,7 +11,7 @@
 <div class="kv"><span>Status</span><strong>{{ str($completionProof->status)->replace('_',' ')->title() }}</strong></div>
 <div class="kv"><span>Submitted</span><strong>{{ $completionProof->submitted_at?->format('Y-m-d H:i') }}</strong></div>
 <p>{{ $completionProof->worker_note }}</p>
-<p class="muted">{{ $completionProof->status === 'submitted' ? 'Waiting for customer confirmation. A duplicate proof cannot be submitted.' : 'This proof has been reviewed.' }}</p>
+<p class="muted">{{ $completionProof->status === 'submitted' ? 'Waiting for customer confirmation. A duplicate proof cannot be submitted.' : ($completionProof->status === 'accepted' ? 'Customer accepted the completion proof. Payment and payout remain separate.' : 'Customer disputed the completion proof. Support review is required.') }}</p>
 @elseif($order->status->value === 'in_progress')
 <form method="post" action="{{ route('worker.orders.completion-proof.submit',$order) }}">
 @csrf

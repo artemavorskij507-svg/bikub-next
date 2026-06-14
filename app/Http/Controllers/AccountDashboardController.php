@@ -10,7 +10,7 @@ class AccountDashboardController extends Controller
     public function __invoke(Request $request)
     {
         $user = $request->user();
-        $orders = Order::where('customer_id', $user->id)->with(['scenario', 'billingDocuments', 'supportTickets', 'workerLocationPings'])->latest()->get();
+        $orders = Order::where('customer_id', $user->id)->with(['scenario', 'billingDocuments', 'supportTickets', 'workerLocationPings', 'completionProofs'])->latest()->get();
         $documents = BillingDocument::whereIn('status', ['issued', 'paid', 'refunded'])
             ->where(fn ($query) => $query->where('customer_id', $user->id)->orWhereHas('order', fn ($order) => $order->where('customer_id', $user->id)))
             ->latest('issued_at')->get();

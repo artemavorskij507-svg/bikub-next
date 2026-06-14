@@ -12,6 +12,7 @@ use App\Models\PaymentWebhookEvent;
 use App\Services\Finance\PaymentReadinessService;
 use App\Services\Finance\BillingDocumentService;
 use App\Services\Finance\QuoteCalculationService;
+use App\Services\Orders\OrderCompletionService;
 use App\Services\Support\SupportTicketService;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Htmlable;
@@ -118,6 +119,7 @@ class FinanceControl extends AdminOsModulePage
             'latestInvoice' => $selected?->billingDocuments()->latest()->first(),
             'readiness' => $selected ? $service->getOrderPaymentReadiness($selected) : null,
             'paymentTicket' => $paymentTicket,
+            'completion' => $selected ? app(OrderCompletionService::class)->getCompletionState($selected) : null,
             'orderUrl' => $selected ? OrderResource::getUrl('edit', ['record' => $selected]) : null,
             'pricingRulesUrl' => PricingRuleResource::getUrl(),
             'supportUrl' => $paymentTicket ? SupportTicketResource::getUrl('view', ['record' => $paymentTicket]) : null,
@@ -126,7 +128,7 @@ class FinanceControl extends AdminOsModulePage
 
     private function base(): Builder
     {
-        return Order::with(['customer', 'scenario', 'priceQuotes', 'supportTickets.assignee', 'events']);
+        return Order::with(['customer', 'scenario', 'priceQuotes', 'billingDocuments', 'paymentRecords', 'dispatchAssignments', 'completionProofs.events', 'supportTickets.assignee', 'events']);
     }
 
     private function queue(): Builder
