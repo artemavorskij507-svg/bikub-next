@@ -1,0 +1,4 @@
+<?php
+namespace App\Console\Commands;
+use App\Models\SecurityReviewerAccess;use App\Services\Security\SecurityReviewerAccessService;use Illuminate\Console\Command;
+class ExpireReviewerAccessCommand extends Command{protected $signature='security:expire-reviewer-access {--dry-run} {--access-id=} {--notify} {--days-warning=7}';protected $description='Expire due delegated reviewer access without deleting users or roles';public function handle(SecurityReviewerAccessService $s):int{$q=SecurityReviewerAccess::where('status','active')->whereNotNull('expires_at')->where('expires_at','<=',now());if($id=$this->option('access-id'))$q->whereKey($id);$ids=$q->pluck('id');$this->info('Due reviewer accesses: '.$ids->count().($this->option('dry-run')?' (dry run)':''));if($this->option('dry-run')){$this->line($ids->implode(','));return self::SUCCESS;}$n=$s->expireDueAccesses();$this->info("Expired {$n} access(es). Users and roles were preserved.");return self::SUCCESS;}}

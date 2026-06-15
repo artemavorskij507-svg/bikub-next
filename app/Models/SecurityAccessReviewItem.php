@@ -1,0 +1,3 @@
+<?php
+namespace App\Models;use Illuminate\Database\Eloquent\Model;
+class SecurityAccessReviewItem extends Model{protected $fillable=['security_access_review_cycle_id','security_reviewer_access_id','user_id','status','recommendation','reviewer_note','decided_by_id','decided_at','metadata'];protected function casts():array{return ['decided_at'=>'datetime','metadata'=>'array'];}public function cycle(){return $this->belongsTo(SecurityAccessReviewCycle::class,'security_access_review_cycle_id');}public function access(){return $this->belongsTo(SecurityReviewerAccess::class,'security_reviewer_access_id');}}

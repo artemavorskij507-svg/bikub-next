@@ -1,5 +1,10 @@
 <?php
 
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::command('security:expire-reviewer-access')->daily()->withoutOverlapping();
+Schedule::command('security:reviewer-access-expiring-soon --days=7')->daily()->withoutOverlapping();
+
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
