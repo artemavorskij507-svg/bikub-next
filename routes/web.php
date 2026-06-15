@@ -17,6 +17,7 @@ use App\Http\Controllers\AccountDashboardController;
 use App\Http\Controllers\AccountOrderController;
 use App\Http\Controllers\OrderCompletionController;
 use App\Http\Controllers\ThemePaletteController;
+use App\Http\Controllers\WorkerPayoutProfileController;
 
 Route::pattern('order', '[0-9]+');
 
@@ -50,6 +51,9 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
     Route::post('/presence/online', [WorkerCockpitController::class, 'online'])->name('presence.online');
     Route::post('/presence/offline', [WorkerCockpitController::class, 'offline'])->name('presence.offline');
     Route::post('/location-pings', [WorkerCockpitController::class, 'location'])->name('location-pings.store');
+    Route::get('/payout-profile', [WorkerPayoutProfileController::class, 'show'])->name('payout-profile.show');
+    Route::post('/payout-profile', [WorkerPayoutProfileController::class, 'update'])->name('payout-profile.update');
+    Route::post('/payout-profile/submit', [WorkerPayoutProfileController::class, 'submit'])->name('payout-profile.submit');
     Route::get('/support', [WorkerSupportController::class, 'index'])->name('support.index');
     Route::get('/support/{ticket}', [WorkerSupportController::class, 'show'])->name('support.show');
     Route::post('/support/{ticket}/reply', [WorkerSupportController::class, 'reply'])->name('support.reply');

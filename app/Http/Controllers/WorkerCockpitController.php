@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class WorkerCockpitController extends Controller
 {
-    public function dashboard(Request $request) { return view('worker.dashboard', ['orders' => $this->orders($request)->take(3), 'availability' => $request->user()->workerAvailability, 'earnings' => app(WorkerSettlementService::class)->getWorkerEarningsSummary($request->user())]); }
+    public function dashboard(Request $request) { return view('worker.dashboard', ['orders' => $this->orders($request)->take(3), 'availability' => $request->user()->workerAvailability, 'earnings' => app(WorkerSettlementService::class)->getWorkerEarningsSummary($request->user()), 'payoutProfile' => app(\App\Services\Finance\WorkerPayoutProfileService::class)->getReadiness($request->user())]); }
     public function index(Request $request) { return view('worker.orders.index', ['orders' => $this->orders($request)]); }
     public function show(Request $request, Order $order, WorkerOrderWorkflowService $workflow)
     {

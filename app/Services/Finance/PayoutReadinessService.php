@@ -15,7 +15,7 @@ class PayoutReadinessService {
         if(!$order->paymentRecords()->where('status','captured')->exists())$blockers[]='Payment is not captured.';
         if($order->completionProofs()->where('status','disputed')->exists())$blockers[]='Open completion dispute blocks payout.';
         if(!$this->providers->resolve()->isConfigured())$blockers[]='Payout provider is not configured.';
-        $settings=app(PayoutSettings::class);if(!$settings->payout_outbound_enabled)$blockers[]='Outbound payout is disabled.';if($settings->payout_provider_key==='manual_bank_review')$blockers[]='Manual payout evidence workflow is not implemented.';if(!$settings->payout_bank_account_collection_enabled)$blockers[]='Worker payout profile collection is not enabled.';
+        $settings=app(PayoutSettings::class);if(!$settings->payout_outbound_enabled)$blockers[]='Outbound payout is disabled.';if($settings->payout_provider_key==='manual_bank_review')$blockers[]='Manual payout evidence workflow is not implemented.';$worker=$order->activeDispatchAssignment()?->assignedUser;$profile=$worker?app(WorkerPayoutProfileService::class)->getReadiness($worker):['ready'=>false,'blockers'=>['Worker assignment is required.']];$blockers=array_merge($blockers,$profile['blockers']);
         if($entry?->status==='paid')$blockers[]='Settlement is already marked paid.';
         return ['entry'=>$entry,'rule'=>$rule,'provider'=>$this->providers->status(),'reviewer_roles'=>['legal'=>'admin.settlement_reviews.legal.approve','tax'=>'admin.settlement_reviews.tax.approve','finance'=>'admin.settlement_reviews.finance.approve'],'ready'=>empty($blockers),'blockers'=>array_values(array_unique($blockers)),'next_action'=>empty($blockers)?'Prepare payout instruction.':$blockers[0]];
     }

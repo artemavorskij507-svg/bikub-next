@@ -38,6 +38,7 @@ class User extends Authenticatable implements FilamentUser
     public function workerAvailability(): HasOne { return $this->hasOne(WorkerAvailability::class); }
     public function workerApplications() { return $this->hasMany(WorkerApplication::class); }
     public function workerDocuments() { return $this->hasMany(WorkerDocument::class); }
+    public function workerPayoutProfile(): HasOne { return $this->hasOne(WorkerPayoutProfile::class, 'worker_id'); }
     public function locationPings() { return $this->hasMany(WorkerLocationPing::class); }
     public function customerOrders() { return $this->hasMany(Order::class, 'customer_id'); }
     public function themePreference(): HasOne { return $this->hasOne(UserThemePreference::class); }
