@@ -1,0 +1,15 @@
+<?php
+namespace App\Filament\Pages;
+use App\Models\Order;
+use App\Services\Finance\{PayoutProviderManager,PayoutReadinessService};
+use App\Settings\PayoutSettings;
+use Filament\Notifications\Notification;
+use Illuminate\Contracts\Support\Htmlable;
+class PayoutProviderSettings extends AdminOsModulePage {
+ public string $providerKey='disabled',$environment='local_review',$currency='NOK';public bool $outboundEnabled=false,$manualReviewEnabled=false,$bankCollectionEnabled=false,$approvalRequired=true;public ?float $minimumAmount=null;public ?string $notes=null;
+ protected static string|\BackedEnum|null $navigationIcon='heroicon-o-building-library';protected static ?string $navigationLabel='Payout Provider Settings';protected static string|\UnitEnum|null $navigationGroup='Finance';protected static ?int $navigationSort=35;protected string $view='filament.pages.payout-provider-settings';
+ public function getModuleKey():string{return 'finance';}public function getHeading():string|Htmlable{return '';}public static function canAccess():bool{return auth()->user()?->can('admin.payouts.provider_settings')??false;}
+ public function mount():void{$s=app(PayoutSettings::class);$this->providerKey=$s->payout_provider_key;$this->environment=$s->payout_environment;$this->outboundEnabled=$s->payout_outbound_enabled;$this->manualReviewEnabled=$s->payout_manual_review_enabled;$this->bankCollectionEnabled=$s->payout_bank_account_collection_enabled;$this->approvalRequired=$s->payout_approval_required;$this->minimumAmount=$s->payout_minimum_amount;$this->currency=$s->payout_currency;$this->notes=$s->payout_provider_notes;}
+ public function saveSettings():void{$this->validate(['providerKey'=>'required|in:disabled,manual_bank_review,external_provider_deferred','environment'=>'required|in:local_review,sandbox,production','currency'=>'required|in:NOK','minimumAmount'=>'nullable|numeric|min:0','notes'=>'nullable|string|max:3000']);if($this->environment==='production'||$this->outboundEnabled)throw \Illuminate\Validation\ValidationException::withMessages(['outboundEnabled'=>'Production and outbound payout remain disabled until a real provider and evidence workflow are approved.']);$s=app(PayoutSettings::class);$s->payout_provider_key=$this->providerKey;$s->payout_environment=$this->environment;$s->payout_outbound_enabled=false;$s->payout_manual_review_enabled=$this->manualReviewEnabled;$s->payout_bank_account_collection_enabled=false;$s->payout_approval_required=$this->approvalRequired;$s->payout_minimum_amount=$this->minimumAmount;$s->payout_currency=$this->currency;$s->payout_provider_notes=$this->notes;$s->save();Notification::make()->title('Payout settings saved. Outbound payout remains disabled.')->success()->send();}
+ public function getViewData():array{$order=Order::where('order_number','BKB-260606-95T8OD')->first()??Order::latest()->first();return ['status'=>app(PayoutProviderManager::class)->status(),'readiness'=>$order?app(PayoutReadinessService::class)->forOrder($order):null,'financeUrl'=>route('filament.admin.pages.finance-control'),'securityUrl'=>route('filament.admin.pages.system-security')];}
+}

@@ -29,7 +29,7 @@ class WorkerSettlementRuleService
 
     public function approve(WorkerSettlementRule $rule, User $actor, string $note): WorkerSettlementRule
     {
-        throw_unless($actor->can('admin.finance.manage'), ValidationException::withMessages(['actor' => 'Finance management permission is required.']));
+        throw_unless($actor->can('admin.settlement_rules.activate'), ValidationException::withMessages(['actor' => 'Settlement rule activation permission is required.']));
         throw_if(blank($note), ValidationException::withMessages(['note' => 'Approval note is required.']));
         $reviewReadiness = $this->reviews->getRuleReviewReadiness($rule);
         throw_unless($reviewReadiness['ready'], ValidationException::withMessages(['review' => $reviewReadiness['blockers']]));
@@ -89,7 +89,7 @@ class WorkerSettlementRuleService
 
     private function transition(WorkerSettlementRule $rule, User $actor, string $status, string $event, string $reason): WorkerSettlementRule
     {
-        throw_unless($actor->can('admin.finance.manage'), ValidationException::withMessages(['actor' => 'Finance management permission is required.']));
+        throw_unless($actor->can('admin.settlement_rules.manage'), ValidationException::withMessages(['actor' => 'Settlement rule management permission is required.']));
         throw_if(blank($reason), ValidationException::withMessages(['reason' => ucfirst($event).' reason is required.']));
         $from = $rule->status;
         $rule->update(['status' => $status, 'rejected_by_id' => $status === 'rejected' ? $actor->id : $rule->rejected_by_id, 'rejected_at' => $status === 'rejected' ? now() : $rule->rejected_at, 'updated_by_id' => $actor->id]);

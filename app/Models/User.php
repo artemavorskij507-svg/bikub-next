@@ -67,6 +67,9 @@ class User extends Authenticatable implements FilamentUser
             'content_manager',
             'workforce_manager',
             'security_manager',
+            'legal_reviewer',
+            'tax_reviewer',
+            'compliance_reviewer',
         ]);
     }
 }

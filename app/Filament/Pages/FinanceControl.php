@@ -129,6 +129,7 @@ class FinanceControl extends AdminOsModulePage
             'orderUrl' => $selected ? OrderResource::getUrl('edit', ['record' => $selected]) : null,
             'pricingRulesUrl' => PricingRuleResource::getUrl(),
             'settlementRulesUrl' => WorkerSettlementRuleResource::getUrl(),
+            'payoutSettingsUrl' => route('filament.admin.pages.payout-provider-settings'),
             'supportUrl' => $paymentTicket ? SupportTicketResource::getUrl('view', ['record' => $paymentTicket]) : null,
         ];
     }
