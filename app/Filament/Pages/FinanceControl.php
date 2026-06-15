@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Resources\Orders\OrderResource;
 use App\Filament\Resources\PricingRules\PricingRuleResource;
+use App\Filament\Resources\WorkerSettlementRules\WorkerSettlementRuleResource;
 use App\Filament\Resources\SupportTickets\SupportTicketResource;
 use App\Models\Order;
 use App\Models\BillingDocument;
@@ -125,6 +126,7 @@ class FinanceControl extends AdminOsModulePage
             'settlement' => $selected ? app(WorkerSettlementService::class)->getSettlementReadiness($selected) : null,
             'orderUrl' => $selected ? OrderResource::getUrl('edit', ['record' => $selected]) : null,
             'pricingRulesUrl' => PricingRuleResource::getUrl(),
+            'settlementRulesUrl' => WorkerSettlementRuleResource::getUrl(),
             'supportUrl' => $paymentTicket ? SupportTicketResource::getUrl('view', ['record' => $paymentTicket]) : null,
         ];
     }
