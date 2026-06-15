@@ -1,0 +1,3 @@
+<?php
+namespace App\Models;use Illuminate\Database\Eloquent\Model;use Illuminate\Database\Eloquent\SoftDeletes;
+class SecurityReviewerAccess extends Model{use SoftDeletes;protected $fillable=['user_id','status','access_scope','source','reason','granted_by_id','revoked_by_id','granted_at','expires_at','revoked_at','revocation_reason','metadata'];protected function casts():array{return ['granted_at'=>'datetime','expires_at'=>'datetime','revoked_at'=>'datetime','metadata'=>'array'];}public function user(){return $this->belongsTo(User::class);}public function events(){return $this->hasMany(SecurityReviewerAccessEvent::class)->latest('created_at');}}
