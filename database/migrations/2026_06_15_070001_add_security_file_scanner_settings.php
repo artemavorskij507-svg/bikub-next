@@ -1,0 +1,3 @@
+<?php
+use Illuminate\Database\Migrations\Migration;use Illuminate\Support\Facades\DB;
+return new class extends Migration{public function up():void{foreach(['security_file_scanner'=>'disabled','clamav_binary_path'=>null,'clamav_timeout_seconds'=>15,'evidence_download_requires_clean_scan'=>true,'evidence_download_override_enabled'=>true,'evidence_retention_enabled'=>false,'evidence_retention_dry_run_only'=>true,'evidence_retention_default_days'=>365] as $name=>$value)DB::table('settings')->insertOrIgnore(['group'=>'security_files','name'=>$name,'locked'=>false,'payload'=>json_encode($value),'created_at'=>now(),'updated_at'=>now()]);}public function down():void{DB::table('settings')->where('group','security_files')->delete();}};
