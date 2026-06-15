@@ -1,0 +1,3 @@
+<?php
+use Illuminate\Database\Migrations\Migration;use Illuminate\Database\Schema\Blueprint;use Illuminate\Support\Facades\Schema;
+return new class extends Migration{public function up():void{Schema::create('evidence_retention_job_events',function(Blueprint $t){$t->id();$t->foreignId('evidence_retention_job_id')->constrained()->cascadeOnDelete();$t->foreignId('actor_id')->nullable()->constrained('users')->nullOnDelete();$t->string('event_type');$t->text('description')->nullable();$t->json('metadata')->nullable();$t->timestamp('created_at');});}public function down():void{Schema::dropIfExists('evidence_retention_job_events');}};
