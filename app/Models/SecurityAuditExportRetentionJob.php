@@ -1,0 +1,3 @@
+<?php
+namespace App\Models;use Illuminate\Database\Eloquent\Model;
+class SecurityAuditExportRetentionJob extends Model{protected $fillable=['job_number','status','mode','export_count','deleted_count','failed_count','cutoff_date','requested_by_id','approved_by_id','executed_by_id','requested_at','approved_at','executed_at','approval_reason','cancellation_reason','failure_reason','notes','metadata'];protected function casts():array{return ['cutoff_date'=>'date','requested_at'=>'datetime','approved_at'=>'datetime','executed_at'=>'datetime','metadata'=>'array'];}public function items(){return $this->hasMany(SecurityAuditExportRetentionJobItem::class);}public function events(){return $this->hasMany(SecurityAuditExportRetentionJobEvent::class)->latest('created_at');}}
