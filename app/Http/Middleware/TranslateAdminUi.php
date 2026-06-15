@@ -13,7 +13,11 @@ class TranslateAdminUi
     {
         $response = $next($request);
 
-        if (! $request->is('admin/*') || ! $response instanceof Response) {
+        $isAdminRequest = $request->is('admin/*');
+        $isAdminLivewireRequest = $request->is('livewire-*/update')
+            && str_contains((string) $request->header('referer'), '/admin');
+
+        if ((! $isAdminRequest && ! $isAdminLivewireRequest) || ! $response instanceof Response) {
             return $response;
         }
 

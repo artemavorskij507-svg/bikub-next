@@ -13,7 +13,23 @@ class AdminUiTranslator
 {
     public function translateResponse(Response $response): Response
     {
-        if (app()->getLocale() === 'en' || ! str_contains((string) $response->headers->get('Content-Type'), 'text/html')) {
+        if (app()->getLocale() === 'en') {
+            return $response;
+        }
+
+        $contentType = (string) $response->headers->get('Content-Type');
+
+        if (str_contains($contentType, 'application/json')) {
+            $payload = json_decode((string) $response->getContent(), true);
+
+            if (is_array($payload)) {
+                $response->setContent(json_encode($this->translateJsonValue($payload), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            }
+
+            return $response;
+        }
+
+        if (! str_contains($contentType, 'text/html')) {
             return $response;
         }
 
@@ -33,24 +49,7 @@ class AdminUiTranslator
             return $response;
         }
 
-        $translations = trans('bikube.admin_ui');
-
-        if (! is_array($translations)) {
-            $translations = [];
-        }
-
-        try {
-            $translations += TranslationEntry::query()
-                ->where('group', 'admin_ui')
-                ->where('locale', app()->getLocale())
-                ->whereNotNull('value')
-                ->get()
-                ->mapWithKeys(fn (TranslationEntry $entry): array => [(string) data_get($entry->metadata, 'source') => $entry->value])
-                ->filter(fn ($value, $source): bool => is_string($source) && $source !== '' && is_string($value) && $value !== '')
-                ->all();
-        } catch (Throwable) {
-            // The static catalog remains available when the translation database is unavailable.
-        }
+        $translations = $this->translations();
 
         $xpath = new DOMXPath($document);
 
@@ -78,6 +77,47 @@ class AdminUiTranslator
         }
 
         return $response;
+    }
+
+    private function translateJsonValue(mixed $value): mixed
+    {
+        if (is_array($value)) {
+            return array_map(fn (mixed $item): mixed => $this->translateJsonValue($item), $value);
+        }
+
+        if (! is_string($value) || $value === '') {
+            return $value;
+        }
+
+        if (str_contains($value, '<') && str_contains($value, '>')) {
+            return $this->translateResponse(new Response($value, 200, ['Content-Type' => 'text/html; charset=UTF-8']))->getContent();
+        }
+
+        return $this->translations()[$value] ?? $value;
+    }
+
+    private function translations(): array
+    {
+        $translations = trans('bikube.admin_ui');
+
+        if (! is_array($translations)) {
+            $translations = [];
+        }
+
+        try {
+            $translations += TranslationEntry::query()
+                ->where('group', 'admin_ui')
+                ->where('locale', app()->getLocale())
+                ->whereNotNull('value')
+                ->get()
+                ->mapWithKeys(fn (TranslationEntry $entry): array => [(string) data_get($entry->metadata, 'source') => $entry->value])
+                ->filter(fn ($value, $source): bool => is_string($source) && $source !== '' && is_string($value) && $value !== '')
+                ->all();
+        } catch (Throwable) {
+            // The static catalog remains available when the translation database is unavailable.
+        }
+
+        return $translations;
     }
 
     private function replaceText(string $text, array $translations): string

@@ -23,4 +23,17 @@ class AdminUiTranslatorTest extends TestCase
         $this->assertStringContainsString('value="Finance Control"', $html);
         $this->assertStringContainsString('const label = "Finance Control";', $html);
     }
+
+    public function test_it_translates_livewire_json_html_fragments(): void
+    {
+        app()->setLocale('ru');
+
+        $response = new Response(json_encode(['components' => [['effects' => ['html' => '<button>Finance Control</button>']]]]), 200, [
+            'Content-Type' => 'application/json',
+        ]);
+
+        $payload = json_decode(app(AdminUiTranslator::class)->translateResponse($response)->getContent(), true);
+
+        $this->assertStringContainsString('Финансовый контроль', $payload['components'][0]['effects']['html']);
+    }
 }

@@ -83,7 +83,6 @@ class AdminPanelProvider extends PanelProvider
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
                 ApplyLocale::class,
-                \App\Http\Middleware\TranslateAdminUi::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,
