@@ -1,0 +1,3 @@
+<?php
+namespace App\Http\Controllers;use App\Services\Finance\WorkerPayoutReviewService;use Illuminate\Http\Request;
+class WorkerPayoutReviewController extends Controller{public function index(Request $r,WorkerPayoutReviewService $s){return view('worker.payout-reviews',['readiness'=>$s->getWorkerReviewReadiness($r->user()),'identity'=>$s->getOrCreateReview($r->user(),'identity'),'tax'=>$s->getOrCreateReview($r->user(),'tax')]);}public function submit(Request $r,string $type,WorkerPayoutReviewService $s){$d=$r->validate(['evidence_summary'=>'required|string|max:5000','worker_note'=>'nullable|string|max:3000']);$s->submitReview($r->user(),$type,$d);return back()->with('status','Review submitted. No external verification or approval is implied.');}}

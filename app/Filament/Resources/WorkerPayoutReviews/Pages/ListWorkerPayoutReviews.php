@@ -1,0 +1,1 @@
+<?php namespace App\Filament\Resources\WorkerPayoutReviews\Pages;use App\Filament\Resources\WorkerPayoutReviews\WorkerPayoutReviewResource;use Filament\Resources\Pages\ListRecords;class ListWorkerPayoutReviews extends ListRecords{protected static string $resource=WorkerPayoutReviewResource::class;}
