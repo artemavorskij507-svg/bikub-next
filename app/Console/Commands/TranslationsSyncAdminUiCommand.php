@@ -19,9 +19,7 @@ class TranslationsSyncAdminUiCommand extends Command
     public function handle(TranslationManagerService $manager): int
     {
         $phrases = collect($manager->scanHardcodedUiStrings())
-            ->filter(fn (array $hit): bool => str_starts_with($hit['file'], 'Pages/')
-                || str_starts_with($hit['file'], 'Resources/')
-                || str_starts_with($hit['file'], 'filament/'))
+            ->filter(fn (array $hit): bool => $this->isAdminUiFile($hit['file']))
             ->map(fn (array $hit): string => trim($hit['snippet'], "\"'"))
             ->filter(fn (string $phrase): bool => $this->isVisiblePhrase($phrase))
             ->unique()
@@ -96,6 +94,15 @@ class TranslationsSyncAdminUiCommand extends Command
                 );
             }
         }
+    }
+
+    private function isAdminUiFile(string $file): bool
+    {
+        return str_starts_with($file, 'Pages/')
+            || str_starts_with($file, 'Resources/')
+            || str_starts_with($file, 'filament/')
+            || str_starts_with($file, 'components/admin-os/')
+            || str_starts_with($file, 'vendor/filament-locale-switcher/');
     }
 
     private function isVisiblePhrase(string $phrase): bool

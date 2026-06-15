@@ -12,14 +12,14 @@ class AdminUiTranslatorTest extends TestCase
     {
         app()->setLocale('ru');
 
-        $response = new Response('<main><h1>Finance Control</h1><input value="Finance Control" placeholder="Name"><script>const label = "Finance Control";</script></main>', 200, [
+        $response = new Response('<main><h1>Finance Control</h1><input value="Finance Control" placeholder="Finance Control"><script>const label = "Finance Control";</script></main>', 200, [
             'Content-Type' => 'text/html; charset=UTF-8',
         ]);
 
         $html = app(AdminUiTranslator::class)->translateResponse($response)->getContent();
 
         $this->assertStringContainsString('Финансовый контроль', $html);
-        $this->assertStringContainsString('placeholder="Название"', $html);
+        $this->assertStringContainsString('placeholder="Финансовый контроль"', $html);
         $this->assertStringContainsString('value="Finance Control"', $html);
         $this->assertStringContainsString('const label = "Finance Control";', $html);
     }
@@ -47,6 +47,19 @@ class AdminUiTranslatorTest extends TestCase
             $this->assertArrayHasKey('Live Operations Map', $translations, $locale);
             $this->assertNotSame('', $translations['Dispatch Center'], $locale);
             $this->assertNotSame('', $translations['Live Operations Map'], $locale);
+        }
+    }
+    public function test_exported_admin_ui_catalog_has_all_four_locales(): void
+    {
+        foreach (['nb', 'en', 'uk', 'ru'] as $locale) {
+            $catalog = require lang_path("{$locale}/bikube.php");
+
+            $this->assertArrayHasKey('admin_ui', $catalog, $locale);
+            $this->assertGreaterThanOrEqual(900, count($catalog['admin_ui']), $locale);
+            $this->assertArrayHasKey('Dispatch Center', $catalog['admin_ui'], $locale);
+            $this->assertArrayHasKey('Live Operations Map', $catalog['admin_ui'], $locale);
+            $this->assertArrayHasKey('Security Governance', $catalog['admin_ui'], $locale);
+            $this->assertArrayHasKey('Finance Control', $catalog['admin_ui'], $locale);
         }
     }
 }
