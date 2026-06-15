@@ -1,0 +1,3 @@
+<?php
+namespace Database\Seeders;use Illuminate\Database\Seeder;use Spatie\Permission\Models\{Permission,Role};use Spatie\Permission\PermissionRegistrar;
+class LocalizationPermissionSeeder extends Seeder{public function run():void{$p=['admin.translations.view','admin.translations.manage','admin.translations.approve','admin.translations.import','admin.translations.export','admin.translations.scan'];foreach($p as $x)Permission::findOrCreate($x,'web');foreach(['owner','admin'] as $r)Role::findOrCreate($r,'web')->givePermissionTo($p);Role::findOrCreate('localization_manager','web')->givePermissionTo($p);app(PermissionRegistrar::class)->forgetCachedPermissions();}}

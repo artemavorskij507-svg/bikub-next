@@ -28,7 +28,7 @@
 <body>
     <header class="public-shell public-header">
         <a class="brand" href="/">BiKuBe<span>.</span></a>
-        <span>Local services operating system for Norway</span>
+        <span>Local services operating system for Norway</span><x-locale-switcher />
         @auth<x-theme-palette.picker surface="public" />@endauth
     </header>
     <main class="public-shell public-main">@yield('content')</main>

@@ -21,8 +21,10 @@ use App\Http\Controllers\WorkerPayoutProfileController;
 use App\Http\Controllers\WorkerPayoutReviewController;
 use App\Http\Controllers\WorkerPayoutEvidenceController;
 use App\Http\Controllers\AdminSecurityAuditExportDownloadController;
+use App\Http\Controllers\LocaleController;
 
 Route::pattern('order', '[0-9]+');
+Route::post('/locale', LocaleController::class)->name('locale.update');
 
 Route::get('/', function () {
     return view('public.home');

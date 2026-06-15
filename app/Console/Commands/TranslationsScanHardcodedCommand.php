@@ -1,0 +1,3 @@
+<?php
+namespace App\Console\Commands;use App\Services\Localization\TranslationManagerService;use Illuminate\Console\Command;
+class TranslationsScanHardcodedCommand extends Command{protected $signature='translations:scan-hardcoded {--limit=50}';protected $description='Report likely hardcoded user/admin UI strings without rewriting them.';public function handle(TranslationManagerService $s):int{$hits=$s->scanHardcodedUiStrings();$this->table(['File','Line','Severity','Snippet'],array_map(fn($h)=>[$h['file'],$h['line'],$h['severity'],$h['snippet']],array_slice($hits,0,(int)$this->option('limit'))));$this->info(count($hits).' likely hardcoded UI strings found.');return self::SUCCESS;}}

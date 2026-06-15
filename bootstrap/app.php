@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [\App\Http\Middleware\SetBikubeLocale::class]);
         $middleware->alias([
             'approved.worker' => \App\Http\Middleware\EnsureApprovedWorker::class,
             'admin.operator' => \App\Http\Middleware\EnsureAdminOperator::class,

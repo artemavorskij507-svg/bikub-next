@@ -42,7 +42,7 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::STYLES_AFTER,
                 fn (): HtmlString => new HtmlString(view('filament.admin-theme')->render().view('filament.theme-palette-assets')->render()),
             )
-            ->renderHook(PanelsRenderHook::TOPBAR_END, fn (): HtmlString => new HtmlString(view('filament.theme-palette-picker')->render()))
+            ->renderHook(PanelsRenderHook::TOPBAR_END, fn (): HtmlString => new HtmlString(view('filament.theme-palette-picker')->render().view('components.locale-switcher')->render()))
             ->renderHook(
                 PanelsRenderHook::TOPBAR_LOGO_AFTER,
                 fn (): HtmlString => new HtmlString(view('filament.admin-top-nav')->render()),
