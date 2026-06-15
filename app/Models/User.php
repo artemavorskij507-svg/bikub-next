@@ -68,6 +68,7 @@ class User extends Authenticatable implements FilamentUser
             'content_manager',
             'workforce_manager',
             'security_manager',
+            'security_reviewer',
             'legal_reviewer',
             'tax_reviewer',
             'compliance_reviewer',
