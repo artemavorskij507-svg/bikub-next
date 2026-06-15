@@ -7,10 +7,10 @@
     $dashboardUrl = route('filament.admin.pages.dashboard');
 
     $stateLabels = [
-        'ready' => 'Ready',
-        'safe' => 'Safe',
-        'review' => 'Review',
-        'blocked' => 'Blocked',
+        'ready' => __('bikube.status.ready'),
+        'safe' => __('bikube.operational_states.safe'),
+        'review' => __('bikube.operational_states.review'),
+        'blocked' => __('bikube.status.blocked'),
     ];
 @endphp
 
@@ -18,43 +18,43 @@
     <main class="bkb-admin-shell bkb-ops-cockpit" aria-labelledby="bkb-ops-title">
         <section class="bkb-ops-hero bkb-surface">
             <div class="bkb-ops-hero__copy">
-                <a class="bkb-back-link" href="{{ $dashboardUrl }}">Back to Admin OS</a>
-                <p class="bkb-kicker">BiKuBe Next / Operations</p>
-                <h1 id="bkb-ops-title">Operations Command Center</h1>
+                <a class="bkb-back-link" href="{{ $dashboardUrl }}">{{ __('bikube.common.back_to_admin') }}</a>
+                <p class="bkb-kicker">{{ __('bikube.operations.kicker') }}</p>
+                <h1 id="bkb-ops-title">{{ __('bikube.operations.title') }}</h1>
                 <p class="bkb-hero__subtitle">
-                    Real launch-readiness cockpit for the Narvik-first platform foundation. This page reports what exists in the current runtime and refuses fake operational data.
+                    {{ __('bikube.operations.description') }}
                 </p>
 
-                <div class="bkb-status-row" aria-label="Operations status">
-                    <span class="bkb-status-badge bkb-status-badge--safe">Skeleton foundation</span>
-                    <span class="bkb-status-badge">No legacy data connected</span>
-                    <span class="bkb-status-badge">No fake GPS, orders or payments</span>
+                <div class="bkb-status-row" aria-label="{{ __('bikube.operations.status_label') }}">
+                    <span class="bkb-status-badge bkb-status-badge--safe">{{ __('bikube.operations.skeleton_foundation') }}</span>
+                    <span class="bkb-status-badge">{{ __('bikube.operations.no_legacy_data') }}</span>
+                    <span class="bkb-status-badge">{{ __('bikube.operations.no_fake_data') }}</span>
                 </div>
             </div>
 
-            <aside class="bkb-ops-summary" aria-label="Foundation summary">
+            <aside class="bkb-ops-summary" aria-label="{{ __('bikube.operations.foundation_summary') }}">
                 <div>
-                    <span>Operational posture</span>
-                    <strong>Foundation only</strong>
-                    <p>Ready for real domain module passes, not production dispatch.</p>
+                    <span>{{ __('bikube.operations.operational_posture') }}</span>
+                    <strong>{{ __('bikube.operations.foundation_only') }}</strong>
+                    <p>{{ __('bikube.operations.foundation_only_detail') }}</p>
                 </div>
                 <div>
-                    <span>Launch city</span>
-                    <strong>Narvik first</strong>
-                    <p>Norway expectations and compliance boundaries stay visible.</p>
+                    <span>{{ __('bikube.operations.launch_city') }}</span>
+                    <strong>{{ __('bikube.operations.narvik_first') }}</strong>
+                    <p>{{ __('bikube.operations.narvik_detail') }}</p>
                 </div>
                 <div>
-                    <span>Data policy</span>
-                    <strong>Honest state</strong>
-                    <p>No placeholder numbers, fake queues or fake maps.</p>
+                    <span>{{ __('bikube.operations.data_policy') }}</span>
+                    <strong>{{ __('bikube.operations.honest_state') }}</strong>
+                    <p>{{ __('bikube.operations.honest_state_detail') }}</p>
                 </div>
             </aside>
         </section>
 
         <section class="bkb-ops-runtime" aria-labelledby="bkb-runtime-title">
             <div class="bkb-section-heading">
-                <p class="bkb-kicker">Runtime evidence</p>
-                <h2 id="bkb-runtime-title">Current foundation checks</h2>
+                <p class="bkb-kicker">{{ __('bikube.operations.runtime_evidence') }}</p>
+                <h2 id="bkb-runtime-title">{{ __('bikube.operations.current_foundation_checks') }}</h2>
             </div>
 
             <div class="bkb-runtime-grid">
@@ -71,8 +71,8 @@
 
         <section class="bkb-ops-runtime" aria-labelledby="bkb-foundation-title">
             <div class="bkb-section-heading">
-                <p class="bkb-kicker">Installed operational modules</p>
-                <h2 id="bkb-foundation-title">Module foundation wiring</h2>
+                <p class="bkb-kicker">{{ __('bikube.operations.installed_modules') }}</p>
+                <h2 id="bkb-foundation-title">{{ __('bikube.operations.module_foundation_wiring') }}</h2>
             </div>
 
             <div class="bkb-runtime-grid">
@@ -82,7 +82,7 @@
                         <strong>{{ $module['tone'] }}</strong>
                         <p>{{ $module['state'] }} - {{ $module['detail'] }}</p>
                         @if ($module['url'])
-                            <a class="bkb-card-link" href="{{ $module['url'] }}">Open real route</a>
+                            <a class="bkb-card-link" href="{{ $module['url'] }}">{{ __('bikube.common.open_real_route') }}</a>
                         @endif
                     </article>
                 @endforeach
@@ -91,8 +91,8 @@
         <section class="bkb-ops-board">
             <div class="bkb-ops-board__main">
                 <div class="bkb-section-heading">
-                    <p class="bkb-kicker">Readiness gates</p>
-                    <h2>What blocks real operations</h2>
+                    <p class="bkb-kicker">{{ __('bikube.operations.readiness_gates') }}</p>
+                    <h2>{{ __('bikube.operations.real_operations_blockers') }}</h2>
                 </div>
 
                 <div class="bkb-gate-list">
@@ -118,10 +118,10 @@
                 </div>
             </div>
 
-            <aside class="bkb-ops-board__rail" aria-label="Operations rail">
+            <aside class="bkb-ops-board__rail" aria-label="{{ __('bikube.operations.operations_rail') }}">
                 <section class="bkb-os-card">
-                    <span class="bkb-card-eyebrow">Admin OS routes</span>
-                    <h2>Skeleton route map</h2>
+                    <span class="bkb-card-eyebrow">{{ __('bikube.operations.admin_routes') }}</span>
+                    <h2>{{ __('bikube.operations.route_map') }}</h2>
                     <div class="bkb-route-list">
                         @foreach ($moduleRoutes as $route)
                             <a href="{{ $route['url'] }}" class="bkb-route-row">
@@ -133,8 +133,8 @@
                 </section>
 
                 <section class="bkb-os-card bkb-os-card--blocked">
-                    <span class="bkb-card-eyebrow">Action honesty</span>
-                    <h2>Visible action classification</h2>
+                    <span class="bkb-card-eyebrow">{{ __('bikube.operations.action_honesty') }}</span>
+                    <h2>{{ __('bikube.operations.action_classification') }}</h2>
                     <div class="bkb-action-list">
                         @foreach ($actions as $action)
                             @if ($action['url'])
