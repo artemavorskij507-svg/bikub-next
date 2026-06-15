@@ -36,4 +36,17 @@ class AdminUiTranslatorTest extends TestCase
 
         $this->assertStringContainsString('Финансовый контроль', $payload['components'][0]['effects']['html']);
     }
+
+    public function test_dispatch_and_live_map_titles_exist_for_all_locales(): void
+    {
+        foreach (['nb', 'en', 'uk', 'ru'] as $locale) {
+            app()->setLocale($locale);
+            $translations = app(AdminUiTranslator::class)->translations();
+
+            $this->assertArrayHasKey('Dispatch Center', $translations, $locale);
+            $this->assertArrayHasKey('Live Operations Map', $translations, $locale);
+            $this->assertNotSame('', $translations['Dispatch Center'], $locale);
+            $this->assertNotSame('', $translations['Live Operations Map'], $locale);
+        }
+    }
 }

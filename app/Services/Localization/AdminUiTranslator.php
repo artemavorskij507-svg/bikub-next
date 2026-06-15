@@ -96,7 +96,7 @@ class AdminUiTranslator
         return $this->translations()[$value] ?? $value;
     }
 
-    private function translations(): array
+    public function translations(): array
     {
         $translations = trans('bikube.admin_ui');
 

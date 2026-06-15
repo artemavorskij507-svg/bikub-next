@@ -47,6 +47,10 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::TOPBAR_LOGO_AFTER,
                 fn (): HtmlString => new HtmlString(view('filament.admin-top-nav')->render()),
             )
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): HtmlString => new HtmlString(view('filament.admin-ui-translator')->render()),
+            )
             ->spa()
             ->globalSearch(false)
  	    ->plugin(LocaleSwitchPlugin::make())
