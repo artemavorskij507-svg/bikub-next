@@ -1,0 +1,3 @@
+<?php
+namespace App\Models;use Illuminate\Database\Eloquent\Model;
+class SecurityPostmortemReviewCycle extends Model{protected $fillable=['cycle_number','security_incident_id','status','review_reason','due_at','scheduled_by_id','reviewed_by_id','completed_by_id','scheduled_at','reviewed_at','completed_at','review_summary','metadata'];protected function casts():array{return ['due_at'=>'datetime','scheduled_at'=>'datetime','reviewed_at'=>'datetime','completed_at'=>'datetime','metadata'=>'array'];}public function events(){return $this->hasMany(SecurityPostmortemReviewEvent::class)->latest('created_at');}}
