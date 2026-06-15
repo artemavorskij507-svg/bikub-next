@@ -19,6 +19,7 @@ use App\Http\Controllers\OrderCompletionController;
 use App\Http\Controllers\ThemePaletteController;
 use App\Http\Controllers\WorkerPayoutProfileController;
 use App\Http\Controllers\WorkerPayoutReviewController;
+use App\Http\Controllers\WorkerPayoutEvidenceController;
 
 Route::pattern('order', '[0-9]+');
 
@@ -57,6 +58,8 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
     Route::post('/payout-profile/submit', [WorkerPayoutProfileController::class, 'submit'])->name('payout-profile.submit');
     Route::get('/payout-reviews', [WorkerPayoutReviewController::class, 'index'])->name('payout-reviews.index');
     Route::post('/payout-reviews/{type}/submit', [WorkerPayoutReviewController::class, 'submit'])->whereIn('type',['identity','tax','payout_compliance'])->name('payout-reviews.submit');
+    Route::post('/payout-reviews/{review}/evidence', [WorkerPayoutEvidenceController::class, 'upload'])->name('payout-reviews.evidence.upload');
+    Route::get('/payout-reviews/evidence/{evidence}/download', [WorkerPayoutEvidenceController::class, 'download'])->name('payout-reviews.evidence.download');
     Route::get('/support', [WorkerSupportController::class, 'index'])->name('support.index');
     Route::get('/support/{ticket}', [WorkerSupportController::class, 'show'])->name('support.show');
     Route::post('/support/{ticket}/reply', [WorkerSupportController::class, 'reply'])->name('support.reply');
