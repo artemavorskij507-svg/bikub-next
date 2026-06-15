@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 
 class WorkerSettlementRuleService
 {
+    public function __construct(private WorkerSettlementRuleReviewService $reviews) {}
     public function createDraft(array $data, User $actor): WorkerSettlementRule
     {
         return DB::transaction(function () use ($data, $actor) {
@@ -30,7 +31,8 @@ class WorkerSettlementRuleService
     {
         throw_unless($actor->can('admin.finance.manage'), ValidationException::withMessages(['actor' => 'Finance management permission is required.']));
         throw_if(blank($note), ValidationException::withMessages(['note' => 'Approval note is required.']));
-        throw_unless($rule->legal_review_status === 'approved' && $rule->tax_review_status === 'approved', ValidationException::withMessages(['review' => 'Legal and tax review must be explicitly approved before activation.']));
+        $reviewReadiness = $this->reviews->getRuleReviewReadiness($rule);
+        throw_unless($reviewReadiness['ready'], ValidationException::withMessages(['review' => $reviewReadiness['blockers']]));
         $this->validateRule($rule->toArray());
         $from = $rule->status;
         $rule->update(['status' => 'active', 'approved_by_id' => $actor->id, 'approved_at' => now(), 'approval_note' => $note, 'updated_by_id' => $actor->id]);

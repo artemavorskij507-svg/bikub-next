@@ -15,6 +15,7 @@ use App\Services\Finance\BillingDocumentService;
 use App\Services\Finance\QuoteCalculationService;
 use App\Services\Orders\OrderCompletionService;
 use App\Services\Finance\WorkerSettlementService;
+use App\Services\Finance\PayoutReadinessService;
 use App\Services\Support\SupportTicketService;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Htmlable;
@@ -124,6 +125,7 @@ class FinanceControl extends AdminOsModulePage
             'paymentTicket' => $paymentTicket,
             'completion' => $selected ? app(OrderCompletionService::class)->getCompletionState($selected) : null,
             'settlement' => $selected ? app(WorkerSettlementService::class)->getSettlementReadiness($selected) : null,
+            'payoutReadiness' => $selected ? app(PayoutReadinessService::class)->forOrder($selected) : null,
             'orderUrl' => $selected ? OrderResource::getUrl('edit', ['record' => $selected]) : null,
             'pricingRulesUrl' => PricingRuleResource::getUrl(),
             'settlementRulesUrl' => WorkerSettlementRuleResource::getUrl(),

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\WorkerSettlementRules;
 use App\Filament\Resources\WorkerSettlementRules\Pages\{CreateWorkerSettlementRule, EditWorkerSettlementRule, ListWorkerSettlementRules};
 use App\Models\WorkerSettlementRule;
 use App\Services\Finance\WorkerSettlementRuleService;
+use App\Services\Finance\WorkerSettlementRuleReviewService;
 use Filament\Actions\{Action, EditAction};
 use Filament\Forms\Components\{DatePicker, Select, Textarea, TextInput};
 use Filament\Resources\Resource;
@@ -52,6 +53,9 @@ class WorkerSettlementRuleResource extends Resource
         ])->filters([SelectFilter::make('status')->options(['draft' => 'Draft', 'active' => 'Active', 'archived' => 'Archived', 'rejected' => 'Rejected'])])->recordActions([
             EditAction::make()->visible(fn (WorkerSettlementRule $record) => $record->status === 'draft' && (auth()->user()?->can('admin.finance.manage') ?? false)),
             Action::make('approve')->color('success')->requiresConfirmation()->form([Textarea::make('note')->required()->helperText('Approval is blocked until legal and tax reviews are explicitly approved.')])->action(fn (WorkerSettlementRule $record, array $data) => app(WorkerSettlementRuleService::class)->approve($record, auth()->user(), $data['note']))->visible(fn (WorkerSettlementRule $record) => $record->status === 'draft' && (auth()->user()?->can('admin.finance.manage') ?? false)),
+            Action::make('requestLegalReview')->label('Request legal review')->form([Textarea::make('note')])->action(fn (WorkerSettlementRule $record, array $data) => app(WorkerSettlementRuleReviewService::class)->requestReview($record, 'legal', auth()->user(), $data['note'] ?? null))->visible(fn (WorkerSettlementRule $record) => $record->status === 'draft' && (auth()->user()?->can('admin.finance.manage') ?? false)),
+            Action::make('requestTaxReview')->label('Request tax review')->form([Textarea::make('note')])->action(fn (WorkerSettlementRule $record, array $data) => app(WorkerSettlementRuleReviewService::class)->requestReview($record, 'tax', auth()->user(), $data['note'] ?? null))->visible(fn (WorkerSettlementRule $record) => $record->status === 'draft' && (auth()->user()?->can('admin.finance.manage') ?? false)),
+            Action::make('requestFinanceReview')->label('Request finance review')->form([Textarea::make('note')])->action(fn (WorkerSettlementRule $record, array $data) => app(WorkerSettlementRuleReviewService::class)->requestReview($record, 'finance', auth()->user(), $data['note'] ?? null))->visible(fn (WorkerSettlementRule $record) => $record->status === 'draft' && (auth()->user()?->can('admin.finance.manage') ?? false)),
             Action::make('reject')->color('danger')->requiresConfirmation()->form([Textarea::make('reason')->required()])->action(fn (WorkerSettlementRule $record, array $data) => app(WorkerSettlementRuleService::class)->reject($record, auth()->user(), $data['reason']))->visible(fn (WorkerSettlementRule $record) => $record->status === 'draft' && (auth()->user()?->can('admin.finance.manage') ?? false)),
             Action::make('archive')->color('warning')->requiresConfirmation()->form([Textarea::make('reason')->required()])->action(fn (WorkerSettlementRule $record, array $data) => app(WorkerSettlementRuleService::class)->archive($record, auth()->user(), $data['reason']))->visible(fn (WorkerSettlementRule $record) => $record->status === 'active' && (auth()->user()?->can('admin.finance.manage') ?? false)),
         ]);

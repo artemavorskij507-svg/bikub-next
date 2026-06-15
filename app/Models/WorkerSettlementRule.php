@@ -17,5 +17,6 @@ class WorkerSettlementRule extends Model
     }
 
     public function events() { return $this->hasMany(WorkerSettlementRuleEvent::class)->latest('created_at'); }
+    public function reviews() { return $this->hasMany(WorkerSettlementRuleReview::class)->latest('created_at'); }
     public function approver() { return $this->belongsTo(User::class, 'approved_by_id'); }
 }
