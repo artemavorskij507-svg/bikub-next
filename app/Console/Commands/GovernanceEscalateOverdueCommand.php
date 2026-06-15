@@ -1,0 +1,4 @@
+<?php
+namespace App\Console\Commands;
+use App\Models\SecurityAccessReviewCycle;use App\Services\Security\SecurityGovernanceNotificationService;use Illuminate\Console\Command;
+class GovernanceEscalateOverdueCommand extends Command{protected $signature='security:governance-escalate-overdue {--dry-run} {--days-overdue=0} {--notify}';protected $description='Escalate overdue security access reviews to database governance notifications';public function handle(SecurityGovernanceNotificationService $s):int{$count=SecurityAccessReviewCycle::where('status','open')->where('due_at','<',now()->subDays(max(0,(int)$this->option('days-overdue'))))->count();$this->info("Overdue access review cycles: {$count}".($this->option('dry-run')?' (dry run)':''));if(!$this->option('dry-run')){$n=$s->escalateOverdue();$this->info("Created or updated {$n} database/in-app escalation(s). No external email or SMS was sent.");}return self::SUCCESS;}}
