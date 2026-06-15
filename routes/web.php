@@ -20,6 +20,7 @@ use App\Http\Controllers\ThemePaletteController;
 use App\Http\Controllers\WorkerPayoutProfileController;
 use App\Http\Controllers\WorkerPayoutReviewController;
 use App\Http\Controllers\WorkerPayoutEvidenceController;
+use App\Http\Controllers\AdminSecurityAuditExportDownloadController;
 
 Route::pattern('order', '[0-9]+');
 
@@ -99,3 +100,5 @@ Route::get('/admin/support-activity', AdminSupportActivityController::class)
 Route::redirect('/admin/support', '/admin/support-center')->middleware('auth')->name('admin.support.redirect');
 Route::get('/admin/support-attachments/{media}/download', AdminSupportAttachmentDownloadController::class)
     ->middleware('auth')->whereNumber('media')->name('admin.support.attachments.download');
+Route::get('/admin/security-audit-exports/{export}/download', AdminSecurityAuditExportDownloadController::class)
+    ->middleware('auth')->whereNumber('export')->name('admin.security-audit-exports.download');
