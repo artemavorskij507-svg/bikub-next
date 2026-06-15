@@ -1,0 +1,3 @@
+<?php
+namespace App\Models;use Illuminate\Database\Eloquent\Model;use Illuminate\Database\Eloquent\SoftDeletes;
+class SecurityIncidentPostmortem extends Model{use SoftDeletes;protected $fillable=['security_incident_id','status','summary','root_cause','impact_summary','detection_summary','response_summary','prevention_summary','lessons_learned','prepared_by_id','approved_by_id','rejected_by_id','submitted_at','approved_at','rejected_at','rejection_reason','metadata'];protected function casts():array{return ['submitted_at'=>'datetime','approved_at'=>'datetime','rejected_at'=>'datetime','metadata'=>'array'];}public function events(){return $this->hasMany(SecurityIncidentPostmortemEvent::class)->latest('created_at');}}
