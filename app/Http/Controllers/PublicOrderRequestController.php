@@ -6,20 +6,24 @@ use App\Models\ServiceScenario;
 use App\Models\ServiceScenarioField;
 use App\Services\Orders\OrderEngine;
 use App\Services\Pricing\PricingEngine;
+use App\Services\PublicSite\PageDataBuilder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PublicOrderRequestController extends Controller
 {
-    public function deliveryCategory(): View
+    public function deliveryCategory(PageDataBuilder $builder): View
     {
         $scenario = ServiceScenario::active()
             ->with(['fields' => fn ($query) => $query->active()])
             ->where('slug', 'delivery')
             ->first();
 
-        return view('public.categories.delivery', compact('scenario'));
+        // Try DB-backed published page first; fall back to static blade config if not found.
+        $builderPageData = $builder->forRoute('/category/delivery');
+
+        return view('public.categories.delivery', compact('scenario', 'builderPageData'));
     }
 
     public function create(string $serviceSlug): View

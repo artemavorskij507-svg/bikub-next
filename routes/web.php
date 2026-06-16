@@ -22,6 +22,7 @@ use App\Http\Controllers\WorkerPayoutReviewController;
 use App\Http\Controllers\WorkerPayoutEvidenceController;
 use App\Http\Controllers\AdminSecurityAuditExportDownloadController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\PublicSitePreviewController;
 
 Route::pattern('order', '[0-9]+');
 Route::post('/locale', LocaleController::class)->name('locale.update');
@@ -31,6 +32,10 @@ Route::get('/', function () {
 });
 
 Route::get('/category/delivery', [PublicOrderRequestController::class, 'deliveryCategory'])->name('public.categories.delivery');
+
+Route::middleware('auth')->prefix('admin')->group(function () {
+    Route::get('/public-site-preview/{page}', PublicSitePreviewController::class)->name('admin.public-site-preview');
+});
 Route::get('/p/{slug}', [PublicCmsController::class, 'page'])->name('public.cms.page');
 Route::get('/services/{serviceSlug}', [PublicCmsController::class, 'servicePage'])->name('public.cms.service-page');
 Route::get('/services/{serviceSlug}/request', [PublicOrderRequestController::class, 'create'])->name('public.orders.request');
