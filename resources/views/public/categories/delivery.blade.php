@@ -185,8 +185,9 @@ html,body{margin:0;padding:0;font-family:'Inter',sans-serif}
 </head>
 <body>
 @php
-$orderRouteBase = route('public.orders.request', 'delivery.groceries');
-$page = [
+use App\Models\DeliveryPageConfig;
+$dbConfig = DeliveryPageConfig::get('page');
+$page = $dbConfig ?: [
     'default_segment' => 'products',
     'segments' => [
         'products' => [
