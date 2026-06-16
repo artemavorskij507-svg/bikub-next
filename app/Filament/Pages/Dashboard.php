@@ -2,25 +2,25 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\CmsPage;
+use App\Models\BillingDocument;
 use App\Models\Order;
-use App\Models\OrderPriceQuote;
-use App\Models\PricingRule;
-use App\Models\SeoMetadata;
-use App\Models\ServiceCategory;
-use App\Models\ServicePage;
+use App\Models\PaymentRecord;
 use App\Models\ServiceScenario;
-use App\Models\ServiceScenarioField;
-use Filament\Pages\Dashboard as BaseDashboard;
-use Throwable;
-use App\Models\{WorkerApplication,WorkerDocument};
+use App\Models\SupportTicket;
+use App\Models\User;
+use App\Models\WorkerAvailability;
+use App\Models\WorkerDocument;
+use App\Models\WorkerProfile;
 use App\Services\Dispatch\DispatchEngine;
+use Filament\Pages\Dashboard as BaseDashboard;
+use Illuminate\Support\Facades\Route;
+use Throwable;
 
 class Dashboard extends BaseDashboard
 {
     protected string $view = 'filament.pages.dashboard';
 
-    protected static ?string $title = 'BiKuBe Admin OS';
+    protected static ?string $title = 'BiKuBe Operations Command Center';
 
     public static function canAccess(): bool
     {
@@ -32,37 +32,106 @@ class Dashboard extends BaseDashboard
     }
 
     /**
-     * @return array<string, array<string, mixed>>
+     * @return array<string, mixed>
      */
-    public function getAdminModules(): array
-    {
-        return config('bikube-next.admin_modules', []);
-    }
-
-    public function getProof(): array
+    public function getBusinessSnapshot(): array
     {
         try {
-            $latestOrder = Order::latest()->first();
-            $latestQuote = OrderPriceQuote::latest()->first();
+            $unassigned = app(DispatchEngine::class)->listUnassignedOrders()->count();
+            $eligibleWorkers = app(DispatchEngine::class)->eligibleWorkers()->count();
+        } catch (Throwable) {
+            $unassigned = 0;
+            $eligibleWorkers = 0;
+        }
+
+        try {
             return [
-                'action' => [
-                    'orders_needing_action' => Order::whereIn('status',['submitted','accepted'])->count(),
-                    'unassigned' => app(DispatchEngine::class)->listUnassignedOrders()->count(),
-                    'dispatch_ready' => Order::whereHas('dispatchEvents',fn($q)=>$q->where('event_type','dispatch.ready'))->count(),
-                    'applications' => WorkerApplication::where('status','submitted')->count(),
-                    'documents' => WorkerDocument::whereIn('status',['pending','submitted'])->count(),
-                    'eligible_workers' => app(DispatchEngine::class)->eligibleWorkers()->count(),
-                    'latest_order' => $latestOrder?->order_number ?? 'None',
-                    'latest_application' => WorkerApplication::latest()->value('email') ?? 'None',
-                ],
-                'services' => ['categories' => ServiceCategory::count(), 'scenarios' => ServiceScenario::active()->count(), 'fields' => ServiceScenarioField::active()->count()],
-                'orders' => ['total' => Order::count(), 'submitted' => Order::where('status', 'submitted')->count(), 'latest' => $latestOrder?->order_number ?? 'None'],
-                'intake' => ['fields' => ServiceScenarioField::active()->count(), 'configured' => ServiceScenario::whereHas('fields', fn ($q) => $q->active())->count(), 'missing' => ServiceScenario::active()->whereDoesntHave('fields', fn ($q) => $q->active())->count()],
-                'pricing' => ['rules' => PricingRule::count(), 'active' => PricingRule::active()->count(), 'quotes' => OrderPriceQuote::count(), 'latest' => $latestQuote ? number_format((float) $latestQuote->total, 2).' '.$latestQuote->currency : 'None', 'manual' => OrderPriceQuote::where('status', 'manual_review_required')->count()],
-                'cms' => ['pages' => CmsPage::count(), 'services' => ServicePage::count(), 'seo' => SeoMetadata::count()],
+                'orders_today' => Order::whereDate('created_at', today())->count(),
+                'orders_waiting_dispatch' => Order::whereIn('status', ['submitted', 'accepted'])->count(),
+                'unassigned_orders' => $unassigned,
+                'assigned_jobs' => Order::whereHas('dispatchAssignments', fn ($query) => $query->whereIn('status', ['assigned', 'accepted']))->count(),
+                'active_workers' => WorkerAvailability::whereIn('status', ['online', 'available'])->count(),
+                'eligible_workers' => $eligibleWorkers,
+                'approved_workers' => WorkerProfile::where('status', 'approved')->count(),
+                'open_support_tickets' => SupportTicket::whereNotIn('status', ['resolved', 'closed'])->count(),
+                'unpaid_invoices' => BillingDocument::whereNull('paid_at')->whereIn('status', ['draft', 'issued', 'sent', 'overdue'])->count(),
+                'blocked_payments' => PaymentRecord::whereIn('status', ['failed', 'blocked', 'requires_action'])->count(),
+                'active_services' => ServiceScenario::active()->count(),
+                'customers' => User::whereHas('customerOrders')->count(),
+                'worker_documents_pending' => WorkerDocument::whereIn('status', ['pending', 'submitted'])->count(),
             ];
         } catch (Throwable) {
-            return [];
+            return [
+                'orders_today' => 0,
+                'orders_waiting_dispatch' => 0,
+                'unassigned_orders' => 0,
+                'assigned_jobs' => 0,
+                'active_workers' => 0,
+                'eligible_workers' => 0,
+                'approved_workers' => 0,
+                'open_support_tickets' => 0,
+                'unpaid_invoices' => 0,
+                'blocked_payments' => 0,
+                'active_services' => 0,
+                'customers' => 0,
+                'worker_documents_pending' => 0,
+            ];
         }
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    public function getBusinessCorridorActions(): array
+    {
+        return array_values(array_filter([
+            $this->action('Open public delivery request', 'Start a real customer intake flow from the public service route.', 'public.orders.request', ['serviceSlug' => 'delivery']),
+            $this->action('Open Orders Hub', 'Review order lifecycle, blockers and settlement state.', 'filament.admin.pages.orders-hub'),
+            $this->action('Open Dispatch Center', 'Assign real submitted orders to eligible workers.', 'filament.admin.pages.dispatch-center'),
+            $this->action('Open Live Map', 'See real worker GPS only; no fake markers.', 'filament.admin.pages.live-operations-map'),
+            $this->action('Open Worker Cockpit', 'Use the real worker dashboard route.', 'worker.dashboard'),
+            $this->action('Open Customer Account', 'Use the authenticated customer account route.', 'account.dashboard'),
+            $this->action('Open Finance Control', 'Review invoices, payment blockers and settlement readiness.', 'filament.admin.pages.finance-control'),
+            $this->action('Open Support Center', 'Handle customer and worker support tickets.', 'filament.admin.pages.support-center'),
+        ]));
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    public function getLaunchReadiness(): array
+    {
+        return [
+            $this->readiness('Orders', Route::has('filament.admin.pages.orders-hub') ? 'Ready' : 'Blocked', 'Real order models and admin order routes exist.', 'Open Orders Hub', 'filament.admin.pages.orders-hub'),
+            $this->readiness('Dispatch', Route::has('filament.admin.pages.dispatch-center') ? 'Ready' : 'Blocked', 'Dispatch queue and assignment audit are visible.', 'Open Dispatch Center', 'filament.admin.pages.dispatch-center'),
+            $this->readiness('Workers', Route::has('worker.dashboard') ? 'Ready' : 'Blocked', 'Worker cockpit and online/presence routes exist.', 'Open Worker Cockpit', 'worker.dashboard'),
+            $this->readiness('Finance', Route::has('filament.admin.pages.finance-control') ? 'Blocked by provider' : 'Blocked', 'Billing is local; external payment provider is not connected.', 'Open Finance Control', 'filament.admin.pages.finance-control'),
+            $this->readiness('Support', Route::has('filament.admin.pages.support-center') ? 'Ready' : 'Blocked', 'Support center and ticket resources exist.', 'Open Support Center', 'filament.admin.pages.support-center'),
+            $this->readiness('System readiness', Route::has('filament.admin.pages.system-security') ? 'Needs production setup' : 'Blocked', 'Payment, payout, GPS, email/SMS and backups still need production configuration.', 'Open System Readiness', 'filament.admin.pages.system-security'),
+        ];
+    }
+
+    private function action(string $label, string $description, string $route, array $parameters = []): ?array
+    {
+        if (! Route::has($route)) {
+            return null;
+        }
+
+        try {
+            return ['label' => $label, 'description' => $description, 'url' => route($route, $parameters, absolute: false)];
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    private function readiness(string $area, string $status, string $meaning, string $action, string $route): array
+    {
+        return [
+            'area' => $area,
+            'status' => $status,
+            'meaning' => $meaning,
+            'action' => $action,
+            'url' => Route::has($route) ? route($route, absolute: false) : '',
+        ];
     }
 }
