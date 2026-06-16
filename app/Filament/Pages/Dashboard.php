@@ -112,7 +112,8 @@ class Dashboard extends BaseDashboard
         $latestOrder = rescue(fn () => Order::query()->latest('updated_at')->first(), null, report: false);
 
         return [
-            $this->corridorStep('Customer request', $deliveryScenario ? 'ready' : 'blocked', $deliveryScenario ? 'Public request route is available for the delivery scenario.' : 'No active delivery scenario/slug is configured.', 'Open checkout', 'public.orders.request', ['serviceSlug' => $deliveryScenario?->slug ?? 'delivery']),
+            $this->corridorStep('Public delivery page', Route::has('public.categories.delivery') ? 'ready' : 'blocked', 'The public delivery category page must explain the real intake path and never return 404.', 'Open delivery page', 'public.categories.delivery'),
+            $this->corridorStep('Checkout', $deliveryScenario ? 'ready' : 'blocked', $deliveryScenario ? 'Public request route is available for the active delivery scenario.' : 'No active delivery scenario/slug is configured.', 'Open checkout', $deliveryScenario ? 'public.orders.request' : null, ['serviceSlug' => $deliveryScenario?->slug ?? 'delivery']),
             $this->corridorStep('Quote / invoice', $latestOrder?->latestPriceQuote() ? 'review' : 'setup', $latestOrder ? 'Finance can calculate a real quote; payment provider remains disabled.' : 'Create a real order before quote/invoice work.', 'Open Finance', 'filament.admin.pages.finance-control'),
             $this->corridorStep('Dispatch', $latestOrder ? 'ready' : 'setup', $latestOrder ? 'Dispatch Center can review assignment readiness for the latest order.' : 'No real order exists for dispatch review.', 'Open Dispatch', 'filament.admin.pages.dispatch-center'),
             $this->corridorStep('Worker accepts', Route::has('worker.dashboard') ? 'review' : 'blocked', 'Worker cockpit exists; active delivery acceptance must come from the worker flow.', 'Open Worker Cockpit', 'worker.dashboard'),
@@ -128,7 +129,7 @@ class Dashboard extends BaseDashboard
     public function getBusinessCorridorActions(): array
     {
         return array_values(array_filter([
-            $this->action('Open public delivery request', 'Start a real customer intake flow from the public service route.', 'public.orders.request', ['serviceSlug' => 'delivery']),
+            $this->action('Open public delivery page', 'Open the public delivery corridor without creating a fake order.', 'public.categories.delivery'),
             $this->action('Open Orders Hub', 'Review order lifecycle, blockers and settlement state.', 'filament.admin.pages.orders-hub'),
             $this->action('Open Dispatch Center', 'Assign real submitted orders to eligible workers.', 'filament.admin.pages.dispatch-center'),
             $this->action('Open Live Map', 'See real worker GPS only; no fake markers.', 'filament.admin.pages.live-operations-map'),
@@ -178,11 +179,11 @@ class Dashboard extends BaseDashboard
         ];
     }
 
-    private function corridorStep(string $step, string $tone, string $blocker, string $action, string $route, array $parameters = []): array
+    private function corridorStep(string $step, string $tone, string $blocker, string $action, ?string $route, array $parameters = []): array
     {
         $url = '';
 
-        if (Route::has($route)) {
+        if ($route && Route::has($route)) {
             try {
                 $url = route($route, $parameters, absolute: false);
             } catch (Throwable) {

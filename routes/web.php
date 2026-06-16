@@ -30,6 +30,7 @@ Route::get('/', function () {
     return view('public.home');
 });
 
+Route::get('/category/delivery', [PublicOrderRequestController::class, 'deliveryCategory'])->name('public.categories.delivery');
 Route::get('/p/{slug}', [PublicCmsController::class, 'page'])->name('public.cms.page');
 Route::get('/services/{serviceSlug}', [PublicCmsController::class, 'servicePage'])->name('public.cms.service-page');
 Route::get('/services/{serviceSlug}/request', [PublicOrderRequestController::class, 'create'])->name('public.orders.request');

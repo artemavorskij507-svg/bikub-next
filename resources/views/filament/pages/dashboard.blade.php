@@ -8,32 +8,44 @@
 
 <x-filament-panels::page>
     <main class="bkb-admin-shell bkb-business-shell" aria-labelledby="bkb-command-title">
-        <section class="bkb-ops-hero bkb-surface bkb-business-hero">
+        <section class="bkb-ops-hero bkb-surface bkb-business-hero bkb-command-hero">
             <div class="bkb-ops-hero__copy">
-                <p class="bkb-kicker">BiKuBe Admin OS</p>
-                <h1 id="bkb-command-title">BiKuBe Operations Command Center</h1>
-                <p class="bkb-hero__subtitle">Orders, dispatch, workers, finance and support in one Narvik-first operating system. Counts are read from the current runtime; blocked production capabilities stay visible.</p>
+                <p class="bkb-kicker">{{ __('bikube.admin_shell.kicker') }}</p>
+                <h1 id="bkb-command-title">{{ __('bikube.admin_shell.title') }}</h1>
+                <p class="bkb-hero__subtitle">{{ __('bikube.admin_shell.subtitle') }}</p>
                 <div class="bkb-status-row">
-                    <span class="bkb-status-badge bkb-status-badge--safe">Business shell</span>
-                    <span class="bkb-status-badge">No fake GPS</span>
-                    <span class="bkb-status-badge">No fake payments</span>
+                    <span class="bkb-status-badge bkb-status-badge--safe">{{ __('bikube.admin_shell.business_shell') }}</span>
+                    <span class="bkb-status-badge">{{ __('bikube.admin_shell.no_fake_gps') }}</span>
+                    <span class="bkb-status-badge">{{ __('bikube.admin_shell.no_fake_payments') }}</span>
+                </div>
+                <div class="bkb-command-rail" aria-label="{{ __('bikube.admin_shell.status_rail') }}">
+                    <div><span>{{ __('bikube.admin_shell.orders') }}</span><strong>{{ $snapshot['orders_waiting_dispatch'] }}</strong></div>
+                    <div><span>{{ __('bikube.admin_shell.dispatch') }}</span><strong>{{ $snapshot['unassigned_orders'] }}</strong></div>
+                    <div><span>{{ __('bikube.admin_shell.workers') }}</span><strong>{{ $snapshot['eligible_workers'] }}</strong></div>
+                    <div><span>{{ __('bikube.admin_shell.finance') }}</span><strong>{{ $snapshot['blocked_payments'] }}</strong></div>
+                    <div><span>{{ __('bikube.admin_shell.support') }}</span><strong>{{ $snapshot['open_support_tickets'] }}</strong></div>
                 </div>
             </div>
 
-            <aside class="bkb-ops-summary" aria-label="Live business snapshot">
-                <div><span>Orders today</span><strong>{{ $snapshot['orders_today'] }}</strong><p>New customer requests created today.</p></div>
-                <div><span>Waiting dispatch</span><strong>{{ $snapshot['orders_waiting_dispatch'] }}</strong><p>Orders that still need operational attention.</p></div>
-                <div><span>Active workers</span><strong>{{ $snapshot['active_workers'] }}</strong><p>Workers currently online or available.</p></div>
+            <aside class="bkb-command-visual" aria-label="{{ __('bikube.admin_shell.visual_label') }}">
+                <div class="bkb-command-map" aria-hidden="true">
+                    <i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="bkb-command-visual__stats">
+                    <div><span>{{ __('bikube.admin_shell.orders_today') }}</span><strong>{{ $snapshot['orders_today'] }}</strong></div>
+                    <div><span>{{ __('bikube.admin_shell.waiting_dispatch') }}</span><strong>{{ $snapshot['orders_waiting_dispatch'] }}</strong></div>
+                    <div><span>{{ __('bikube.admin_shell.active_workers') }}</span><strong>{{ $snapshot['active_workers'] }}</strong></div>
+                </div>
             </aside>
         </section>
 
         <section class="bkb-business-grid bkb-business-grid--snapshot" aria-label="Business snapshot">
-            <article class="bkb-business-card"><span>Order pipeline</span><strong>{{ $snapshot['orders_waiting_dispatch'] }}</strong><p>Submitted or accepted orders waiting for movement.</p><a href="{{ route('filament.admin.pages.orders-hub', absolute: false) }}">Open Orders Hub</a></article>
-            <article class="bkb-business-card"><span>Dispatch queue</span><strong>{{ $snapshot['unassigned_orders'] }}</strong><p>Real unassigned orders from the dispatch engine.</p><a href="{{ route('filament.admin.pages.dispatch-center', absolute: false) }}">Open Dispatch Center</a></article>
-            <article class="bkb-business-card"><span>Assigned jobs</span><strong>{{ $snapshot['assigned_jobs'] }}</strong><p>Orders with active dispatch assignments.</p><a href="{{ route('filament.admin.pages.live-operations-map', absolute: false) }}">Open Live Map</a></article>
-            <article class="bkb-business-card"><span>Worker availability</span><strong>{{ $snapshot['eligible_workers'] }}</strong><p>Approved workers matching dispatch eligibility.</p><a href="{{ route('filament.admin.pages.people-workforce', absolute: false) }}">Open Workforce</a></article>
-            <article class="bkb-business-card"><span>Finance blockers</span><strong>{{ $snapshot['unpaid_invoices'] + $snapshot['blocked_payments'] }}</strong><p>Unpaid invoices and failed or blocked payment records.</p><a href="{{ route('filament.admin.pages.finance-control', absolute: false) }}">Open Finance</a></article>
-            <article class="bkb-business-card"><span>Support issues</span><strong>{{ $snapshot['open_support_tickets'] }}</strong><p>Open customer, worker or operational support tickets.</p><a href="{{ route('filament.admin.pages.support-center', absolute: false) }}">Open Support</a></article>
+            <article class="bkb-business-card"><span>{{ __('bikube.admin_shell.order_pipeline') }}</span><strong>{{ $snapshot['orders_waiting_dispatch'] }}</strong><p>{{ __('bikube.admin_shell.order_pipeline_body') }}</p><a href="{{ route('filament.admin.pages.orders-hub', absolute: false) }}">{{ __('bikube.admin_shell.open_orders_hub') }}</a></article>
+            <article class="bkb-business-card"><span>{{ __('bikube.admin_shell.dispatch_queue') }}</span><strong>{{ $snapshot['unassigned_orders'] }}</strong><p>{{ __('bikube.admin_shell.dispatch_queue_body') }}</p><a href="{{ route('filament.admin.pages.dispatch-center', absolute: false) }}">{{ __('bikube.admin_shell.open_dispatch_center') }}</a></article>
+            <article class="bkb-business-card"><span>{{ __('bikube.admin_shell.assigned_jobs') }}</span><strong>{{ $snapshot['assigned_jobs'] }}</strong><p>{{ __('bikube.admin_shell.assigned_jobs_body') }}</p><a href="{{ route('filament.admin.pages.live-operations-map', absolute: false) }}">{{ __('bikube.admin_shell.open_live_map') }}</a></article>
+            <article class="bkb-business-card"><span>{{ __('bikube.admin_shell.worker_availability') }}</span><strong>{{ $snapshot['eligible_workers'] }}</strong><p>{{ __('bikube.admin_shell.worker_availability_body') }}</p><a href="{{ route('filament.admin.pages.people-workforce', absolute: false) }}">{{ __('bikube.admin_shell.open_workforce') }}</a></article>
+            <article class="bkb-business-card"><span>{{ __('bikube.admin_shell.finance_blockers') }}</span><strong>{{ $snapshot['unpaid_invoices'] + $snapshot['blocked_payments'] }}</strong><p>{{ __('bikube.admin_shell.finance_blockers_body') }}</p><a href="{{ route('filament.admin.pages.finance-control', absolute: false) }}">{{ __('bikube.admin_shell.open_finance') }}</a></article>
+            <article class="bkb-business-card"><span>{{ __('bikube.admin_shell.support_issues') }}</span><strong>{{ $snapshot['open_support_tickets'] }}</strong><p>{{ __('bikube.admin_shell.support_issues_body') }}</p><a href="{{ route('filament.admin.pages.support-center', absolute: false) }}">{{ __('bikube.admin_shell.open_support') }}</a></article>
         </section>
 
         <section class="bkb-os-section-grid">

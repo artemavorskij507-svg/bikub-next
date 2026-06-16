@@ -12,6 +12,16 @@ use Illuminate\View\View;
 
 class PublicOrderRequestController extends Controller
 {
+    public function deliveryCategory(): View
+    {
+        $scenario = ServiceScenario::active()
+            ->with(['fields' => fn ($query) => $query->active()])
+            ->where('slug', 'delivery')
+            ->first();
+
+        return view('public.categories.delivery', compact('scenario'));
+    }
+
     public function create(string $serviceSlug): View
     {
         $scenario = ServiceScenario::active()->with(['fields' => fn ($query) => $query->active()])->where('slug', $serviceSlug)->firstOrFail();

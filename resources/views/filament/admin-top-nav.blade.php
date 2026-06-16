@@ -3,15 +3,9 @@
 
     $currentRoute = Route::currentRouteName();
 
-    $dashboard = [
-        'label' => 'BiKuBe',
-        'short' => 'Панель',
-        'route' => 'filament.admin.pages.dashboard',
-    ];
-
     $groups = [
         [
-            'label' => 'Панель',
+            'label' => __('bikube.os_nav.panel'),
             'route' => 'filament.admin.pages.dashboard',
             'items' => [
                 ['label' => 'Operations Command Center', 'description' => 'Business overview, launch blockers and real corridor.', 'route' => 'filament.admin.pages.dashboard'],
@@ -19,10 +13,9 @@
             ],
         ],
         [
-            'label' => 'Операции',
-            'route' => 'filament.admin.pages.operations-command-center',
+            'label' => __('bikube.os_nav.operations'),
+            'route' => 'filament.admin.pages.orders-hub',
             'items' => [
-                ['label' => 'Operations Command Center', 'description' => 'Business overview and launch readiness.', 'route' => 'filament.admin.pages.dashboard'],
                 ['label' => 'Orders Hub', 'description' => 'Order lifecycle, blockers and action queue.', 'route' => 'filament.admin.pages.orders-hub'],
                 ['label' => 'Dispatch Center', 'description' => 'Assignment and dispatch operations.', 'route' => 'filament.admin.pages.dispatch-center'],
                 ['label' => 'Live Map', 'description' => 'Real worker GPS only; no fake markers.', 'route' => 'filament.admin.pages.live-operations-map'],
@@ -31,7 +24,7 @@
             ],
         ],
         [
-            'label' => 'Заказы',
+            'label' => __('bikube.os_nav.orders'),
             'route' => 'filament.admin.resources.orders.index',
             'items' => [
                 ['label' => 'Orders', 'description' => 'All customer orders.', 'route' => 'filament.admin.resources.orders.index'],
@@ -42,7 +35,7 @@
             ],
         ],
         [
-            'label' => 'Диспетчерская',
+            'label' => __('bikube.os_nav.dispatch'),
             'route' => 'filament.admin.pages.dispatch-center',
             'items' => [
                 ['label' => 'Dispatch Board', 'description' => 'Assignment queue and operational blockers.', 'route' => 'filament.admin.pages.dispatch-center'],
@@ -52,7 +45,7 @@
             ],
         ],
         [
-            'label' => 'Персонал',
+            'label' => __('bikube.os_nav.people'),
             'route' => 'filament.admin.pages.people-workforce',
             'items' => [
                 ['label' => 'Workers', 'description' => 'Worker profiles and availability.', 'route' => 'filament.admin.resources.worker-profiles.index'],
@@ -64,7 +57,7 @@
             ],
         ],
         [
-            'label' => 'Клиенты',
+            'label' => __('bikube.os_nav.customers'),
             'route' => 'account.dashboard',
             'items' => [
                 ['label' => 'Customers', 'description' => 'Authenticated customer account route.', 'route' => 'account.dashboard'],
@@ -74,7 +67,7 @@
             ],
         ],
         [
-            'label' => 'Финансы',
+            'label' => __('bikube.os_nav.finance'),
             'route' => 'filament.admin.pages.finance-control',
             'items' => [
                 ['label' => 'Finance Control', 'description' => 'Billing, payments and settlement blockers.', 'route' => 'filament.admin.pages.finance-control'],
@@ -86,7 +79,7 @@
             ],
         ],
         [
-            'label' => 'Поддержка',
+            'label' => __('bikube.os_nav.support'),
             'route' => 'filament.admin.pages.support-center',
             'items' => [
                 ['label' => 'Support Center', 'description' => 'Operational support cockpit.', 'route' => 'filament.admin.pages.support-center'],
@@ -94,7 +87,7 @@
             ],
         ],
         [
-            'label' => 'Услуги',
+            'label' => __('bikube.os_nav.services'),
             'route' => 'filament.admin.pages.services-catalog',
             'items' => [
                 ['label' => 'Delivery', 'description' => 'Delivery service catalog readiness.', 'route' => 'filament.admin.pages.services-catalog'],
@@ -105,7 +98,7 @@
             ],
         ],
         [
-            'label' => 'Контент',
+            'label' => __('bikube.os_nav.content'),
             'route' => 'filament.admin.pages.translation-manager',
             'items' => [
                 ['label' => 'Translation Manager', 'description' => 'Four-language Admin OS localization.', 'route' => 'filament.admin.pages.translation-manager'],
@@ -114,31 +107,35 @@
             ],
         ],
         [
-            'label' => 'Система',
+            'label' => __('bikube.os_nav.system'),
             'route' => 'filament.admin.pages.system-security',
             'items' => [
                 ['label' => 'System Readiness', 'description' => 'Business launch blockers and readiness.', 'route' => 'filament.admin.pages.system-security'],
                 ['label' => 'Operations Settings', 'description' => 'Operational gates and map policy.', 'route' => 'filament.admin.pages.operations-settings'],
                 ['label' => 'API Keys', 'description' => 'Payment/provider key readiness.', 'route' => 'filament.admin.pages.payment-provider-settings'],
                 ['label' => 'Logs', 'description' => 'Audit log and technical evidence.', 'route' => 'filament.admin.pages.audit-log'],
-                ['label' => 'Security Technical Readiness', 'description' => 'Reviewer, scanner, retention and incident tools.', 'route' => 'filament.admin.pages.security-governance'],
+                ['label' => 'Technical Security Readiness', 'description' => 'Reviewer, scanner, retention and incident tools.', 'route' => 'filament.admin.pages.security-governance'],
                 ['label' => 'Scanner & Private Evidence', 'description' => 'Private evidence scan gate.', 'route' => 'filament.admin.pages.security-file-scanner'],
             ],
         ],
     ];
 
-    $groups = array_values(array_filter($groups, fn (array $group): bool => Route::has($group['route'])));
+    $groups = collect($groups)
+        ->filter(fn (array $group): bool => Route::has($group['route']))
+        ->map(function (array $group): array {
+            $group['items'] = collect($group['items'])
+                ->filter(fn (array $item): bool => Route::has($item['route']))
+                ->values()
+                ->all();
+
+            return $group;
+        })
+        ->filter(fn (array $group): bool => $group['items'] !== [])
+        ->values();
 @endphp
 
-<nav class="bkb-top-module-nav" aria-label="BiKuBe Admin OS module switcher">
+<nav class="bkb-top-module-nav" aria-label="{{ __('bikube.common.module_switcher') }}">
     <div class="bkb-top-module-nav__bar">
-        @if (Route::has($dashboard['route']))
-            @php($isDashboardActive = $currentRoute === $dashboard['route'])
-            <a href="{{ route($dashboard['route'], absolute: false) }}" @class(['bkb-top-module-nav__link','bkb-top-module-nav__link--dashboard','bkb-top-module-nav__link--active' => $isDashboardActive]) @if ($isDashboardActive) aria-current="page" @endif>
-                <span>{{ $dashboard['short'] }}</span>
-            </a>
-        @endif
-
         @foreach ($groups as $group)
             @php($isGroupActive = $currentRoute === $group['route'] || collect($group['items'])->contains(fn ($item) => $currentRoute === $item['route']))
             <div @class(['bkb-top-module-nav__group','bkb-top-module-nav__group--active' => $isGroupActive])>
@@ -148,11 +145,10 @@
                 </button>
                 <div class="bkb-top-module-nav__dropdown" role="menu">
                     @foreach ($group['items'] as $item)
-                        @continue(! Route::has($item['route']))
                         @php($isItemActive = $currentRoute === $item['route'])
-                        <a href="{{ route($item['route'], absolute: false) }}" @class(['bkb-top-module-nav__dropdown-link','bkb-top-module-nav__dropdown-link--active' => $isItemActive]) @if ($isItemActive) aria-current="page" @endif role="menuitem">
+                        <a href="{{ route($item['route'], absolute: false) }}" role="menuitem" @class(['bkb-top-module-nav__item','bkb-top-module-nav__item--active' => $isItemActive]) @if($isItemActive) aria-current="page" @endif>
                             <strong>{{ $item['label'] }}</strong>
-                            <small>{{ $item['description'] }}</small>
+                            <span>{{ $item['description'] }}</span>
                         </a>
                     @endforeach
                 </div>
