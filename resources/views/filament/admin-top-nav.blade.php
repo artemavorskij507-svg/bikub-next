@@ -5,35 +5,54 @@
 
     $dashboard = [
         'label' => 'BiKuBe',
-        'short' => 'Panel',
+        'short' => 'Панель',
         'route' => 'filament.admin.pages.dashboard',
     ];
 
     $groups = [
         [
-            'label' => 'Operations',
+            'label' => 'Панель',
+            'route' => 'filament.admin.pages.dashboard',
+            'items' => [
+                ['label' => 'Operations Command Center', 'description' => 'Business overview, launch blockers and real corridor.', 'route' => 'filament.admin.pages.dashboard'],
+                ['label' => 'Business Overview', 'description' => 'Runtime snapshot of orders, workers, finance and support.', 'route' => 'filament.admin.pages.operations-command-center'],
+            ],
+        ],
+        [
+            'label' => 'Операции',
             'route' => 'filament.admin.pages.operations-command-center',
             'items' => [
                 ['label' => 'Operations Command Center', 'description' => 'Business overview and launch readiness.', 'route' => 'filament.admin.pages.dashboard'],
                 ['label' => 'Orders Hub', 'description' => 'Order lifecycle, blockers and action queue.', 'route' => 'filament.admin.pages.orders-hub'],
                 ['label' => 'Dispatch Center', 'description' => 'Assignment and dispatch operations.', 'route' => 'filament.admin.pages.dispatch-center'],
                 ['label' => 'Live Map', 'description' => 'Real worker GPS only; no fake markers.', 'route' => 'filament.admin.pages.live-operations-map'],
-                ['label' => 'Today's Work', 'description' => 'Kanban-style operational order board.', 'route' => 'filament.admin.pages.order-board'],
+                ['label' => 'Today Work', 'description' => 'Kanban-style operational order board.', 'route' => 'filament.admin.pages.order-board'],
                 ['label' => 'Problems / Exceptions', 'description' => 'Support and operational incidents.', 'route' => 'filament.admin.pages.support-center'],
             ],
         ],
         [
-            'label' => 'Orders',
+            'label' => 'Заказы',
             'route' => 'filament.admin.resources.orders.index',
             'items' => [
                 ['label' => 'Orders', 'description' => 'All customer orders.', 'route' => 'filament.admin.resources.orders.index'],
                 ['label' => 'Delivery Orders', 'description' => 'Delivery service order intake.', 'route' => 'filament.admin.pages.orders-hub'],
                 ['label' => 'Quotes', 'description' => 'Pricing rules and quote readiness.', 'route' => 'filament.admin.resources.pricing-rules.index'],
                 ['label' => 'Invoices', 'description' => 'Billing documents and payment state.', 'route' => 'filament.admin.resources.billing-documents.index'],
+                ['label' => 'Trackers', 'description' => 'Order tracking visibility is opened from a selected order.', 'route' => 'filament.admin.pages.orders-hub'],
             ],
         ],
         [
-            'label' => 'Workforce',
+            'label' => 'Диспетчерская',
+            'route' => 'filament.admin.pages.dispatch-center',
+            'items' => [
+                ['label' => 'Dispatch Board', 'description' => 'Assignment queue and operational blockers.', 'route' => 'filament.admin.pages.dispatch-center'],
+                ['label' => 'Live Operations Map', 'description' => 'Real GPS only; stale and missing GPS are visible.', 'route' => 'filament.admin.pages.live-operations-map'],
+                ['label' => 'Assignments', 'description' => 'Assigned and unassigned work in one board.', 'route' => 'filament.admin.pages.order-board'],
+                ['label' => 'Routes', 'description' => 'Route optimization is blocked until real routing is connected.', 'route' => 'filament.admin.pages.operation-zones'],
+            ],
+        ],
+        [
+            'label' => 'Персонал',
             'route' => 'filament.admin.pages.people-workforce',
             'items' => [
                 ['label' => 'Workers', 'description' => 'Worker profiles and availability.', 'route' => 'filament.admin.resources.worker-profiles.index'],
@@ -41,19 +60,21 @@
                 ['label' => 'Worker Documents', 'description' => 'Private worker compliance documents.', 'route' => 'filament.admin.resources.worker-documents.index'],
                 ['label' => 'Worker Payout Profiles', 'description' => 'Masked payout readiness profiles.', 'route' => 'filament.admin.resources.worker-payout-profiles.index'],
                 ['label' => 'Worker Payout Reviews', 'description' => 'Identity, tax and payout review queue.', 'route' => 'filament.admin.resources.worker-payout-reviews.index'],
+                ['label' => 'Settlement Readiness', 'description' => 'Settlement ledger and payout blockers.', 'route' => 'filament.admin.resources.worker-settlement-entries.index'],
             ],
         ],
         [
-            'label' => 'Customers',
+            'label' => 'Клиенты',
             'route' => 'account.dashboard',
             'items' => [
                 ['label' => 'Customers', 'description' => 'Authenticated customer account route.', 'route' => 'account.dashboard'],
                 ['label' => 'Account Orders', 'description' => 'Customer order visibility.', 'route' => 'account.orders.index'],
+                ['label' => 'Account Activity', 'description' => 'Customer-facing account dashboard.', 'route' => 'account.dashboard'],
                 ['label' => 'Support Requests', 'description' => 'Customer support portal.', 'route' => 'account.support.index'],
             ],
         ],
         [
-            'label' => 'Finance',
+            'label' => 'Финансы',
             'route' => 'filament.admin.pages.finance-control',
             'items' => [
                 ['label' => 'Finance Control', 'description' => 'Billing, payments and settlement blockers.', 'route' => 'filament.admin.pages.finance-control'],
@@ -65,7 +86,7 @@
             ],
         ],
         [
-            'label' => 'Support',
+            'label' => 'Поддержка',
             'route' => 'filament.admin.pages.support-center',
             'items' => [
                 ['label' => 'Support Center', 'description' => 'Operational support cockpit.', 'route' => 'filament.admin.pages.support-center'],
@@ -73,7 +94,7 @@
             ],
         ],
         [
-            'label' => 'Services',
+            'label' => 'Услуги',
             'route' => 'filament.admin.pages.services-catalog',
             'items' => [
                 ['label' => 'Delivery', 'description' => 'Delivery service catalog readiness.', 'route' => 'filament.admin.pages.services-catalog'],
@@ -84,7 +105,7 @@
             ],
         ],
         [
-            'label' => 'Content',
+            'label' => 'Контент',
             'route' => 'filament.admin.pages.translation-manager',
             'items' => [
                 ['label' => 'Translation Manager', 'description' => 'Four-language Admin OS localization.', 'route' => 'filament.admin.pages.translation-manager'],
@@ -93,7 +114,7 @@
             ],
         ],
         [
-            'label' => 'System',
+            'label' => 'Система',
             'route' => 'filament.admin.pages.system-security',
             'items' => [
                 ['label' => 'System Readiness', 'description' => 'Business launch blockers and readiness.', 'route' => 'filament.admin.pages.system-security'],

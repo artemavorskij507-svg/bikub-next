@@ -1,5 +1,7 @@
 @php
     $snapshot = $this->getBusinessSnapshot();
+    $pipeline = $this->getOrderPipeline();
+    $corridor = $this->getDeliveryCorridor();
     $actions = $this->getBusinessCorridorActions();
     $readiness = $this->getLaunchReadiness();
 @endphp
@@ -32,6 +34,55 @@
             <article class="bkb-business-card"><span>Worker availability</span><strong>{{ $snapshot['eligible_workers'] }}</strong><p>Approved workers matching dispatch eligibility.</p><a href="{{ route('filament.admin.pages.people-workforce', absolute: false) }}">Open Workforce</a></article>
             <article class="bkb-business-card"><span>Finance blockers</span><strong>{{ $snapshot['unpaid_invoices'] + $snapshot['blocked_payments'] }}</strong><p>Unpaid invoices and failed or blocked payment records.</p><a href="{{ route('filament.admin.pages.finance-control', absolute: false) }}">Open Finance</a></article>
             <article class="bkb-business-card"><span>Support issues</span><strong>{{ $snapshot['open_support_tickets'] }}</strong><p>Open customer, worker or operational support tickets.</p><a href="{{ route('filament.admin.pages.support-center', absolute: false) }}">Open Support</a></article>
+        </section>
+
+        <section class="bkb-os-section-grid">
+            <article class="bkb-os-command-panel">
+                <div class="bkb-section-heading">
+                    <div>
+                        <p class="bkb-kicker">Order pipeline</p>
+                        <h2>From request to completion</h2>
+                    </div>
+                </div>
+                <div class="bkb-os-pipeline" aria-label="Order pipeline">
+                    @foreach ([
+                        'created' => 'Created',
+                        'waiting_dispatch' => 'Waiting dispatch',
+                        'assigned' => 'Assigned',
+                        'in_progress' => 'In progress',
+                        'completed' => 'Completed',
+                        'blocked' => 'Blocked',
+                    ] as $key => $label)
+                        <div class="is-{{ $key }}">
+                            <span>{{ $label }}</span>
+                            <strong>{{ $pipeline[$key] }}</strong>
+                        </div>
+                    @endforeach
+                </div>
+            </article>
+
+            <article class="bkb-os-command-panel">
+                <div class="bkb-section-heading">
+                    <div>
+                        <p class="bkb-kicker">Delivery business corridor</p>
+                        <h2>Real operational chain</h2>
+                    </div>
+                </div>
+                <div class="bkb-delivery-corridor" aria-label="Delivery business corridor">
+                    @foreach ($corridor as $step)
+                        <div class="is-{{ $step['tone'] }}">
+                            <span>Step {{ $loop->iteration }}</span>
+                            <strong>{{ $step['step'] }}</strong>
+                            <p>{{ $step['blocker'] }}</p>
+                            @if ($step['url'])
+                                <a href="{{ $step['url'] }}">{{ $step['action'] }}</a>
+                            @else
+                                <button type="button" disabled title="{{ $step['blocker'] }}">{{ $step['action'] }}</button>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </article>
         </section>
 
         <section class="bkb-ops-board">

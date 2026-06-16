@@ -80,6 +80,49 @@ class Dashboard extends BaseDashboard
     }
 
     /**
+     * @return array<string, int>
+     */
+    public function getOrderPipeline(): array
+    {
+        try {
+            return [
+                'created' => Order::count(),
+                'waiting_dispatch' => Order::whereIn('status', ['submitted', 'accepted'])->count(),
+                'assigned' => Order::whereHas('dispatchAssignments', fn ($query) => $query->whereIn('status', ['assigned', 'accepted']))->count(),
+                'in_progress' => Order::where('status', 'in_progress')->count(),
+                'completed' => Order::whereNotNull('completed_at')->count(),
+                'blocked' => Order::whereHas('supportTickets', fn ($query) => $query->whereNotIn('status', ['resolved', 'closed']))
+                    ->orWhereIn('payment_status', ['failed', 'blocked', 'requires_action'])
+                    ->count(),
+            ];
+        } catch (Throwable) {
+            return array_fill_keys(['created', 'waiting_dispatch', 'assigned', 'in_progress', 'completed', 'blocked'], 0);
+        }
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    public function getDeliveryCorridor(): array
+    {
+        $deliveryScenario = rescue(fn () => ServiceScenario::query()
+            ->where('slug', 'delivery')
+            ->orWhere('scenario_key', 'delivery')
+            ->first(), null, report: false);
+        $latestOrder = rescue(fn () => Order::query()->latest('updated_at')->first(), null, report: false);
+
+        return [
+            $this->corridorStep('Customer request', $deliveryScenario ? 'ready' : 'blocked', $deliveryScenario ? 'Public request route is available for the delivery scenario.' : 'No active delivery scenario/slug is configured.', 'Open checkout', 'public.orders.request', ['serviceSlug' => $deliveryScenario?->slug ?? 'delivery']),
+            $this->corridorStep('Quote / invoice', $latestOrder?->latestPriceQuote() ? 'review' : 'setup', $latestOrder ? 'Finance can calculate a real quote; payment provider remains disabled.' : 'Create a real order before quote/invoice work.', 'Open Finance', 'filament.admin.pages.finance-control'),
+            $this->corridorStep('Dispatch', $latestOrder ? 'ready' : 'setup', $latestOrder ? 'Dispatch Center can review assignment readiness for the latest order.' : 'No real order exists for dispatch review.', 'Open Dispatch', 'filament.admin.pages.dispatch-center'),
+            $this->corridorStep('Worker accepts', Route::has('worker.dashboard') ? 'review' : 'blocked', 'Worker cockpit exists; active delivery acceptance must come from the worker flow.', 'Open Worker Cockpit', 'worker.dashboard'),
+            $this->corridorStep('Tracking', 'blocked', 'Live map accepts real GPS only. Mobile HTTPS/GPS proof is still required.', 'Open Live Map', 'filament.admin.pages.live-operations-map'),
+            $this->corridorStep('Completion proof', $latestOrder ? 'review' : 'setup', 'Completion proof remains workflow-controlled; no fake delivered state is shown.', 'Open Orders Hub', 'filament.admin.pages.orders-hub'),
+            $this->corridorStep('Finance / settlement', 'blocked', 'Payment capture and payout provider are still blocked, so no paid state is claimed.', 'Open Finance', 'filament.admin.pages.finance-control'),
+        ];
+    }
+
+    /**
      * @return array<int, array<string, string>>
      */
     public function getBusinessCorridorActions(): array
@@ -133,5 +176,20 @@ class Dashboard extends BaseDashboard
             'action' => $action,
             'url' => Route::has($route) ? route($route, absolute: false) : '',
         ];
+    }
+
+    private function corridorStep(string $step, string $tone, string $blocker, string $action, string $route, array $parameters = []): array
+    {
+        $url = '';
+
+        if (Route::has($route)) {
+            try {
+                $url = route($route, $parameters, absolute: false);
+            } catch (Throwable) {
+                $url = '';
+            }
+        }
+
+        return compact('step', 'tone', 'blocker', 'action', 'url');
     }
 }
