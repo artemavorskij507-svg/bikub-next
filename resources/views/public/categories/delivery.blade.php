@@ -1,462 +1,424 @@
-@extends('public.layouts.app')
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="description" content="BiKuBe Levering — dagligvarer, mat og tunge varer levert i Narvik og Ballangen.">
+  <link rel="canonical" href="{{ url()->current() }}">
+  <title>Levering — BiKuBe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ asset('storage/delivery-template/style.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/theme-palette.css') }}">
+  <script>window.BKB_THEME_SURFACE='public'</script>
+  <script src="{{ asset('js/theme-palette.js') }}" defer></script>
+</head>
+<body>
+<div class="delivery-page">
 
-@section('content')
-<article class="bkb-delivery-page">
-
-    {{-- HERO --}}
-    <section class="bkb-delivery-hero">
-        <div class="bkb-delivery-hero__copy">
-            <p class="eyebrow">{{ __('bikube.public.delivery.eyebrow') }}</p>
-            <h1>{{ __('bikube.public.delivery.hero_title') }}</h1>
-            <p class="subtitle">{{ __('bikube.public.delivery.hero_subtitle') }}</p>
-            <div class="bkb-delivery-actions">
-                @if ($scenario)
-                    <a class="bkb-btn bkb-btn--primary" href="{{ route('public.orders.request', $scenario->slug) }}">
-                        {{ __('bikube.public.delivery.cta_start') }}
-                    </a>
-                @else
-                    <button type="button" class="bkb-btn bkb-btn--primary" disabled>
-                        {{ __('bikube.public.delivery.cta_unavailable') }}
-                    </button>
-                @endif
-                <a class="bkb-btn bkb-btn--secondary" href="{{ route('account.orders.index') }}">
-                    {{ __('bikube.public.delivery.cta_track') }}
-                </a>
-            </div>
-            <p class="bkb-delivery-honesty">
-                {{ __('bikube.public.delivery.payment_honest') }}
-            </p>
-        </div>
-        <div class="bkb-delivery-hero__visual" aria-hidden="true">
-            <span class="bkb-pin bkb-pin--green" style="left:22%;top:28%"></span>
-            <span class="bkb-pin bkb-pin--blue"  style="left:68%;top:38%"></span>
-            <span class="bkb-pin bkb-pin--green" style="left:42%;top:70%"></span>
-            <span class="bkb-pin bkb-pin--amber" style="left:78%;top:72%"></span>
-            <svg class="bkb-route" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M66 56 Q180 80 204 76 Q240 70 126 140 Q100 155 234 144" stroke="#33e49d" stroke-width="1.5" stroke-dasharray="6 4" fill="none" opacity="0.5"/>
-            </svg>
-        </div>
-    </section>
-
-    {{-- HOW IT WORKS --}}
-    <section class="bkb-section" id="how-it-works">
-        <div class="bkb-section__head">
-            <p class="eyebrow">{{ __('bikube.public.delivery.how_eyebrow') }}</p>
-            <h2>{{ __('bikube.public.delivery.how_title') }}</h2>
-        </div>
-        <div class="bkb-steps">
-            <div class="bkb-step">
-                <div class="bkb-step__num">1</div>
-                <h3>{{ __('bikube.public.delivery.step1_title') }}</h3>
-                <p>{{ __('bikube.public.delivery.step1_body') }}</p>
-            </div>
-            <div class="bkb-step">
-                <div class="bkb-step__num">2</div>
-                <h3>{{ __('bikube.public.delivery.step2_title') }}</h3>
-                <p>{{ __('bikube.public.delivery.step2_body') }}</p>
-            </div>
-            <div class="bkb-step">
-                <div class="bkb-step__num">3</div>
-                <h3>{{ __('bikube.public.delivery.step3_title') }}</h3>
-                <p>{{ __('bikube.public.delivery.step3_body') }}</p>
-            </div>
-            <div class="bkb-step">
-                <div class="bkb-step__num">4</div>
-                <h3>{{ __('bikube.public.delivery.step4_title') }}</h3>
-                <p>{{ __('bikube.public.delivery.step4_body') }}</p>
-            </div>
-        </div>
-    </section>
-
-    {{-- SERVICE CARDS --}}
-    <section class="bkb-section">
-        <div class="bkb-section__head">
-            <p class="eyebrow">{{ __('bikube.public.delivery.services_eyebrow') }}</p>
-            <h2>{{ __('bikube.public.delivery.services_title') }}</h2>
-        </div>
-        <div class="bkb-service-cards">
-            <div class="bkb-service-card">
-                <div class="bkb-service-card__icon">🛒</div>
-                <h3>{{ __('bikube.public.delivery.svc_grocery_title') }}</h3>
-                <p>{{ __('bikube.public.delivery.svc_grocery_body') }}</p>
-                @if ($scenario)
-                    <a class="bkb-service-card__link" href="{{ route('public.orders.request', $scenario->slug) }}">
-                        {{ __('bikube.public.delivery.svc_request') }} →
-                    </a>
-                @endif
-            </div>
-            <div class="bkb-service-card">
-                <div class="bkb-service-card__icon">🍱</div>
-                <h3>{{ __('bikube.public.delivery.svc_meal_title') }}</h3>
-                <p>{{ __('bikube.public.delivery.svc_meal_body') }}</p>
-                @if ($scenario)
-                    <a class="bkb-service-card__link" href="{{ route('public.orders.request', $scenario->slug) }}">
-                        {{ __('bikube.public.delivery.svc_request') }} →
-                    </a>
-                @endif
-            </div>
-            <div class="bkb-service-card">
-                <div class="bkb-service-card__icon">📦</div>
-                <h3>{{ __('bikube.public.delivery.svc_bulky_title') }}</h3>
-                <p>{{ __('bikube.public.delivery.svc_bulky_body') }}</p>
-                @if ($scenario)
-                    <a class="bkb-service-card__link" href="{{ route('public.orders.request', $scenario->slug) }}">
-                        {{ __('bikube.public.delivery.svc_request') }} →
-                    </a>
-                @endif
-            </div>
-        </div>
-    </section>
-
-    {{-- COVERAGE --}}
-    <section class="bkb-section bkb-coverage">
-        <div class="bkb-section__head">
-            <p class="eyebrow">{{ __('bikube.public.delivery.coverage_eyebrow') }}</p>
-            <h2>{{ __('bikube.public.delivery.coverage_title') }}</h2>
-            <p class="bkb-coverage__text">{{ __('bikube.public.delivery.coverage_body') }}</p>
-        </div>
-        <div class="bkb-zone-badges">
-            <span class="bkb-zone-badge bkb-zone-badge--active">📍 Narvik</span>
-            <span class="bkb-zone-badge bkb-zone-badge--active">📍 Ballangen</span>
-        </div>
-    </section>
-
-    {{-- READINESS BLOCK --}}
-    <section class="bkb-section bkb-readiness" id="readiness">
-        <div class="bkb-section__head">
-            <p class="eyebrow">{{ __('bikube.public.delivery.readiness_eyebrow') }}</p>
-            <h2>{{ __('bikube.public.delivery.readiness_title') }}</h2>
-        </div>
-        <div class="bkb-readiness-grid">
-            <div class="bkb-readiness-item bkb-readiness-item--ready">
-                <span class="bkb-readiness-item__label">{{ __('bikube.public.delivery.readiness_request_label') }}</span>
-                <strong class="bkb-readiness-item__status">{{ __('bikube.status.ready') }}</strong>
-                <p>{{ $scenario ? __('bikube.public.delivery.readiness_request_ready') : __('bikube.public.delivery.readiness_request_missing') }}</p>
-            </div>
-            <div class="bkb-readiness-item bkb-readiness-item--blocked">
-                <span class="bkb-readiness-item__label">{{ __('bikube.public.delivery.readiness_payment_label') }}</span>
-                <strong class="bkb-readiness-item__status">{{ __('bikube.status.blocked') }}</strong>
-                <p>{{ __('bikube.public.delivery.readiness_payment_body') }}</p>
-            </div>
-            <div class="bkb-readiness-item bkb-readiness-item--review">
-                <span class="bkb-readiness-item__label">{{ __('bikube.public.delivery.readiness_dispatch_label') }}</span>
-                <strong class="bkb-readiness-item__status">{{ __('bikube.status.review') }}</strong>
-                <p>{{ __('bikube.public.delivery.readiness_dispatch_body') }}</p>
-            </div>
-            <div class="bkb-readiness-item bkb-readiness-item--blocked">
-                <span class="bkb-readiness-item__label">{{ __('bikube.public.delivery.readiness_gps_label') }}</span>
-                <strong class="bkb-readiness-item__status">{{ __('bikube.status.blocked') }}</strong>
-                <p>{{ __('bikube.public.delivery.readiness_gps_body') }}</p>
-            </div>
-        </div>
-    </section>
-
-    {{-- BOTTOM CTA --}}
-    <section class="bkb-section bkb-cta-section">
-        <div class="bkb-cta-block">
-            <h2>{{ __('bikube.public.delivery.bottom_cta_title') }}</h2>
-            <p>{{ __('bikube.public.delivery.bottom_cta_body') }}</p>
-            <div class="bkb-delivery-actions">
-                @if ($scenario)
-                    <a class="bkb-btn bkb-btn--primary" href="{{ route('public.orders.request', $scenario->slug) }}">
-                        {{ __('bikube.public.delivery.cta_start') }}
-                    </a>
-                @else
-                    <button type="button" class="bkb-btn bkb-btn--primary" disabled>
-                        {{ __('bikube.public.delivery.cta_unavailable') }}
-                    </button>
-                @endif
-                <a class="bkb-btn bkb-btn--secondary" href="{{ route('account.orders.index') }}">
-                    {{ __('bikube.public.delivery.cta_track') }}
-                </a>
-            </div>
-        </div>
-    </section>
-
-    {{-- FOOTER NOTE --}}
-    <div class="bkb-delivery-footer-note">
-        BiKuBe · Narvik operations · {{ __('bikube.public.delivery.footer_note') }}
+  {{-- ─── TOP NAV ──────────────────────────────────────────────── --}}
+  <header class="top-nav">
+    <div class="container nav-inner">
+      <a href="{{ url('/') }}" class="brand">
+        <i class="fa-solid fa-bicycle"></i>
+        <span>BiKu<span>Be</span><small>Levering i Narvik</small></span>
+      </a>
+      <nav class="nav-links">
+        <a class="active" href="{{ route('public.categories.delivery') }}">Levering</a>
+        <a href="{{ route('public.orders.request', 'delivery.groceries') }}">Dagligvarer</a>
+        <a href="{{ route('public.orders.request', 'delivery.meals') }}">Mat</a>
+        <a href="{{ route('public.orders.request', 'delivery.bulky') }}">Tunge varer</a>
+        <a href="{{ route('public.workers.apply') }}">Bli sjåfør</a>
+      </nav>
+      <div class="nav-actions">
+        @auth
+          <a href="{{ route('account.dashboard') }}" class="btn login">Min konto</a>
+        @else
+          <a href="{{ route('login') }}" class="btn login">Logg inn</a>
+        @endauth
+        <a href="{{ route('public.orders.request', 'delivery.groceries') }}" class="btn signup">Bestill nå</a>
+      </div>
     </div>
+  </header>
 
-</article>
+  {{-- ─── HERO ────────────────────────────────────────────────── --}}
+  <section class="hero">
+    <div class="container">
+      <div class="hero-shell">
+        <div class="hero-left">
+          <h1>Levering av alt,<br><span>du trenger</span></h1>
+          <p class="hero-sub">Dagligvarer, ferdigmat og store gjenstander levert trygt og raskt til hjemmet ditt i Narvik og Ballangen.</p>
+          <ul class="hero-features">
+            <li><i class="fa-solid fa-check"></i> Lokal levering — ekte sjåfører</li>
+            <li><i class="fa-solid fa-check"></i> Bestill enkelt — ingen app nødvendig</li>
+            <li><i class="fa-solid fa-check"></i> Sporbar via kontokabinett</li>
+          </ul>
+          <div class="card-strip">
+            <a class="strip-card strip-g" href="{{ route('public.orders.request', 'delivery.groceries') }}">
+              <img src="{{ asset('storage/delivery-template/images/bananas.jpg') }}" alt="Dagligvarer">
+              <div><h3>Dagligvarer</h3><p>fra butikker</p></div>
+            </a>
+            <a class="strip-card strip-o" href="{{ route('public.orders.request', 'delivery.meals') }}">
+              <img src="{{ asset('storage/delivery-template/images/milk.jpg') }}" alt="Ferdigmat">
+              <div><h3>Ferdigmat</h3><p>fra restauranter</p></div>
+            </a>
+            <a class="strip-card strip-p" href="{{ route('public.orders.request', 'delivery.bulky') }}">
+              <img src="{{ asset('storage/delivery-template/images/hero.jpg') }}" alt="Tunge varer">
+              <div><h3>Tunge varer</h3><p>stor leveranse</p></div>
+            </a>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="hero-badge">Narvik<small>Pilotlansering</small></div>
+        </div>
+      </div>
 
-<style>
-/* === BiKuBe Delivery Landing — premium dark OS === */
-.bkb-delivery-page {
-    background: #040e1c;
-    color: #eef7ff;
-    margin: -2rem -1rem 0;
-    padding: 0 0 4rem;
-    min-height: calc(100vh - 6rem);
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-}
+      {{-- Metrics --}}
+      <div class="metrics">
+        <div class="metric">
+          <i class="fa-solid fa-location-dot"></i>
+          <div><b>2 byer</b><span>Narvik og Ballangen</span></div>
+        </div>
+        <div class="metric">
+          <i class="fa-solid fa-truck-fast"></i>
+          <div><b>3 typer</b><span>leveringstjenester</span></div>
+        </div>
+        <div class="metric">
+          <i class="fa-solid fa-shield-halved"></i>
+          <div><b>Ekte</b><span>sjåfører og lokal drift</span></div>
+        </div>
+        <div class="metric">
+          <i class="fa-solid fa-star"></i>
+          <div><b>Pilot</b><span>ærlig lansering 2026</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-/* Hero */
-.bkb-delivery-hero {
-    position: relative;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.85fr);
-    gap: 2rem;
-    align-items: center;
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 4rem 1.5rem 3rem;
-}
-.bkb-delivery-hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(circle at 75% 25%, rgba(35, 225, 151, .18), transparent 30%),
-        radial-gradient(circle at 25% 10%, rgba(56, 217, 255, .12), transparent 35%);
-    pointer-events: none;
-}
-.bkb-delivery-hero__copy { position: relative; z-index: 2; }
-.bkb-delivery-hero__copy h1 {
-    font-size: clamp(2.4rem, 7vw, 5rem);
-    line-height: 1;
-    font-weight: 950;
-    margin: .6rem 0 0;
-    letter-spacing: -.02em;
-    color: #fff;
-}
-.bkb-delivery-hero__copy h1 em {
-    font-style: normal;
-    background: linear-gradient(to right, #33e49d, #3dd9ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.subtitle { max-width: 640px; color: #b0c6db; font-size: clamp(1rem, 2vw, 1.3rem); line-height: 1.55; margin: 1.2rem 0 0; }
-.bkb-delivery-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.6rem; }
-.bkb-delivery-honesty {
-    margin-top: 1.2rem;
-    font-size: .83rem;
-    color: #7f96b1;
-    background: rgba(255, 200, 60, .06);
-    border: 1px solid rgba(255, 200, 60, .2);
-    border-radius: 8px;
-    padding: .65rem .9rem;
-    max-width: 540px;
-    line-height: 1.5;
-}
+  {{-- ─── HOW IT WORKS ────────────────────────────────────────── --}}
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Slik fungerer det</h2>
+      </div>
+      <div class="promo-grid">
+        <div class="promo pg" style="flex-direction:column;align-items:flex-start;gap:.5rem;min-height:130px">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;background:rgba(139,227,58,.18);color:var(--green);font-weight:900;font-size:1.1rem;flex-shrink:0">1</span>
+            <h3 style="margin:0;font-size:1.25rem">Velg leveringstype</h3>
+          </div>
+          <p style="margin:0 0 0 3.15rem;color:#c4d3e8;font-size:.95rem">Dagligvarer, mat eller store gjenstander — klikk på ønsket tjeneste.</p>
+        </div>
+        <div class="promo po" style="flex-direction:column;align-items:flex-start;gap:.5rem;min-height:130px">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;background:rgba(245,189,84,.18);color:#f5bd54;font-weight:900;font-size:1.1rem;flex-shrink:0">2</span>
+            <h3 style="margin:0;font-size:1.25rem">Fyll ut bestillingen</h3>
+          </div>
+          <p style="margin:0 0 0 3.15rem;color:#c4d3e8;font-size:.95rem">Hentested, leveringsadresse, ønsket tidspunkt og kontaktinfo.</p>
+        </div>
+        <div class="promo pp" style="flex-direction:column;align-items:flex-start;gap:.5rem;min-height:130px">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;background:rgba(139,58,227,.18);color:#bf7bff;font-weight:900;font-size:1.1rem;flex-shrink:0">3</span>
+            <h3 style="margin:0;font-size:1.25rem">Dispatcher bekrefter</h3>
+          </div>
+          <p style="margin:0 0 0 3.15rem;color:#c4d3e8;font-size:.95rem">Operasjonsteamet gjennomgår og tildeler en lokal sjåfør.</p>
+        </div>
+      </div>
+      <div style="margin-top:12px;border-radius:14px;border:1px solid #2a3b56;padding:14px 18px;background:linear-gradient(140deg,#0f3826,#09271b);display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+        <span style="display:grid;place-items:center;width:2.4rem;height:2.4rem;flex-shrink:0;border-radius:50%;background:rgba(139,227,58,.18);color:var(--green);font-weight:900;font-size:1.1rem">4</span>
+        <div style="flex:1;min-width:200px">
+          <h3 style="margin:0 0 .2rem;font-size:1.15rem">Sjåfør leverer — du bekrefter</h3>
+          <p style="margin:0;color:#c4d3e8;font-size:.9rem">Sjåføren laster opp leveringsbevis. Du bekrefter mottak i kontokabinett.</p>
+        </div>
+        <a href="{{ route('public.orders.request', 'delivery.groceries') }}"
+           style="flex-shrink:0;border-radius:999px;padding:12px 22px;background:var(--green);color:#172a0a;font-weight:700;text-decoration:none;white-space:nowrap">
+          Bestill nå
+        </a>
+      </div>
+    </div>
+  </section>
 
-/* Visual panel */
-.bkb-delivery-hero__visual {
-    position: relative;
-    aspect-ratio: 1.1;
-    border: 1px solid rgba(137, 165, 194, .18);
-    border-radius: 16px;
-    background: linear-gradient(145deg, rgba(9, 26, 43, .92), rgba(3, 13, 24, .95));
-    box-shadow: 0 30px 80px rgba(0, 0, 0, .35);
-    overflow: hidden;
-    z-index: 1;
-}
-.bkb-delivery-hero__visual::before {
-    content: "";
-    position: absolute;
-    inset: 10%;
-    background-image:
-        linear-gradient(rgba(122, 160, 194, .1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(122, 160, 194, .1) 1px, transparent 1px);
-    background-size: 40px 40px;
-    transform: perspective(480px) rotateX(55deg);
-    transform-origin: center bottom;
-}
-.bkb-route { position: absolute; inset: 0; width: 100%; height: 100%; }
-.bkb-pin {
-    position: absolute;
-    width: 12px; height: 12px;
-    border-radius: 999px;
-    transform: translate(-50%, -50%);
-}
-.bkb-pin--green { background: #33e49d; box-shadow: 0 0 0 7px rgba(51, 228, 157, .14), 0 0 20px rgba(51, 228, 157, .7); }
-.bkb-pin--blue  { background: #55d9ff; box-shadow: 0 0 0 7px rgba(85, 217, 255, .14), 0 0 20px rgba(85, 217, 255, .7); }
-.bkb-pin--amber { background: #f5bd54; box-shadow: 0 0 0 7px rgba(245, 189, 84, .14),  0 0 20px rgba(245, 189, 84, .7); }
+  {{-- ─── SERVICE CARDS ───────────────────────────────────────── --}}
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Velg leveringstjeneste</h2>
+      </div>
+      <div class="products-row" style="grid-template-columns:repeat(3,1fr);gap:14px">
 
-/* Buttons */
-.bkb-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 3rem;
-    border-radius: 8px;
-    padding: .7rem 1.2rem;
-    font-weight: 800;
-    font-size: .9rem;
-    text-decoration: none;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all .2s ease;
-}
-.bkb-btn--primary {
-    background: linear-gradient(135deg, #1ab07e, #0b7657);
-    color: #fff;
-    border-color: rgba(47, 229, 157, .5);
-    box-shadow: 0 14px 40px rgba(23, 207, 142, .2);
-}
-.bkb-btn--primary:hover { filter: brightness(1.1); transform: translateY(-2px); }
-.bkb-btn--primary:disabled { opacity: .5; cursor: not-allowed; transform: none; filter: none; }
-.bkb-btn--secondary {
-    background: rgba(10, 29, 48, .8);
-    color: #dcefff;
-    border-color: rgba(137, 165, 194, .28);
-}
-.bkb-btn--secondary:hover { border-color: rgba(51, 228, 157, .4); color: #33e49d; }
+        <article class="product-card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+          <img src="{{ asset('storage/delivery-template/images/bananas.jpg') }}" alt="Dagligvarer" style="height:180px;border-radius:0">
+          <div style="padding:16px;flex:1;display:flex;flex-direction:column">
+            <div class="product-name" style="font-size:1.25rem;min-height:auto">Dagligvarer</div>
+            <div class="product-meta" style="margin-top:.35rem">Hent fra Rema, Coop, SPAR og lokale butikker i Narvik</div>
+            <div style="margin-top:auto;padding-top:1rem">
+              <div class="price-row" style="margin-bottom:.75rem">
+                <span class="price" style="font-size:1.3rem">fra 149 NOK</span>
+              </div>
+              <a href="{{ route('public.orders.request', 'delivery.groceries') }}"
+                 class="buy" style="display:flex;align-items:center;justify-content:center;gap:.5rem;text-decoration:none">
+                <i class="fa-solid fa-basket-shopping"></i> Bestill dagligvarer
+              </a>
+            </div>
+          </div>
+        </article>
 
-/* Sections */
-.bkb-section {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 4rem 1.5rem;
-}
-.bkb-section__head { margin-bottom: 2.5rem; max-width: 740px; }
-.bkb-section__head h2 {
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    font-weight: 850;
-    color: #fff;
-    letter-spacing: -.02em;
-    line-height: 1.1;
-    margin: .4rem 0 0;
-}
-.eyebrow {
-    color: #33e49d;
-    font-size: .78rem;
-    font-weight: 950;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-}
+        <article class="product-card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+          <img src="{{ asset('storage/delivery-template/images/milk.jpg') }}" alt="Ferdigmat" style="height:180px;border-radius:0">
+          <div style="padding:16px;flex:1;display:flex;flex-direction:column">
+            <div class="product-name" style="font-size:1.25rem;min-height:auto">Ferdigmat</div>
+            <div class="product-meta" style="margin-top:.35rem">Hent fra restauranter og take-away-steder i Narvik</div>
+            <div style="margin-top:auto;padding-top:1rem">
+              <div class="price-row" style="margin-bottom:.75rem">
+                <span class="price" style="font-size:1.3rem">fra 99 NOK</span>
+              </div>
+              <a href="{{ route('public.orders.request', 'delivery.meals') }}"
+                 class="buy" style="display:flex;align-items:center;justify-content:center;gap:.5rem;text-decoration:none">
+                <i class="fa-solid fa-utensils"></i> Bestill mat
+              </a>
+            </div>
+          </div>
+        </article>
 
-/* Steps */
-.bkb-steps {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.2rem;
-}
-.bkb-step {
-    background: rgba(8, 24, 40, .7);
-    border: 1px solid rgba(137, 165, 194, .15);
-    border-radius: 14px;
-    padding: 1.8rem 1.4rem;
-    display: flex;
-    flex-direction: column;
-    gap: .6rem;
-    transition: border-color .2s;
-}
-.bkb-step:hover { border-color: rgba(51, 228, 157, .3); }
-.bkb-step__num {
-    width: 40px; height: 40px;
-    border-radius: 999px;
-    background: rgba(51, 228, 157, .12);
-    border: 1px solid rgba(51, 228, 157, .35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    font-weight: 900;
-    color: #33e49d;
-    margin-bottom: .3rem;
-}
-.bkb-step h3 { font-size: 1rem; font-weight: 800; color: #fff; margin: 0; }
-.bkb-step p  { font-size: .88rem; color: #9ab3c8; line-height: 1.5; margin: 0; }
+        <article class="product-card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+          <img src="{{ asset('storage/delivery-template/images/hero.jpg') }}" alt="Tunge varer" style="height:180px;border-radius:0">
+          <div style="padding:16px;flex:1;display:flex;flex-direction:column">
+            <div class="product-name" style="font-size:1.25rem;min-height:auto">Tunge varer</div>
+            <div class="product-meta" style="margin-top:.35rem">Møbler, hvitevarer og store gjenstander hentet og levert</div>
+            <div style="margin-top:auto;padding-top:1rem">
+              <div class="price-row" style="margin-bottom:.75rem">
+                <span class="price" style="font-size:1.3rem">fra 599 NOK</span>
+              </div>
+              <a href="{{ route('public.orders.request', 'delivery.bulky') }}"
+                 class="buy" style="display:flex;align-items:center;justify-content:center;gap:.5rem;text-decoration:none">
+                <i class="fa-solid fa-truck"></i> Bestill stor leveranse
+              </a>
+            </div>
+          </div>
+        </article>
 
-/* Service cards */
-.bkb-service-cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.2rem;
-}
-.bkb-service-card {
-    background: rgba(8, 24, 40, .7);
-    border: 1px solid rgba(137, 165, 194, .15);
-    border-radius: 16px;
-    padding: 2rem 1.6rem;
-    display: flex;
-    flex-direction: column;
-    gap: .6rem;
-    transition: border-color .2s, transform .2s;
-}
-.bkb-service-card:hover { border-color: rgba(51, 228, 157, .35); transform: translateY(-4px); }
-.bkb-service-card__icon { font-size: 2.2rem; line-height: 1; }
-.bkb-service-card h3 { font-size: 1.15rem; font-weight: 800; color: #fff; margin: 0; }
-.bkb-service-card p  { font-size: .9rem; color: #9ab3c8; line-height: 1.5; margin: 0; flex: 1; }
-.bkb-service-card__link {
-    margin-top: .6rem;
-    color: #33e49d;
-    font-size: .85rem;
-    font-weight: 700;
-    text-decoration: none;
-    display: inline-block;
-    transition: letter-spacing .15s;
-}
-.bkb-service-card__link:hover { letter-spacing: .02em; }
+      </div>
 
-/* Coverage */
-.bkb-coverage { border-top: 1px solid rgba(137, 165, 194, .1); }
-.bkb-coverage__text { color: #9ab3c8; margin-top: .5rem; font-size: 1rem; line-height: 1.6; }
-.bkb-zone-badges { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.4rem; }
-.bkb-zone-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    padding: .55rem 1rem;
-    border-radius: 999px;
-    font-weight: 700;
-    font-size: .85rem;
-}
-.bkb-zone-badge--active {
-    background: rgba(51, 228, 157, .1);
-    border: 1px solid rgba(51, 228, 157, .35);
-    color: #33e49d;
-}
+      <div class="promo-grid" style="margin-top:14px">
+        <div class="promo pg">
+          <div><h3>Narvik</h3><p>Alle bydeler — sentrum, Ankenes, Håkvik</p></div>
+          <img src="{{ asset('storage/delivery-template/images/avocado.jpg') }}" alt="">
+        </div>
+        <div class="promo po">
+          <div><h3>Ballangen</h3><p>Lokale leveranser — hele kommunen</p></div>
+          <img src="{{ asset('storage/delivery-template/images/chips.jpg') }}" alt="">
+        </div>
+        <div class="promo pp">
+          <div><h3>Betaling</h3><p>Vipps MobilePay — kommer snart</p></div>
+          <img src="{{ asset('storage/delivery-template/images/bananas.jpg') }}" alt="">
+        </div>
+      </div>
+    </div>
+  </section>
 
-/* Readiness */
-.bkb-readiness { background: rgba(5, 14, 26, .6); border-top: 1px solid rgba(137, 165, 194, .1); border-bottom: 1px solid rgba(137, 165, 194, .1); }
-.bkb-readiness-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-}
-.bkb-readiness-item {
-    border: 1px solid rgba(137, 165, 194, .18);
-    border-radius: 10px;
-    background: rgba(8, 24, 40, .8);
-    padding: 1.2rem;
-    min-height: 9rem;
-}
-.bkb-readiness-item__label { color: #7f96b1; font-size: .7rem; font-weight: 950; text-transform: uppercase; display: block; }
-.bkb-readiness-item__status { display: block; margin-top: .4rem; font-size: 1.1rem; color: #f2fbff; }
-.bkb-readiness-item p { margin-top: .4rem; color: #8da4b5; font-size: .82rem; line-height: 1.5; }
-.bkb-readiness-item--ready  .bkb-readiness-item__status { color: #33e49d; }
-.bkb-readiness-item--blocked .bkb-readiness-item__status { color: #ff7b7b; }
-.bkb-readiness-item--review  .bkb-readiness-item__status { color: #f5bd54; }
+  {{-- ─── LOCAL STORES ────────────────────────────────────────── --}}
+  <section class="section">
+    <div class="container">
+      <div class="section-title"><h2>Lokale hentesteder</h2></div>
+      <div class="store-grid">
+        <div class="store"><b>Rema 1000</b><span>Narvik</span></div>
+        <div class="store"><b>Coop Extra</b><span>Narvik</span></div>
+        <div class="store"><b>SPAR</b><span>Narvik</span></div>
+        <div class="store"><b>Kiwi</b><span>Narvik</span></div>
+        <div class="store"><b>Coop Prix</b><span>Ballangen</span></div>
+        <div class="store"><b>Rema 1000</b><span>Ballangen</span></div>
+        <div class="store" style="border:1px dashed #3a5070;background:transparent"><b style="color:#7a93b0">Din butikk?</b><span>Ta kontakt</span></div>
+        <div class="store" style="border:1px dashed #3a5070;background:transparent"><b style="color:#7a93b0">Restaurant?</b><span>Bli partner</span></div>
+      </div>
+      <p style="margin-top:10px;color:#7a93b0;font-size:13px">
+        ⚠️ Butikkpartnere er under oppsett for pilotlansering. Hentested beskrives i bestillingsskjemaet.
+      </p>
+    </div>
+  </section>
 
-/* CTA section */
-.bkb-cta-section { border-top: 1px solid rgba(137, 165, 194, .1); }
-.bkb-cta-block { max-width: 620px; }
-.bkb-cta-block h2 { font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 850; color: #fff; margin: 0 0 .8rem; letter-spacing: -.02em; }
-.bkb-cta-block p { color: #9ab3c8; margin: 0 0 1.6rem; font-size: 1rem; line-height: 1.6; }
+  {{-- ─── COLLECTIONS / USE CASES ────────────────────────────── --}}
+  <section class="section">
+    <div class="container">
+      <div class="section-title"><h2>Eksempler på bestillinger</h2></div>
+      <div class="collect-grid">
+        <div class="collect">
+          <img src="{{ asset('storage/delivery-template/images/bananas.jpg') }}" alt="Dagligvarer">
+          <div class="txt"><b>Ukeshandel</b><p>Alt fra én butikk</p></div>
+        </div>
+        <div class="collect">
+          <img src="{{ asset('storage/delivery-template/images/milk.jpg') }}" alt="Mat">
+          <div class="txt"><b>Fredagsmiddag</b><p>Fra favorittrestauranten</p></div>
+        </div>
+        <div class="collect">
+          <img src="{{ asset('storage/delivery-template/images/hero.jpg') }}" alt="Tunge varer">
+          <div class="txt"><b>Nytt TV-møbel</b><p>Hentet og levert</p></div>
+        </div>
+        <div class="collect">
+          <img src="{{ asset('storage/delivery-template/images/avocado.jpg') }}" alt="Helse">
+          <div class="txt"><b>Sunn lunsj</b><p>Rask levering på dagtid</p></div>
+        </div>
+        <div class="collect">
+          <img src="{{ asset('storage/delivery-template/images/chips.jpg') }}" alt="Snacks">
+          <div class="txt"><b>Filmkveld</b><p>Snacks og drikke</p></div>
+        </div>
+      </div>
 
-/* Footer note */
-.bkb-delivery-footer-note {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 0 1.5rem 1.5rem;
-    font-size: .78rem;
-    color: #4a5e6e;
-}
+      <div class="feature-grid">
+        <div class="feature"><i class="fa-solid fa-lock"></i><span>Sikker betaling — Vipps snart</span></div>
+        <div class="feature"><i class="fa-solid fa-box"></i><span>Forsiktig håndtering</span></div>
+        <div class="feature"><i class="fa-solid fa-headset"></i><span>Lokal support</span></div>
+        <div class="feature"><i class="fa-solid fa-map-location-dot"></i><span>GPS-sporing etter henting</span></div>
+      </div>
+    </div>
+  </section>
 
-/* Responsive */
-@media (max-width: 900px) {
-    .bkb-delivery-hero { grid-template-columns: 1fr; }
-    .bkb-delivery-hero__visual { min-height: 16rem; }
-    .bkb-steps { grid-template-columns: repeat(2, 1fr); }
-    .bkb-service-cards { grid-template-columns: 1fr; }
-    .bkb-readiness-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 540px) {
-    .bkb-steps { grid-template-columns: 1fr; }
-    .bkb-readiness-grid { grid-template-columns: 1fr; }
-}
-</style>
-@endsection
+  {{-- ─── READINESS ───────────────────────────────────────────── --}}
+  <section class="section">
+    <div class="container">
+      <div style="border:1px solid #2e4a6a;border-radius:16px;background:linear-gradient(145deg,#07192e,#040f1e);padding:24px">
+        <h2 style="margin:0 0 6px;font-size:1.6rem">Hva er klart nå?</h2>
+        <p style="margin:0 0 18px;color:#9db3cb;font-size:.95rem">BiKuBe er i pilotfase. Vi viser kun ærlig status.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+          <div style="border:1px solid rgba(139,227,58,.3);border-radius:12px;background:rgba(20,60,25,.55);padding:14px 16px">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem">
+              <i class="fa-solid fa-circle-check" style="color:var(--green)"></i>
+              <b style="font-size:.9rem">Bestilling</b>
+            </div>
+            <p style="margin:0;color:#b5d4b0;font-size:.82rem">Skjema fungerer — ordre opprettes i systemet umiddelbart.</p>
+          </div>
+          <div style="border:1px solid rgba(245,189,84,.3);border-radius:12px;background:rgba(60,42,10,.55);padding:14px 16px">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem">
+              <i class="fa-solid fa-clock" style="color:#f5bd54"></i>
+              <b style="font-size:.9rem">Betaling</b>
+            </div>
+            <p style="margin:0;color:#d4c890;font-size:.82rem">Vipps MobilePay kobles snart. Nå: manuell fakturering etter levering.</p>
+          </div>
+          <div style="border:1px solid rgba(245,189,84,.3);border-radius:12px;background:rgba(60,42,10,.55);padding:14px 16px">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem">
+              <i class="fa-solid fa-location-dot" style="color:#f5bd54"></i>
+              <b style="font-size:.9rem">GPS-sporing</b>
+            </div>
+            <p style="margin:0;color:#d4c890;font-size:.82rem">Tilgjengelig etter at sjåføren aksepterer og gir nettleser-tillatelse.</p>
+          </div>
+          <div style="border:1px solid rgba(139,227,58,.3);border-radius:12px;background:rgba(20,60,25,.55);padding:14px 16px">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem">
+              <i class="fa-solid fa-circle-check" style="color:var(--green)"></i>
+              <b style="font-size:.9rem">Leveringsbevis</b>
+            </div>
+            <p style="margin:0;color:#b5d4b0;font-size:.82rem">Sjåfør laster opp bevis. Du bekrefter mottak direkte.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{-- ─── BOTTOM CTA ──────────────────────────────────────────── --}}
+  <section class="section">
+    <div class="container">
+      <div style="text-align:center;border:1px solid #243a59;border-radius:20px;background:linear-gradient(145deg,#0b2035,#060e1c);padding:48px 24px">
+        <p style="margin:0 0 8px;color:var(--green);font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase">Klar til å bestille?</p>
+        <h2 style="margin:0 0 12px;font-size:clamp(1.6rem,4vw,2.8rem);font-weight:900">Start din leveringsbestilling</h2>
+        <p style="margin:0 0 28px;color:#9db3cb;font-size:1rem;max-width:40rem;margin-left:auto;margin-right:auto">
+          Lokal levering i Narvik og Ballangen. Ekte sjåfører, ærlig pris, ingen skjulte kostnader.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a href="{{ route('public.orders.request', 'delivery.groceries') }}"
+             style="border-radius:999px;padding:14px 32px;background:var(--green);color:#172a0a;font-weight:700;font-size:1.05rem;text-decoration:none">
+            <i class="fa-solid fa-basket-shopping" style="margin-right:.5rem"></i>Bestill levering
+          </a>
+          @auth
+            <a href="{{ route('account.orders.index') }}"
+               style="border-radius:999px;padding:14px 32px;border:1px solid #3a5a7a;color:#d0e4f6;font-weight:600;text-decoration:none">
+              <i class="fa-solid fa-box-open" style="margin-right:.5rem"></i>Mine bestillinger
+            </a>
+          @else
+            <a href="{{ route('login') }}"
+               style="border-radius:999px;padding:14px 32px;border:1px solid #3a5a7a;color:#d0e4f6;font-weight:600;text-decoration:none">
+              <i class="fa-solid fa-user" style="margin-right:.5rem"></i>Spor eksisterende ordre
+            </a>
+          @endauth
+        </div>
+        <p style="margin:18px 0 0;color:#5a7a9a;font-size:.82rem">
+          <i class="fa-solid fa-triangle-exclamation" style="margin-right:.35rem;color:#f5bd54"></i>
+          Nettbetaling er ikke tilkoblet ennå. Ordre bekreftes manuelt av operasjonsteamet.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {{-- ─── FOOTER ──────────────────────────────────────────────── --}}
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand" style="font-size:28px;margin-bottom:10px">
+          <i class="fa-solid fa-bicycle"></i>
+          <span>BiKu<span>Be</span></span>
+        </div>
+        <p>Lokal leveringstjeneste for Narvik og Ballangen. Ekte sjåfører, ærlige priser.</p>
+      </div>
+      <div>
+        <h4>Tjenester</h4>
+        <ul>
+          <li><a href="{{ route('public.orders.request', 'delivery.groceries') }}">Dagligvarer</a></li>
+          <li><a href="{{ route('public.orders.request', 'delivery.meals') }}">Ferdigmat</a></li>
+          <li><a href="{{ route('public.orders.request', 'delivery.bulky') }}">Tunge varer</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Kunder</h4>
+        <ul>
+          <li><a href="{{ route('public.orders.request', 'delivery.groceries') }}">Slik bestiller du</a></li>
+          @auth
+            <li><a href="{{ route('account.orders.index') }}">Mine bestillinger</a></li>
+            <li><a href="{{ route('account.support.create') }}">Kontakt support</a></li>
+          @else
+            <li><a href="{{ route('login') }}">Logg inn</a></li>
+            <li><a href="{{ route('register') }}">Opprett konto</a></li>
+          @endauth
+        </ul>
+      </div>
+      <div>
+        <h4>Partnere</h4>
+        <ul>
+          <li><a href="{{ route('public.workers.apply') }}">Bli sjåfør</a></li>
+          <li><a href="{{ url('/') }}">Om BiKuBe</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Dekning</h4>
+        <ul>
+          <li>Narvik</li>
+          <li>Ballangen</li>
+          <li><a href="{{ route('account.support.create') }}">support@bikube.no</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© {{ date('Y') }} BiKuBe. Alle rettigheter forbeholdt.</span>
+      <span>Pilotlansering Narvik / Ballangen</span>
+    </div>
+  </footer>
+
+</div>
+
+<script src="{{ asset('storage/delivery-template/script.js') }}"></script>
+<script>
+(function() {
+  var safe = function(id, fn) { var el = document.getElementById(id); if (el) fn(el); };
+  safe('prodPrev', function(){});
+  safe('prodNext', function(){});
+  safe('colPrev', function(){});
+  safe('colNext', function(){});
+  document.querySelectorAll('#productTabs .tab').forEach(function(t) {
+    t.addEventListener('click', function() {
+      document.querySelectorAll('#productTabs .tab').forEach(function(x) { x.classList.remove('active'); });
+      t.classList.add('active');
+    });
+  });
+})();
+</script>
+</body>
+</html>
