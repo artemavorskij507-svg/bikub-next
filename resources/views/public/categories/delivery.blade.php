@@ -4,15 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BiKuBe Delivery — Narvik</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
 [x-cloak]{display:none!important}
 *,*::before,*::after{box-sizing:border-box}
-html,body{margin:0;padding:0;font-family:'Inter',sans-serif}
+html,body{margin:0;padding:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
 .delivery-page{min-height:100vh;width:100%;overflow-x:hidden;background:#020713;color:#f8fafc}
 .delivery-page a{text-decoration:none}
 /* ── HERO ── */
@@ -185,9 +181,7 @@ html,body{margin:0;padding:0;font-family:'Inter',sans-serif}
 </head>
 <body>
 @php
-use App\Models\DeliveryPageConfig;
-$dbConfig = DeliveryPageConfig::get('page');
-$page = $dbConfig ?: [
+$page = [
     'default_segment' => 'products',
     'segments' => [
         'products' => [
@@ -195,8 +189,8 @@ $page = $dbConfig ?: [
             'label' => 'Products Delivery',
             'subtitle' => 'Groceries from Norwegian stores',
             'eyebrow' => 'BiKuBe Grocery',
-            'description' => 'Dagligvarer, husholdningsprodukter og daglige essensielle varer med nøysom pakking og live ordrestatus.',
-            'cta_url' => route('public.orders.request', 'delivery.groceries'),
+            'description' => 'Dagligvarer, husholdningsprodukter og daglige essensielle varer med nøysom pakking og ordrestatus.',
+            'cta_url' => route('public.orders.request', 'delivery-groceries'),
             'accent' => 'green',
             'category_image' => asset('images/bikube/delivery/category-products.png'),
             'slides' => [
@@ -220,12 +214,12 @@ $page = $dbConfig ?: [
                 ['title'=>'Familiens ukeshandel','subtitle'=>'Én bestilling for hele uken','image'=>asset('images/bikube/delivery/segments/groceries/5.png')],
             ],
             'stores' => [
-                ['name'=>'MENY','logo'=>asset('images/bikube/delivery/stores/meny.png'),'rating'=>'4.9','eta'=>'30 min'],
-                ['name'=>'KIWI','logo'=>asset('images/bikube/delivery/stores/kiwi.jpg'),'rating'=>'4.8','eta'=>'30 min'],
-                ['name'=>'REMA 1000','logo'=>asset('images/bikube/delivery/stores/rema1000.svg'),'rating'=>'4.8','eta'=>'35 min'],
-                ['name'=>'Coop Mega','logo'=>asset('images/bikube/delivery/stores/coopmega.svg'),'rating'=>'4.7','eta'=>'35 min'],
-                ['name'=>'SPAR','logo'=>asset('images/bikube/delivery/stores/spar.svg'),'rating'=>'4.9','eta'=>'40 min'],
-                ['name'=>'Joker','logo'=>asset('images/bikube/delivery/stores/joker.svg'),'rating'=>'4.7','eta'=>'40 min'],
+                ['name'=>'MENY','logo'=>asset('images/bikube/delivery/stores/meny.png'),'label'=>'Pickup example'],
+                ['name'=>'KIWI','logo'=>asset('images/bikube/delivery/stores/kiwi.jpg'),'label'=>'Pickup example'],
+                ['name'=>'REMA 1000','logo'=>asset('images/bikube/delivery/stores/rema1000.svg'),'label'=>'Pickup example'],
+                ['name'=>'Coop Mega','logo'=>asset('images/bikube/delivery/stores/coopmega.svg'),'label'=>'Pickup example'],
+                ['name'=>'SPAR','logo'=>asset('images/bikube/delivery/stores/spar.svg'),'label'=>'Pickup example'],
+                ['name'=>'Joker','logo'=>asset('images/bikube/delivery/stores/joker.svg'),'label'=>'Pickup example'],
             ],
         ],
         'meals' => [
@@ -233,8 +227,8 @@ $page = $dbConfig ?: [
             'label' => 'Ready Meals',
             'subtitle' => 'Hot food from restaurants',
             'eyebrow' => 'BiKuBe Mat',
-            'description' => 'Varm mat, restaurantmåltider og takeaway med klar ETA og support.',
-            'cta_url' => route('public.orders.request', 'delivery.meals'),
+            'description' => 'Varm mat, restaurantmåltider og takeaway. ETA bekreftes av dispatcher etter bestilling.',
+            'cta_url' => route('public.orders.request', 'delivery-meals'),
             'accent' => 'amber',
             'category_image' => asset('images/bikube/delivery/category-meals.png'),
             'slides' => [
@@ -255,14 +249,14 @@ $page = $dbConfig ?: [
             'promos' => [
                 ['title'=>'Middag i kveld','subtitle'=>'Ferdigmat og restaurantmat','image'=>asset('images/bikube/delivery/segments/meals/1.png')],
                 ['title'=>'Kokkens utvalg','subtitle'=>'Utvalgte varme retter i nærheten','image'=>asset('images/bikube/delivery/segments/meals/3.png')],
-                ['title'=>'Rask lunsj','subtitle'=>'Måltider med klar ETA','image'=>asset('images/bikube/delivery/segments/meals/4.png')],
+                ['title'=>'Rask lunsj','subtitle'=>'Send bestilling — dispatcher bekrefter ETA','image'=>asset('images/bikube/delivery/segments/meals/4.png')],
             ],
             'stores' => [
-                ['name'=>'Narvik Kitchen','logo'=>asset('images/bikube/delivery/segments/meals/1.png'),'rating'=>'4.9','eta'=>'25 min'],
-                ['name'=>'Sushi Partner','logo'=>asset('images/bikube/delivery/segments/meals/2.png'),'rating'=>'4.8','eta'=>'30 min'],
-                ['name'=>'Grill House','logo'=>asset('images/bikube/delivery/segments/meals/3.png'),'rating'=>'4.7','eta'=>'30 min'],
-                ['name'=>'Cafe Route','logo'=>asset('images/bikube/delivery/segments/meals/4.png'),'rating'=>'4.8','eta'=>'20 min'],
-                ['name'=>'Dinner Hub','logo'=>asset('images/bikube/delivery/segments/meals/5.png'),'rating'=>'4.9','eta'=>'35 min'],
+                ['name'=>'Partner setup','logo'=>asset('images/bikube/delivery/segments/meals/1.png'),'label'=>'Confirm pickup in order form'],
+                ['name'=>'Partner setup','logo'=>asset('images/bikube/delivery/segments/meals/2.png'),'label'=>'Confirm pickup in order form'],
+                ['name'=>'Partner setup','logo'=>asset('images/bikube/delivery/segments/meals/3.png'),'label'=>'Confirm pickup in order form'],
+                ['name'=>'Partner setup','logo'=>asset('images/bikube/delivery/segments/meals/4.png'),'label'=>'Confirm pickup in order form'],
+                ['name'=>'Partner setup','logo'=>asset('images/bikube/delivery/segments/meals/5.png'),'label'=>'Confirm pickup in order form'],
             ],
         ],
         'bulky' => [
@@ -271,7 +265,7 @@ $page = $dbConfig ?: [
             'subtitle' => 'Large goods and home items',
             'eyebrow' => 'BiKuBe Cargo',
             'description' => 'Møbler, hvitevarer og store gjenstander med håndtering, planlagte slots og kundebekreftelse.',
-            'cta_url' => route('public.orders.request', 'delivery.bulky'),
+            'cta_url' => route('public.orders.request', 'delivery-bulky'),
             'accent' => 'violet',
             'category_image' => asset('images/bikube/delivery/category-bulky.png'),
             'slides' => [
@@ -295,22 +289,22 @@ $page = $dbConfig ?: [
                 ['title'=>'Kontorflytt','subtitle'=>'Bokser, skrivebord og utstyr','image'=>asset('images/bikube/delivery/segments/bulky/5.png')],
             ],
             'stores' => [
-                ['name'=>'Home Partner','logo'=>asset('images/bikube/delivery/segments/bulky/1.png'),'rating'=>'4.8','eta'=>'same day'],
-                ['name'=>'Appliance Hub','logo'=>asset('images/bikube/delivery/segments/bulky/2.png'),'rating'=>'4.7','eta'=>'slot'],
-                ['name'=>'Furniture Route','logo'=>asset('images/bikube/delivery/segments/bulky/3.png'),'rating'=>'4.9','eta'=>'planlagt'],
-                ['name'=>'Cargo Team','logo'=>asset('images/bikube/delivery/segments/bulky/4.png'),'rating'=>'4.8','eta'=>'slot'],
-                ['name'=>'Office Supply','logo'=>asset('images/bikube/delivery/segments/bulky/6.png'),'rating'=>'4.7','eta'=>'planlagt'],
+                ['name'=>'Partner setup','logo'=>asset('images/bikube/delivery/segments/bulky/1.png'),'label'=>'Confirm pickup in order form'],
+                ['name'=>'Partner setup','logo'=>asset('images/bikube/delivery/segments/bulky/2.png'),'label'=>'Confirm pickup in order form'],
+                ['name'=>'Partner setup','logo'=>asset('images/bikube/delivery/segments/bulky/3.png'),'label'=>'Confirm pickup in order form'],
+                ['name'=>'Partner setup','logo'=>asset('images/bikube/delivery/segments/bulky/4.png'),'label'=>'Confirm pickup in order form'],
+                ['name'=>'Partner setup','logo'=>asset('images/bikube/delivery/segments/bulky/6.png'),'label'=>'Confirm pickup in order form'],
             ],
         ],
     ],
     'stats' => [
-        ['value'=>'10 000+','label'=>'items available','icon'=>'bag'],
-        ['value'=>'200+','label'=>'stores and partners','icon'=>'store'],
-        ['value'=>'30 min','label'=>'average dispatch','icon'=>'clock'],
-        ['value'=>'4.9','label'=>'service rating','icon'=>'star'],
+        ['value'=>'Pilot','label'=>'Narvik og Ballangen','icon'=>'bag'],
+        ['value'=>'Partner setup','label'=>'Butikker tilknyttes','icon'=>'store'],
+        ['value'=>'ETA etter bekreftelse','label'=>'Dispatcher bekrefter tid','icon'=>'clock'],
+        ['value'=>'Rating after launch','label'=>'Kvalitetsvurdering','icon'=>'star'],
     ],
     'benefits' => [
-        ['title'=>'Secure payment','subtitle'=>'Protected checkout','icon'=>'lock'],
+        ['title'=>'Secure payment','subtitle'=>'Payment coming soon','icon'=>'lock'],
         ['title'=>'Careful packing','subtitle'=>'Freshness preserved','icon'=>'gift'],
         ['title'=>'Support 24/7','subtitle'=>'Always online','icon'=>'phone'],
         ['title'=>'Bonuses and offers','subtitle'=>'Useful promotions','icon'=>'spark'],
@@ -341,12 +335,12 @@ $page = $dbConfig ?: [
 
         <header class="delivery-nav">
             <a href="{{ route('public.categories.delivery') }}" class="delivery-brand" aria-label="BiKuBe Delivery">
-                <i class="fa-solid fa-bag-shopping" style="color:#84cc16"></i>
+                <svg fill="none" stroke="#84cc16" stroke-width="2" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M5 8h14l-1.3 11.3a2 2 0 0 1-2 1.7H8.3a2 2 0 0 1-2-1.7L5 8Z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>
                 <span>BiKuBe <span style="color:#84cc16">Delivery</span></span>
             </a>
             <nav class="delivery-nav__links" aria-label="Delivery sections">
                 <a class="active" href="#" style="display:inline-flex;align-items:center;gap:6px;color:#84cc16">
-                    <i class="fa-solid fa-location-dot"></i> Narvik
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 2C8.7 2 6 4.7 6 8c0 5 6 13 6 13s6-8 6-13c0-3.3-2.7-6-6-6Z"/><circle cx="12" cy="8" r="2"/></svg> Narvik
                 </a>
                 <a href="#popular-products" @click.prevent="setSegment('products')">Produkter</a>
                 <a href="#popular-products" @click.prevent="setSegment('meals')">Ferdigmat</a>
@@ -370,11 +364,11 @@ $page = $dbConfig ?: [
             <ul class="delivery-hero-benefits">
                 <li>Rask bestilling</li>
                 <li>Skånsom levering</li>
-                <li>Sporing i sanntid</li>
+                <li>GPS after pickup</li>
             </ul>
             <div class="delivery-cta-row">
                 <button type="button" class="delivery-btn delivery-btn--primary delivery-btn--large"
-                    @click="goToOrder('delivery.groceries')">Bestill dagligvarer</button>
+                    @click="goToOrder('delivery-groceries')">Bestill dagligvarer</button>
                 <a class="delivery-btn delivery-btn--soft delivery-btn--large"
                     href="#popular-products">Se leveringsvalg</a>
             </div>
@@ -493,7 +487,7 @@ $page = $dbConfig ?: [
                             <span class="delivery-store__logo"><img :src="store.logo" :alt="store.name" loading="lazy"></span>
                             <span>
                                 <h3 x-text="store.name"></h3>
-                                <p><span x-text="store.rating"></span> rating · <span x-text="store.eta"></span></p>
+                                <p x-text="store.label || 'Pilot setup · confirm pickup in request'"></p>
                             </span>
                             <button type="button" @click="goToOrder(resolveScenario(activeSegment))" aria-label="Åpne">→</button>
                         </article>
@@ -644,9 +638,9 @@ window.deliveryCommercePage = function(page) {
         resumeSlider() { this.pauseSlider(); this.timer = setInterval(() => this.nextSlide(), 5600); },
         restartSlider() { this.resumeSlider(); },
         resolveScenario(seg) {
-            if (seg === 'meals') return 'delivery.meals';
-            if (seg === 'bulky') return 'delivery.bulky';
-            return 'delivery.groceries';
+            if (seg === 'meals') return 'delivery-meals';
+            if (seg === 'bulky') return 'delivery-bulky';
+            return 'delivery-groceries';
         },
         goToOrder(scenario) {
             window.location.href = '{{ url("services") }}/' + scenario + '/request';

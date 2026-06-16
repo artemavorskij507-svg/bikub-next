@@ -43,6 +43,8 @@ Route::get('/worker-invitations/received', [PublicWorkerInvitationController::cl
 Route::get('/worker-invitations/{token}', [PublicWorkerInvitationController::class, 'show'])->name('public.worker-invitations.show');
 Route::post('/worker-invitations/{token}', [PublicWorkerInvitationController::class, 'store'])->name('public.worker-invitations.store');
 
+Route::get('/worker', fn () => redirect()->route('worker.dashboard'))->name('worker.entry');
+
 Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.')->group(function () {
     Route::get('/dashboard', [WorkerCockpitController::class, 'dashboard'])->name('dashboard');
     Route::get('/orders', [WorkerCockpitController::class, 'index'])->name('orders.index');
