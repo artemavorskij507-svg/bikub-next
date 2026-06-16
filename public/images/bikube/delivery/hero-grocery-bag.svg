@@ -1,0 +1,33 @@
+<svg width="920" height="640" viewBox="0 0 920 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="bg" x1="80" y1="40" x2="820" y2="580" gradientUnits="userSpaceOnUse">
+<stop stop-color="#1A2A3D"/>
+<stop offset="1" stop-color="#09131F"/>
+</linearGradient>
+<linearGradient id="bag" x1="240" y1="130" x2="620" y2="520" gradientUnits="userSpaceOnUse">
+<stop stop-color="#E9FF8A"/>
+<stop offset="0.5" stop-color="#A3E635"/>
+<stop offset="1" stop-color="#5A8612"/>
+</linearGradient>
+<radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(465 380) rotate(90) scale(250 320)">
+<stop stop-color="#D9F99D" stop-opacity="0.5"/>
+<stop offset="1" stop-color="#D9F99D" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect x="24" y="24" width="872" height="592" rx="42" fill="url(#bg)"/>
+<rect x="24" y="24" width="872" height="592" rx="42" stroke="#8CB635" stroke-opacity="0.4"/>
+<ellipse cx="460" cy="496" rx="240" ry="40" fill="#020712"/>
+<ellipse cx="460" cy="380" rx="300" ry="220" fill="url(#glow)"/>
+<path d="M322 200C322 141.5 369.5 94 428 94H492C550.5 94 598 141.5 598 200V232H556V206C556 170.7 527.3 142 492 142H428C392.7 142 364 170.7 364 206V232H322V200Z" fill="#D6F18A"/>
+<path d="M266 226H654L620 518C616.2 550.7 588.5 575 555.6 575H364.4C331.5 575 303.8 550.7 300 518L266 226Z" fill="url(#bag)"/>
+<path d="M300 252H620L593 510C590.8 530.8 573.2 546.6 552.3 546.6H367.7C346.8 546.6 329.2 530.8 327 510L300 252Z" fill="#A4CC42"/>
+<rect x="348" y="290" width="224" height="154" rx="18" fill="#0A1828"/>
+<path d="M375 339H545" stroke="#C9F564" stroke-width="18" stroke-linecap="round"/>
+<path d="M375 384H507" stroke="#7CC31F" stroke-width="12" stroke-linecap="round"/>
+<circle cx="650" cy="366" r="74" fill="#0D2033" stroke="#B7EE48" stroke-width="2"/>
+<path d="M619 366H683" stroke="#B7EE48" stroke-width="12" stroke-linecap="round"/>
+<path d="M651 334V398" stroke="#B7EE48" stroke-width="12" stroke-linecap="round"/>
+<circle cx="215" cy="430" r="52" fill="#0D2033" stroke="#B7EE48" stroke-width="2"/>
+<path d="M190 430H240" stroke="#B7EE48" stroke-width="10" stroke-linecap="round"/>
+<path d="M202 410L225 450" stroke="#B7EE48" stroke-width="10" stroke-linecap="round"/>
+</svg>
