@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\PublicCmsController;
+use App\Http\Controllers\PublicClassifiedController;
 use App\Http\Controllers\PublicOrderRequestController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AccountClassifiedController;
 use App\Http\Controllers\PublicWorkerApplicationController;
 use App\Http\Controllers\PublicWorkerInvitationController;
 use App\Http\Controllers\WorkerCockpitController;
@@ -31,6 +33,8 @@ Route::get('/', function () {
 });
 
 Route::get('/category/delivery', [PublicOrderRequestController::class, 'deliveryCategory'])->name('public.categories.delivery');
+Route::get('/classifieds', [PublicClassifiedController::class, 'index'])->name('public.classifieds.index');
+Route::get('/classifieds/{listing:slug}', [PublicClassifiedController::class, 'show'])->name('public.classifieds.show');
 Route::get('/p/{slug}', [PublicCmsController::class, 'page'])->name('public.cms.page');
 Route::get('/services/{serviceSlug}', [PublicCmsController::class, 'servicePage'])->name('public.cms.service-page');
 Route::get('/services/{serviceSlug}/request', [PublicOrderRequestController::class, 'create'])->name('public.orders.request');
@@ -73,6 +77,9 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
 
 Route::get('/account', AccountDashboardController::class)->middleware('auth')->name('account.dashboard');
 Route::middleware('auth')->prefix('account')->name('account.')->group(function () {
+    Route::get('/classifieds', [AccountClassifiedController::class, 'index'])->name('classifieds.index');
+    Route::get('/classifieds/create', [AccountClassifiedController::class, 'create'])->name('classifieds.create');
+    Route::post('/classifieds', [AccountClassifiedController::class, 'store'])->name('classifieds.store');
     Route::get('/orders', [AccountOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AccountOrderController::class, 'show'])->whereNumber('order')->name('orders.show');
     Route::get('/billing', [AccountBillingController::class, 'index'])->name('billing.index');

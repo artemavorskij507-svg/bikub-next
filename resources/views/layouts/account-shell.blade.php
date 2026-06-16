@@ -19,6 +19,7 @@
     <nav aria-label="Account navigation">
         <a href="{{ route('account.dashboard') }}">Overview</a>
         <a href="{{ route('account.orders.index') }}">Orders</a>
+        <a href="{{ route('account.classifieds.index') }}">Classifieds</a>
         <a href="{{ route('account.billing.index') }}">Billing</a>
         <a href="{{ route('account.support.index') }}">Support</a>
         <x-theme-palette.picker surface="account" />
