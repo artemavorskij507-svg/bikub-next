@@ -57,7 +57,7 @@ class AdminUiTranslator
             $node->nodeValue = $this->replaceText($node->nodeValue, $translations);
         }
 
-        foreach ($xpath->query('//*[@title or @aria-label or @placeholder]') ?: [] as $node) {
+        foreach ($xpath->query('//*[@title or @aria-label or @placeholder or @value]') ?: [] as $node) {
             if (! $node instanceof DOMElement) {
                 continue;
             }
@@ -65,6 +65,14 @@ class AdminUiTranslator
             foreach (['title', 'aria-label', 'placeholder'] as $attribute) {
                 if ($node->hasAttribute($attribute)) {
                     $node->setAttribute($attribute, $this->replaceText($node->getAttribute($attribute), $translations));
+                }
+            }
+
+            if ($node->tagName === 'input' && $node->hasAttribute('value')) {
+                $type = strtolower($node->getAttribute('type') ?: 'text');
+
+                if (in_array($type, ['button', 'submit', 'reset'], true)) {
+                    $node->setAttribute('value', $this->replaceText($node->getAttribute('value'), $translations));
                 }
             }
         }

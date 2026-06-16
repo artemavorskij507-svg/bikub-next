@@ -7,7 +7,7 @@
         (() => {
             const translations = @json($adminUiTranslations);
             const attributes = ['title', 'aria-label', 'placeholder'];
-            const ignored = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'OPTION']);
+            const ignored = new Set(['SCRIPT', 'STYLE', 'TEXTAREA']);
 
             const translateText = (value) => {
                 const trimmed = value.trim();
@@ -31,6 +31,14 @@
                             element.setAttribute(attribute, translateText(element.getAttribute(attribute)));
                         }
                     });
+
+                    if (
+                        element.tagName === 'INPUT'
+                        && ['button', 'submit', 'reset'].includes((element.getAttribute('type') || '').toLowerCase())
+                        && element.hasAttribute('value')
+                    ) {
+                        element.setAttribute('value', translateText(element.getAttribute('value')));
+                    }
                 });
             };
 

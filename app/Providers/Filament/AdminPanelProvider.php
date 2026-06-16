@@ -20,6 +20,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Http\Middleware\SetBikubeLocale;
 use Prunacatalin\FilamentLocaleSwitcher\Http\Middleware\ApplyLocale;
 use Prunacatalin\FilamentLocaleSwitcher\LocaleSwitchPlugin;
 use Benriadh1\FilamentTranslationManager\BenriadhFilamentTranslationManagerPlugin;
@@ -87,6 +88,7 @@ class AdminPanelProvider extends PanelProvider
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
                 ApplyLocale::class,
+                SetBikubeLocale::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,
