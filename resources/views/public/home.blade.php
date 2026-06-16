@@ -3,8 +3,8 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-        <title>BiKuBe — локальная операционная система услуг</title>
-        <meta name="description" content="BiKuBe — локальная платформа для Narvik и окрестностей. Доставка, переезды, автопомощь, утилизация и мастера на час без лишних обещаний." />
+        <title>{{ __('bikube.public.home.page_title') }}</title>
+        <meta name="description" content="{{ __('bikube.public.home.page_description') }}" />
         @fonts
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -1051,20 +1051,20 @@
                     </a>
 
                     <nav class="nav-links">
-                        <a href="#categories">Категории</a>
-                        <a href="#popular-scenarios">Популярные услуги</a>
-                        <a href="#how-it-works">Как это работает</a>
-                        <a href="#business">Для бизнеса</a>
-                        <a href="#readiness">Статус платформы</a>
+                        <a href="#categories">{{ __('bikube.public.home.nav_categories') }}</a>
+                        <a href="#popular-scenarios">{{ __('bikube.public.home.nav_popular') }}</a>
+                        <a href="#how-it-works">{{ __('bikube.public.home.nav_how') }}</a>
+                        <a href="#business">{{ __('bikube.public.home.nav_business') }}</a>
+                        <a href="#readiness">{{ __('bikube.public.home.nav_status') }}</a>
                     </nav>
 
                     <div class="header-actions">
                         @auth
-                            <a href="/admin" class="button button--secondary">Кабинет</a>
+                            <a href="/admin" class="button button--secondary">{{ __('bikube.public.home.nav_account') }}</a>
                         @else
-                            <a href="/login" class="button button--secondary">Войти</a>
+                            <a href="/login" class="button button--secondary">{{ __('bikube.public.home.nav_login') }}</a>
                         @endauth
-                        <a href="#categories" class="button button--primary">Создать заказ</a>
+                        <a href="#categories" class="button button--primary">{{ __('bikube.public.home.nav_create_order') }}</a>
                     </div>
                 </div>
             </header>
@@ -1079,30 +1079,30 @@
                                 <span>Narvik, Norway</span>
                                 <span class="badge__flag"></span>
                             </div>
-                            <h1>BiKuBe — локальная <span>операционная система услуг</span></h1>
-                            <p>Инновационная платформа для быстрого поиска исполнителей и заказа услуг в Нарвике. Доставка, переезды, помощь на дороге, эко-утилизация и мастера на все руки — всё в один клик.</p>
+                            <h1>{{ __('bikube.public.home.hero_title') }} <span>{{ __('bikube.public.home.hero_title_accent') }}</span></h1>
+                            <p>{{ __('bikube.public.home.hero_subtitle') }}</p>
 
                             <div class="hero-actions">
-                                <a href="#categories" class="button button--primary">Выбрать услугу</a>
-                                <a href="#readiness" class="button button--secondary">Что доступно сейчас</a>
+                                <a href="#categories" class="button button--primary">{{ __('bikube.public.home.hero_cta_primary') }}</a>
+                                <a href="#readiness" class="button button--secondary">{{ __('bikube.public.home.hero_cta_secondary') }}</a>
                             </div>
 
                             <div class="hero-stats">
                                 <div class="stat-card">
                                     <div class="stat-card__value">10+</div>
-                                    <div class="stat-card__label">направлений услуг</div>
+                                    <div class="stat-card__label">{{ __('bikube.public.home.stat_directions') }}</div>
                                 </div>
                                 <div class="stat-card">
                                     <div class="stat-card__value">Request</div>
-                                    <div class="stat-card__label">реальная форма заявки</div>
+                                    <div class="stat-card__label">{{ __('bikube.public.home.stat_request') }}</div>
                                 </div>
                                 <div class="stat-card">
                                     <div class="stat-card__value">Narvik</div>
-                                    <div class="stat-card__label">локальные исполнители</div>
+                                    <div class="stat-card__label">{{ __('bikube.public.home.stat_narvik') }}</div>
                                 </div>
                                 <div class="stat-card">
-                                    <div class="stat-card__value">Честно</div>
-                                    <div class="stat-card__label">без ложных обещаний</div>
+                                    <div class="stat-card__value">✓</div>
+                                    <div class="stat-card__label">{{ __('bikube.public.home.stat_honest') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -1126,9 +1126,9 @@
                 {{-- Categories Section --}}
                 <section id="categories" class="section">
                     <div class="section__head">
-                        <p class="section__eyebrow">Каталог</p>
-                        <h2 class="section__title">Выберите категорию услуг</h2>
-                        <p class="section__text">BiKuBe собирает активные сценарии локальных услуг Narvik. Заявки принимаются на рассмотрение без обещания назначения или оплаты.</p>
+                        <p class="section__eyebrow">{{ __('bikube.public.home.cat_eyebrow') }}</p>
+                        <h2 class="section__title">{{ __('bikube.public.home.cat_title') }}</h2>
+                        <p class="section__text">{{ __('bikube.public.home.cat_body') }}</p>
                     </div>
 
                     @php
@@ -1148,13 +1148,13 @@
                         ];
 
                         $categoryDescs = [
-                            'delivery' => 'Доставка продуктов, еды и посылок по Нарвику.',
-                            'moving' => 'Профессиональные квартирные и офисные переезды.',
-                            'eco' => 'Вывоз мусора, старой мебели и крупной бытовой техники.',
-                            'handyman' => 'Мелкий бытовой ремонт, сборка мебели, услуги сантехника.',
-                            'roadside' => 'Заявка на эвакуатор или помощь на дороге.',
-                            'personal-task' => 'Выполнение личных поручений, курьеры и консьерж-сервис.',
-                            'classifieds' => 'Заявка на доставку покупки с доски объявлений.'
+                            'delivery'      => __('bikube.public.home.cat_desc_delivery'),
+                            'moving'        => __('bikube.public.home.cat_desc_moving'),
+                            'eco'           => __('bikube.public.home.cat_desc_eco'),
+                            'handyman'      => __('bikube.public.home.cat_desc_handyman'),
+                            'roadside'      => __('bikube.public.home.cat_desc_roadside'),
+                            'personal-task' => __('bikube.public.home.cat_desc_personal_task'),
+                            'classifieds'   => __('bikube.public.home.cat_desc_classifieds'),
                         ];
                     @endphp
 
@@ -1200,8 +1200,8 @@
                 <section id="popular-scenarios" class="section popular-scenarios" style="padding: 48px;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; gap: 16px;">
                         <div>
-                            <p class="section__eyebrow" style="margin-bottom: 6px;">Быстрый выбор</p>
-                            <h2 class="section__title" style="font-size: clamp(1.8rem, 3vw, 2.5rem);">Популярные сценарии заказа</h2>
+                            <p class="section__eyebrow" style="margin-bottom: 6px;">{{ __('bikube.public.home.popular_eyebrow') }}</p>
+                            <h2 class="section__title" style="font-size: clamp(1.8rem, 3vw, 2.5rem);">{{ __('bikube.public.home.popular_title') }}</h2>
                         </div>
                         <div class="bk-row-nav">
                             <button type="button" onclick="bkScroll('scenarios-slider', -1)" aria-label="Назад" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(160, 194, 239, 0.25); color: #d8eafc; background: rgba(5, 17, 40, 0.72); cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 900;">←</button>
@@ -1211,14 +1211,14 @@
 
                     @php
                         $featuredScenarios = [
-                            ['title' => 'Доставка продуктов', 'slug' => 'delivery-groceries', 'img' => 'slide-groceries.png'],
-                            ['title' => 'Доставка готовых блюд', 'slug' => 'delivery-meals', 'img' => 'slide-meals.png'],
-                            ['title' => 'Доставка крупных грузов', 'slug' => 'delivery-bulky', 'img' => 'slide-bulky.png'],
-                            ['title' => 'Переезд квартиры под ключ', 'slug' => 'moving-home', 'img' => 'category-moving.png'],
-                            ['title' => 'Сборка и разборка мебели', 'slug' => 'handyman-assembly', 'img' => 'category-handyman.png'],
-                            ['title' => 'Вывоз крупного мусора', 'slug' => 'eco-disposal', 'img' => 'category-eco.png'],
-                            ['title' => 'Заявка на эвакуатор', 'slug' => 'tow-emergency', 'img' => 'banner-roadside.png'],
-                            ['title' => 'Доставка с доски объявлений', 'slug' => 'classifieds-delivery', 'img' => 'scenario-classifieds.png'],
+                            ['title' => __('bikube.public.home.popular_grocery'),     'slug' => 'delivery-groceries',    'img' => 'slide-groceries.png'],
+                            ['title' => __('bikube.public.home.popular_meals'),       'slug' => 'delivery-meals',        'img' => 'slide-meals.png'],
+                            ['title' => __('bikube.public.home.popular_bulky'),       'slug' => 'delivery-bulky',        'img' => 'slide-bulky.png'],
+                            ['title' => __('bikube.public.home.popular_moving'),      'slug' => 'moving-home',           'img' => 'category-moving.png'],
+                            ['title' => __('bikube.public.home.popular_assembly'),    'slug' => 'handyman-assembly',     'img' => 'category-handyman.png'],
+                            ['title' => __('bikube.public.home.popular_eco'),         'slug' => 'eco-disposal',          'img' => 'category-eco.png'],
+                            ['title' => __('bikube.public.home.popular_tow'),         'slug' => 'tow-emergency',         'img' => 'banner-roadside.png'],
+                            ['title' => __('bikube.public.home.popular_classifieds'), 'slug' => 'classifieds-delivery',  'img' => 'scenario-classifieds.png'],
                         ];
                     @endphp
 
@@ -1227,7 +1227,7 @@
                             <a href="{{ route('public.cms.service-page', ['serviceSlug' => $scen['slug']]) }}" class="scenario-card" style="background-image: url('{{ asset('images/bikube/home/' . $scen['img']) }}')">
                                 <span class="scenario-card__title">{{ $scen['title'] }}</span>
                                 <div class="scenario-card__footer">
-                                    <span class="scenario-card__action">Заказать</span>
+                                    <span class="scenario-card__action">{{ __('bikube.public.home.popular_order_btn') }}</span>
                                 </div>
                             </a>
                         @endforeach
@@ -1237,31 +1237,31 @@
                 {{-- How it works Section --}}
                 <section id="how-it-works" class="section">
                     <div class="section__head" style="text-align: center; margin: 0 auto 48px;">
-                        <p class="section__eyebrow">Процесс</p>
-                        <h2 class="section__title">Как это работает</h2>
-                        <p class="section__text">Три простых шага для решения любой задачи — без посредников и лишних звонков.</p>
+                        <p class="section__eyebrow">{{ __('bikube.public.home.how_eyebrow') }}</p>
+                        <h2 class="section__title">{{ __('bikube.public.home.how_title') }}</h2>
+                        <p class="section__text">{{ __('bikube.public.home.how_body') }}</p>
                     </div>
 
                     <div class="steps-grid">
                         <div class="step-item">
                             <div class="step-icon">🔍</div>
-                            <h3>1. Выбор услуги</h3>
-                            <p>Выберите нужную категорию и конкретный сценарий работы в каталоге.</p>
+                            <h3>{{ __('bikube.public.home.step1_title') }}</h3>
+                            <p>{{ __('bikube.public.home.step1_body') }}</p>
                         </div>
                         <div class="step-item">
                             <div class="step-icon">📋</div>
-                            <h3>2. Детали и адрес</h3>
-                            <p>Заполните простую форму заказа: укажите адреса, время и требования.</p>
+                            <h3>{{ __('bikube.public.home.step2_title') }}</h3>
+                            <p>{{ __('bikube.public.home.step2_body') }}</p>
                         </div>
                         <div class="step-item">
                             <div class="step-icon">💳</div>
-                            <h3>3. Заявка на рассмотрение</h3>
-                            <p>Отправьте реальную заявку. Оплата и назначение исполнителя пока не подключены.</p>
+                            <h3>{{ __('bikube.public.home.step3_title') }}</h3>
+                            <p>{{ __('bikube.public.home.step3_body') }}</p>
                         </div>
                         <div class="step-item" style="background: linear-gradient(180deg, rgba(184, 248, 41, 0.05), rgba(4, 14, 33, 0.5)); border-color: rgba(184, 248, 41, 0.25);">
                             <div class="step-icon" style="background: rgba(184, 248, 41, 0.15); border-color: #b8f829; color: #b8f829;">✨</div>
-                            <h3>4. Статус разработки</h3>
-                            <p>Live tracking появится только после подключения реального dispatch и GPS-модуля.</p>
+                            <h3>{{ __('bikube.public.home.step4_title') }}</h3>
+                            <p>{{ __('bikube.public.home.step4_body') }}</p>
                         </div>
                     </div>
                 </section>
@@ -1270,36 +1270,36 @@
                 <section class="section split-grid" style="padding-top: 0;">
                     <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'classifieds-delivery']) }}" class="banner-card" style="background-image: url('{{ asset('images/bikube/home/scenario-classifieds.png') }}')">
                         <div class="banner-card__content">
-                            <h3 class="banner-card__title">Доска объявлений + доставка</h3>
-                            <p class="banner-card__text">Отправьте заявку на доставку локальной покупки. Сделка, оплата и назначение пока не подключены.</p>
+                            <h3 class="banner-card__title">{{ __('bikube.public.home.banner_classifieds_title') }}</h3>
+                            <p class="banner-card__text">{{ __('bikube.public.home.banner_classifieds_body') }}</p>
                         </div>
-                        <span class="banner-card__link">Создать заказ</span>
+                        <span class="banner-card__link">{{ __('bikube.public.home.banner_classifieds_cta') }}</span>
                     </a>
 
                     <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'tow-emergency']) }}" class="banner-card" style="background-image: url('{{ asset('images/bikube/home/banner-roadside.png') }}')">
                         <div class="banner-card__content">
-                            <h3 class="banner-card__title">Эвакуатор и техпомощь</h3>
-                            <p class="banner-card__text">Отправьте заявку на эвакуатор или дорожную помощь. Назначение и отслеживание пока не подключены.</p>
+                            <h3 class="banner-card__title">{{ __('bikube.public.home.banner_roadside_title') }}</h3>
+                            <p class="banner-card__text">{{ __('bikube.public.home.banner_roadside_body') }}</p>
                         </div>
-                        <span class="banner-card__link">Вызвать помощь</span>
+                        <span class="banner-card__link">{{ __('bikube.public.home.banner_roadside_cta') }}</span>
                     </a>
                 </section>
 
                 <section class="section split-grid" style="padding-top: 0;">
                     <div class="banner-card" style="background-image: url('{{ asset('images/bikube/home/banner-it.png') }}')">
                         <div class="banner-card__content">
-                            <h3 class="banner-card__title">Дополнительные направления</h3>
-                            <p class="banner-card__text">Новые направления услуг будут опубликованы только после настройки реального сценария заявки.</p>
+                            <h3 class="banner-card__title">{{ __('bikube.public.home.banner_coming_title') }}</h3>
+                            <p class="banner-card__text">{{ __('bikube.public.home.banner_coming_body') }}</p>
                         </div>
-                        <span class="banner-card__link">Пока недоступно</span>
+                        <span class="banner-card__link">{{ __('bikube.public.home.banner_coming_cta') }}</span>
                     </div>
 
                     <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'delivery-meals']) }}" class="banner-card" style="background-image: url('{{ asset('images/bikube/home/banner-glf-mat.png') }}')">
                         <div class="banner-card__content">
-                            <h3 class="banner-card__title">Заявка на доставку еды</h3>
-                            <p class="banner-card__text">Отправьте запрос по активному сценарию. Ресторанный каталог и partner portal пока не подключены.</p>
+                            <h3 class="banner-card__title">{{ __('bikube.public.home.banner_meals_title') }}</h3>
+                            <p class="banner-card__text">{{ __('bikube.public.home.banner_meals_body') }}</p>
                         </div>
-                        <span class="banner-card__link">Заказать еду</span>
+                        <span class="banner-card__link">{{ __('bikube.public.home.banner_meals_cta') }}</span>
                     </a>
                 </section>
 
@@ -1307,18 +1307,18 @@
                 <section id="business" class="section split-grid" style="padding-top: 0;">
                     <div class="banner-card" style="background-image: url('{{ asset('images/bikube/home/banner-business.png') }}')">
                         <div class="banner-card__content">
-                            <h3 class="banner-card__title">Для бизнеса</h3>
-                            <p class="banner-card__text">Корпоративный контур, API-интеграции и SLA находятся в плане развития платформы.</p>
+                            <h3 class="banner-card__title">{{ __('bikube.public.home.banner_business_title') }}</h3>
+                            <p class="banner-card__text">{{ __('bikube.public.home.banner_business_body') }}</p>
                         </div>
-                        <span class="banner-card__link">Стать клиентом</span>
+                        <span class="banner-card__link">{{ __('bikube.public.home.banner_business_cta') }}</span>
                     </div>
 
                     <div id="partners" class="banner-card" style="background-image: url('{{ asset('images/bikube/home/banner-partners.png') }}')">
                         <div class="banner-card__content">
-                            <h3 class="banner-card__title">Стать исполнителем</h3>
-                            <p class="banner-card__text">Worker и partner portals пока не подключены. Регистрация исполнителей откроется после проверки операционного процесса.</p>
+                            <h3 class="banner-card__title">{{ __('bikube.public.home.banner_worker_title') }}</h3>
+                            <p class="banner-card__text">{{ __('bikube.public.home.banner_worker_body') }}</p>
                         </div>
-                        <span class="banner-card__link">Присоединиться к сети</span>
+                        <span class="banner-card__link">{{ __('bikube.public.home.banner_worker_cta') }}</span>
                     </div>
                 </section>
 
@@ -1326,12 +1326,12 @@
                 <section id="readiness" class="section" style="padding-top: 0;">
                     <div class="promo-block">
                         <div class="promo-block__left">
-                            <h3>Что доступно сейчас</h3>
-                            <p>Каталог активных услуг и отправка реальных заявок работают. Оплата, dispatch, GPS tracking, чат и мобильные приложения пока не подключены.</p>
+                            <h3>{{ __('bikube.public.home.readiness_title') }}</h3>
+                            <p>{{ __('bikube.public.home.readiness_body') }}</p>
 
                             <div class="store-buttons">
-                                <span class="store-button" aria-disabled="true">Mobile app not available yet</span>
-                                <span class="store-button" aria-disabled="true">Partner portal not connected yet</span>
+                                <span class="store-button" aria-disabled="true">{{ __('bikube.public.home.readiness_mobile_na') }}</span>
+                                <span class="store-button" aria-disabled="true">{{ __('bikube.public.home.readiness_partner_na') }}</span>
                             </div>
                         </div>
 
@@ -1352,44 +1352,44 @@
                                 <span class="brand__mark"></span>
                                 <span>BiKuBe</span>
                             </a>
-                            <p style="line-height: 1.6; font-size: 0.9rem;">BiKuBe Next — Narvik-first платформа локальных услуг. Сейчас доступны каталог и отправка заявок на рассмотрение.</p>
+                            <p style="line-height: 1.6; font-size: 0.9rem;">{{ __('bikube.public.home.footer_tagline') }}</p>
                         </div>
 
                         <div class="footer-col">
-                            <h4>Услуги</h4>
+                            <h4>{{ __('bikube.public.home.footer_services_title') }}</h4>
                             <div class="footer-links">
-                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'delivery-groceries']) }}">Доставка</a>
-                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'moving-home']) }}">Переезды</a>
-                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'handyman-hourly']) }}">Мастер на час</a>
-                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'eco-disposal']) }}">Утилизация</a>
+                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'delivery-groceries']) }}">{{ __('bikube.public.home.footer_delivery') }}</a>
+                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'moving-home']) }}">{{ __('bikube.public.home.footer_moving') }}</a>
+                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'handyman-hourly']) }}">{{ __('bikube.public.home.footer_handyman') }}</a>
+                                <a href="{{ route('public.cms.service-page', ['serviceSlug' => 'eco-disposal']) }}">{{ __('bikube.public.home.footer_eco') }}</a>
                             </div>
                         </div>
 
                         <div class="footer-col">
-                            <h4>Статус</h4>
+                            <h4>{{ __('bikube.public.home.footer_status_title') }}</h4>
                             <div class="footer-links">
-                                <a href="#readiness">Возможности платформы</a>
-                                <a href="#business">План для бизнеса</a>
-                                <a href="/login">Войти в кабинет</a>
+                                <a href="#readiness">{{ __('bikube.public.home.footer_platform') }}</a>
+                                <a href="#business">{{ __('bikube.public.home.footer_business') }}</a>
+                                <a href="/login">{{ __('bikube.public.home.footer_login') }}</a>
                             </div>
                         </div>
 
                         <div class="footer-col">
-                            <h4>Регион запуска</h4>
+                            <h4>{{ __('bikube.public.home.footer_region_title') }}</h4>
                             <div class="footer-contact">
                                 <div class="footer-contact__item">
                                     <span class="footer-contact__icon">📍</span>
                                     <span>Narvik, Norway</span>
                                 </div>
-                                <div class="footer-contact__item"><span>Публичные контакты ещё не настроены.</span></div>
+                                <div class="footer-contact__item"><span>{{ __('bikube.public.home.footer_contact_na') }}</span></div>
                             </div>
                         </div>
                     </div>
 
                     <div class="footer-bottom">
-                        <span>© {{ date('Y') }} BiKuBe Ecosystem. Все права защищены.</span>
+                        <span>{{ __('bikube.public.home.footer_copy', ['year' => date('Y')]) }}</span>
                         <div class="footer-legal">
-                            <span>Legal pages are not published yet</span>
+                            <span>{{ __('bikube.public.home.footer_legal_na') }}</span>
                         </div>
                     </div>
                 </div>
