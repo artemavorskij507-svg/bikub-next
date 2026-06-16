@@ -15,6 +15,7 @@
 
 <header class="shell-header">
     <a class="shell-brand" href="/">{{ $brand }}<span>.</span></a>
+    <span style="font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;opacity:.52;padding:.18rem .55rem;border:1px solid currentColor;border-radius:6px">Customer account</span>
     <nav aria-label="Account navigation">
         <a href="{{ route('account.dashboard') }}">Overview</a>
         <a href="{{ route('account.orders.index') }}">Orders</a>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nb">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BiKuBe Delivery — Narvik</title>
+<title>{{ __('bikube.delivery.page_title') }}</title>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
 [x-cloak]{display:none!important}
@@ -177,6 +177,22 @@ html,body{margin:0;padding:0;font-family:Inter,ui-sans-serif,system-ui,sans-seri
   .delivery-store{width:286px;grid-template-columns:74px 1fr auto}
   .delivery-fab-cart{right:12px;bottom:12px}
 }
+/* ── LOCALE SWITCHER ── */
+.delivery-locale{display:flex;align-items:center;gap:4px}
+.delivery-locale button{border:1px solid rgba(148,163,184,.28);border-radius:8px;background:transparent;color:#94a3b8;font-size:11px;font-weight:900;padding:5px 8px;cursor:pointer;transition:border-color .16s,color .16s,background .16s;letter-spacing:.04em}
+.delivery-locale button:hover{border-color:rgba(163,230,53,.6);color:#d9f99d}
+.delivery-locale button.is-active{border-color:rgba(163,230,53,.72);background:rgba(132,204,22,.14);color:#bef264}
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .56s cubic-bezier(.22,1,.36,1),transform .56s cubic-bezier(.22,1,.36,1)}
+.reveal.is-visible{opacity:1;transform:none}
+.reveal-left{opacity:0;transform:translateX(-18px);transition:opacity .52s cubic-bezier(.22,1,.36,1),transform .52s cubic-bezier(.22,1,.36,1)}
+.reveal-left.is-visible{opacity:1;transform:none}
+/* ── HERO slide ken-burns ── */
+.delivery-slide{animation:slideKenBurns 9s ease-in-out infinite alternate}
+@keyframes slideKenBurns{from{transform:scale(1.01)}to{transform:scale(1.06)}}
+/* ── SEGMENT card pulse on active ── */
+.delivery-segment.is-active::after{content:"";position:absolute;inset:0;border-radius:inherit;animation:segmentPulse 2.4s ease-in-out infinite;pointer-events:none}
+@keyframes segmentPulse{0%,100%{box-shadow:0 0 0 0 rgba(163,230,53,.0)}50%{box-shadow:0 0 22px 4px rgba(163,230,53,.22)}}
 </style>
 </head>
 <body>
@@ -342,35 +358,43 @@ $page = [
                 <a class="active" href="#" style="display:inline-flex;align-items:center;gap:6px;color:#84cc16">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 2C8.7 2 6 4.7 6 8c0 5 6 13 6 13s6-8 6-13c0-3.3-2.7-6-6-6Z"/><circle cx="12" cy="8" r="2"/></svg> Narvik
                 </a>
-                <a href="#popular-products" @click.prevent="setSegment('products')">Produkter</a>
-                <a href="#popular-products" @click.prevent="setSegment('meals')">Ferdigmat</a>
-                <a href="#popular-products" @click.prevent="setSegment('bulky')">Stor leveranse</a>
-                <a href="#delivery-support">Support</a>
+                <a href="#popular-products" @click.prevent="setSegment('products')">{{ __('bikube.delivery.nav_products') }}</a>
+                <a href="#popular-products" @click.prevent="setSegment('meals')">{{ __('bikube.delivery.nav_meals') }}</a>
+                <a href="#popular-products" @click.prevent="setSegment('bulky')">{{ __('bikube.delivery.nav_bulky') }}</a>
+                <a href="#delivery-support">{{ __('bikube.delivery.nav_support') }}</a>
             </nav>
             <div class="delivery-nav__actions">
+                <form method="POST" action="{{ route('locale.update') }}" class="delivery-locale" aria-label="{{ __('bikube.delivery.locale_label') }}">
+                    @csrf
+                    @foreach(['nb' => 'NO', 'en' => 'EN', 'uk' => 'UA', 'ru' => 'RU'] as $loc => $lbl)
+                        <button type="submit" name="locale" value="{{ $loc }}"
+                            class="{{ app()->getLocale() === $loc ? 'is-active' : '' }}"
+                            aria-label="{{ $loc }}">{{ $lbl }}</button>
+                    @endforeach
+                </form>
                 @auth
-                    <a class="delivery-btn delivery-btn--ghost" href="{{ route('account.dashboard') }}">Konto</a>
+                    <a class="delivery-btn delivery-btn--ghost" href="{{ route('account.dashboard') }}">{{ __('bikube.delivery.nav_account') }}</a>
                 @else
-                    <a class="delivery-btn delivery-btn--ghost" href="{{ route('login') }}">Logg inn</a>
+                    <a class="delivery-btn delivery-btn--ghost" href="{{ route('login') }}">{{ __('bikube.delivery.nav_login') }}</a>
                 @endauth
-                <a class="delivery-btn delivery-btn--primary" href="{{ route('public.workers.apply') }}">Bli sjåfør</a>
+                <a class="delivery-btn delivery-btn--primary" href="{{ route('public.workers.apply') }}">{{ __('bikube.delivery.nav_become_driver') }}</a>
             </div>
         </header>
 
         <div class="delivery-hero__copy">
             <p class="delivery-eyebrow" x-text="currentSlide.eyebrow || activeSegmentData.eyebrow"></p>
-            <h1>Alt du trenger,<br>levert raskt</h1>
-            <p class="delivery-lead">Dagligvarer, ferdigmat og store leveranser — raskt og trygt levert hjem.</p>
+            <h1>{{ __('bikube.delivery.hero_title_line1') }}<br>{{ __('bikube.delivery.hero_title_line2') }}</h1>
+            <p class="delivery-lead">{{ __('bikube.delivery.hero_lead') }}</p>
             <ul class="delivery-hero-benefits">
-                <li>Rask bestilling</li>
-                <li>Skånsom levering</li>
-                <li>GPS after pickup</li>
+                <li>{{ __('bikube.delivery.hero_bullet_1') }}</li>
+                <li>{{ __('bikube.delivery.hero_bullet_2') }}</li>
+                <li>{{ __('bikube.delivery.hero_bullet_3') }}</li>
             </ul>
             <div class="delivery-cta-row">
                 <button type="button" class="delivery-btn delivery-btn--primary delivery-btn--large"
-                    @click="goToOrder('delivery-groceries')">Bestill dagligvarer</button>
+                    @click="goToOrder('delivery-groceries')">{{ __('bikube.delivery.cta_order') }}</button>
                 <a class="delivery-btn delivery-btn--soft delivery-btn--large"
-                    href="#popular-products">Se leveringsvalg</a>
+                    href="#popular-products">{{ __('bikube.delivery.cta_browse') }}</a>
             </div>
         </div>
 
@@ -424,10 +448,10 @@ $page = [
         </section>
 
         {{-- ── PRODUCTS ── --}}
-        <section id="popular-products" class="delivery-section">
+        <section id="popular-products" class="delivery-section reveal">
             <div class="delivery-heading">
                 <div>
-                    <h2 x-text="activeSegment === 'meals' ? 'Populære måltider' : (activeSegment === 'bulky' ? 'Populære storleveringer' : 'Populære produkter')"></h2>
+                    <h2 x-text="activeSegment === 'meals' ? '{{ __('bikube.delivery.section_popular_meals') }}' : (activeSegment === 'bulky' ? '{{ __('bikube.delivery.section_popular_bulky') }}' : '{{ __('bikube.delivery.section_popular_products') }}')"></h2>
                     <p x-text="activeSegmentData.description"></p>
                 </div>
                 <div class="delivery-tabs">
@@ -450,14 +474,14 @@ $page = [
                             <strong x-text="product.price"></strong>
                             <span x-show="product.old_price" x-text="product.old_price"></span>
                         </div>
-                        <button type="button" @click="addToCart(product)">Legg til</button>
+                        <button type="button" @click="addToCart(product)">+</button>
                     </article>
                 </template>
             </div>
         </section>
 
         {{-- ── PROMOS ── --}}
-        <section class="delivery-section delivery-promos">
+        <section class="delivery-section delivery-promos reveal">
             <template x-for="promo in activePromos" :key="promo.title">
                 <div class="delivery-promo"
                     :style="`background-image: url('${promo.image}')`"
@@ -471,14 +495,14 @@ $page = [
         </section>
 
         {{-- ── STORES ── --}}
-        <section id="stores-and-partners" class="delivery-section">
+        <section id="stores-and-partners" class="delivery-section reveal">
             <div class="delivery-heading">
                 <div>
-                    <h2>Butikker og partnere</h2>
-                    <p x-text="activeSegment === 'meals' ? 'Kjøkkenpartnere for hurtig måltidslevering.' : (activeSegment === 'bulky' ? 'Partnere for store varer og planlagt levering.' : 'Lokale butikker med rask hjemlevering.')"></p>
+                    <h2>{{ __('bikube.delivery.section_stores') }}</h2>
+                    <p x-text="activeSegment === 'meals' ? '{{ __('bikube.delivery.stores_desc_meals') }}' : (activeSegment === 'bulky' ? '{{ __('bikube.delivery.stores_desc_bulky') }}' : '{{ __('bikube.delivery.stores_desc_products') }}')"></p>
                 </div>
                 <button type="button" class="delivery-btn delivery-btn--soft"
-                    @click="goToOrder(resolveScenario(activeSegment))">Åpne valg</button>
+                    @click="goToOrder(resolveScenario(activeSegment))">{{ __('bikube.delivery.stores_open_btn') }}</button>
             </div>
             <div class="delivery-stores-marquee">
                 <div class="delivery-stores-track">
@@ -513,40 +537,40 @@ $page = [
         <footer class="delivery-footer">
             <div class="delivery-footer__brand">
                 <img src="{{ asset('images/bikube/delivery/logo-delivery.svg') }}" alt="BiKuBe Delivery">
-                <p>Lokal levering av dagligvarer, ferdigmat og store varer i Narvik og omegn.</p>
+                <p>{{ __('bikube.delivery.footer_tagline') }}</p>
             </div>
             <div>
-                <h4>Tjenester</h4>
-                <a href="#" @click.prevent="setSegment('products')">Products Delivery</a>
-                <a href="#" @click.prevent="setSegment('meals')">Ready Meals</a>
-                <a href="#" @click.prevent="setSegment('bulky')">Bulky Delivery</a>
+                <h4>{{ __('bikube.delivery.footer_services') }}</h4>
+                <a href="#" @click.prevent="setSegment('products')">{{ __('bikube.delivery.nav_products') }}</a>
+                <a href="#" @click.prevent="setSegment('meals')">{{ __('bikube.delivery.nav_meals') }}</a>
+                <a href="#" @click.prevent="setSegment('bulky')">{{ __('bikube.delivery.nav_bulky') }}</a>
             </div>
             <div>
-                <h4>Kunder</h4>
-                <a href="{{ route('account.dashboard') }}">Min konto</a>
-                <a href="{{ route('account.orders.index') }}">Mine bestillinger</a>
-                <a href="{{ route('account.support.index') }}">Support</a>
+                <h4>{{ __('bikube.delivery.footer_customers') }}</h4>
+                <a href="{{ route('account.dashboard') }}">{{ __('bikube.delivery.footer_my_account') }}</a>
+                <a href="{{ route('account.orders.index') }}">{{ __('bikube.delivery.footer_my_orders') }}</a>
+                <a href="{{ route('account.support.index') }}">{{ __('bikube.delivery.footer_support_link') }}</a>
             </div>
             <div>
-                <h4>Bli sjåfør</h4>
-                <a href="{{ route('public.workers.apply') }}">Søk nå</a>
-                <a href="{{ route('worker.dashboard') }}">Worker portal</a>
+                <h4>{{ __('bikube.delivery.footer_become_driver') }}</h4>
+                <a href="{{ route('public.workers.apply') }}">{{ __('bikube.delivery.footer_apply') }}</a>
+                <a href="{{ route('worker.dashboard') }}">{{ __('bikube.delivery.footer_worker_portal') }}</a>
             </div>
             <div>
-                <h4>Support 24/7</h4>
-                <p>Bestilling, dispatch og leveringsstatus.</p>
+                <h4>{{ __('bikube.delivery.footer_support_title') }}</h4>
+                <p>{{ __('bikube.delivery.footer_support_desc') }}</p>
                 <a href="mailto:support@bikube.no">support@bikube.no</a>
             </div>
             <div class="delivery-footer__bottom">
-                <span>© {{ date('Y') }} BiKuBe Delivery · Narvik</span>
+                <span>© {{ date('Y') }} {{ __('bikube.delivery.footer_copyright') }}</span>
                 <span>Vilkår · Personvern · Driftstatus</span>
             </div>
         </footer>
     </main>
 
     {{-- ── FAB CART ── --}}
-    <button type="button" class="delivery-fab-cart" @click="openCartDrawer()" aria-label="Åpne handlekurv">
-        <span>Handlekurv</span>
+    <button type="button" class="delivery-fab-cart" @click="openCartDrawer()" aria-label="{{ __('bikube.delivery.cart_title') }}">
+        <span>{{ __('bikube.delivery.cart_title') }}</span>
         <span x-text="cartCount"></span>
     </button>
 
@@ -556,12 +580,12 @@ $page = [
     </template>
     <aside class="delivery-drawer" x-show="isCartDrawerOpen" x-transition.opacity.duration.180ms>
         <header class="delivery-drawer__head">
-            <h3>Handlekurv <span x-text="`(${cartCount})`"></span></h3>
+            <h3>{{ __('bikube.delivery.cart_title') }} <span x-text="`(${cartCount})`"></span></h3>
             <button type="button" class="delivery-drawer__close" @click="closeCartDrawer()">×</button>
         </header>
         <div class="delivery-drawer__body">
             <template x-if="cart.length === 0">
-                <div class="delivery-drawer__empty">Kurven er tom</div>
+                <div class="delivery-drawer__empty">{{ __('bikube.delivery.cart_empty') }}</div>
             </template>
             <div class="delivery-cart-list" x-show="cart.length > 0">
                 <template x-for="item in cart" :key="item.cartKey">
@@ -576,19 +600,17 @@ $page = [
                                 <button type="button" @click="changeQty(item.cartKey, 1)">+</button>
                             </div>
                         </div>
-                        <button type="button" class="remove-btn" @click="removeItem(item.cartKey)">Fjern</button>
+                        <button type="button" class="remove-btn" @click="removeItem(item.cartKey)">{{ __('bikube.delivery.cart_remove') }}</button>
                     </article>
                 </template>
             </div>
         </div>
         <footer class="delivery-drawer__foot">
             <div class="delivery-cart-foot">
-                <p style="font-size:13px;color:#94a3b8;margin:0 0 8px">
-                    Gå til bestillingsskjema for å fullføre leveransen.
-                </p>
+                <p style="font-size:13px;color:#94a3b8;margin:0 0 8px">{{ __('bikube.delivery.cart_note') }}</p>
                 <div class="delivery-cart-actions">
-                    <button type="button" class="clear-btn" @click="clearCart()">Tøm kurv</button>
-                    <a class="checkout-btn" :href="checkoutUrl">Bestill nå →</a>
+                    <button type="button" class="clear-btn" @click="clearCart()">{{ __('bikube.delivery.cart_clear') }}</button>
+                    <a class="checkout-btn" :href="checkoutUrl">{{ __('bikube.delivery.cart_checkout') }} →</a>
                 </div>
             </div>
         </footer>
@@ -687,6 +709,19 @@ window.deliveryCommercePage = function(page) {
         },
     };
 };
+</script>
+<script>
+(function(){
+    const io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+            if(e.isIntersecting){
+                e.target.classList.add('is-visible');
+                io.unobserve(e.target);
+            }
+        });
+    },{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.reveal,.reveal-left').forEach(function(el){io.observe(el);});
+})();
 </script>
 </body>
 </html>
