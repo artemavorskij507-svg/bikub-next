@@ -3,11 +3,14 @@
 namespace App\Filament\Resources\PublicSitePages\RelationManagers;
 
 use App\Models\PublicSiteSection;
+use App\Models\PublicSiteSectionItem;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -23,6 +26,11 @@ class SectionsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
+        $safetyLabels = array_combine(
+            PublicSiteSectionItem::ALLOWED_SAFETY_LABELS,
+            PublicSiteSectionItem::ALLOWED_SAFETY_LABELS
+        );
+
         return $schema->components([
             Section::make('Section identity')->schema([
                 Select::make('section_type')
@@ -39,29 +47,84 @@ class SectionsRelationManager extends RelationManager
                     ->default(true),
             ]),
 
-            Section::make('Title / Subtitle (nb)')->schema([
+            Section::make('Title · Subtitle')->schema([
                 TextInput::make('title.nb')->label('Title (NO)')->maxLength(255),
                 TextInput::make('subtitle.nb')->label('Subtitle (NO)')->maxLength(512),
-            ]),
-
-            Section::make('English')->schema([
                 TextInput::make('title.en')->label('Title (EN)')->maxLength(255),
                 TextInput::make('subtitle.en')->label('Subtitle (EN)')->maxLength(512),
-            ])->collapsible(),
-
-            Section::make('Ukrainian')->schema([
                 TextInput::make('title.uk')->label('Title (UA)')->maxLength(255),
-                TextInput::make('subtitle.uk')->label('Subtitle (UA)')->maxLength(512),
-            ])->collapsible(),
-
-            Section::make('Russian')->schema([
                 TextInput::make('title.ru')->label('Title (RU)')->maxLength(255),
-                TextInput::make('subtitle.ru')->label('Subtitle (RU)')->maxLength(512),
-            ])->collapsible(),
+            ])->columns(2)->collapsible(),
 
             Section::make('Config')->schema([
-                KeyValue::make('config')->label('Section config (key/value)')->nullable(),
+                KeyValue::make('config')
+                    ->label('Section config (e.g. segment: products)')
+                    ->helperText('Use "segment" key with value products/meals/bulky to link to delivery segments.')
+                    ->nullable(),
             ])->collapsible(),
+
+            Section::make('Items')->schema([
+                Repeater::make('items')
+                    ->relationship('items')
+                    ->orderColumn('sort_order')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state): string => ($state['title']['nb'] ?? $state['item_type'] ?? 'Item'))
+                    ->schema([
+                        Select::make('item_type')
+                            ->label('Type')
+                            ->options(PublicSiteSectionItem::ITEM_TYPES)
+                            ->required()
+                            ->columnSpanFull(),
+
+                        Toggle::make('is_active')->default(true)->inline(false),
+                        TextInput::make('sort_order')->numeric()->default(0),
+
+                        TextInput::make('title.nb')->label('Title (NO)')->maxLength(255),
+                        TextInput::make('title.en')->label('Title (EN)')->maxLength(255),
+                        TextInput::make('title.uk')->label('Title (UA)')->maxLength(255),
+                        TextInput::make('title.ru')->label('Title (RU)')->maxLength(255),
+
+                        TextInput::make('subtitle.nb')->label('Subtitle (NO)')->maxLength(512),
+                        TextInput::make('subtitle.en')->label('Subtitle (EN)')->maxLength(512),
+
+                        Textarea::make('body.nb')->label('Body (NO)')->rows(2)->maxLength(2000),
+                        Textarea::make('body.en')->label('Body (EN)')->rows(2)->maxLength(2000),
+
+                        TextInput::make('cta_label.nb')->label('CTA label (NO)')->maxLength(120),
+                        TextInput::make('cta_label.en')->label('CTA label (EN)')->maxLength(120),
+
+                        TextInput::make('cta_route')
+                            ->label('CTA route or /path')
+                            ->helperText('Named route or /internal path only. No external URLs.')
+                            ->maxLength(255),
+
+                        TextInput::make('image_path')
+                            ->label('Image path (from public/)')
+                            ->placeholder('images/bikube/delivery/slide-groceries.png')
+                            ->maxLength(512),
+
+                        TextInput::make('mobile_image_path')->label('Mobile image path')->nullable(),
+
+                        TextInput::make('badge')
+                            ->label('Badge')
+                            ->helperText('No fake ratings (4.9) or fake KPIs (10 000+).')
+                            ->maxLength(60),
+
+                        Select::make('safety_label')
+                            ->label('Safety label')
+                            ->options($safetyLabels)
+                            ->nullable(),
+
+                        TextInput::make('linked_scenario_slug')
+                            ->label('Linked scenario slug')
+                            ->placeholder('delivery-groceries')
+                            ->nullable(),
+
+                        TextInput::make('icon')->label('Icon')->nullable(),
+                    ])
+                    ->columns(2)
+                    ->columnSpanFull(),
+            ]),
         ]);
     }
 

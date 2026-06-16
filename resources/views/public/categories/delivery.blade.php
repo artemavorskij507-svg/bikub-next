@@ -326,6 +326,10 @@ $page = [
         ['title'=>'Bonuses and offers','subtitle'=>'Useful promotions','icon'=>'spark'],
     ],
 ];
+// Overlay DB-published content when available; static array is the fallback.
+if (!empty($builderPageData) && ($builderPageData['_source'] ?? '') === 'db') {
+    $page = app(\App\Services\PublicSite\DeliveryPageAssembler::class)->assemble($builderPageData, $page);
+}
 @endphp
 
 <section class="delivery-page"
