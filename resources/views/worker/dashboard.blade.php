@@ -129,13 +129,8 @@ if ($activeOrder) {
         linear-gradient(to bottom, rgba(4,10,22,.25) 0%, transparent 15%, transparent 85%, rgba(4,10,22,.3) 100%);
 }
 
-/* ── Left info panel ─────────────────────────────────────────────── */
-.left-panel {
-    position: absolute; z-index: 10; top: 64px; bottom: 14px; left: 14px;
-    width: 218px; display: flex; flex-direction: column; gap: 8px;
-    pointer-events: none; /* children override */
-}
-.left-panel > * { pointer-events: auto; }
+/* ── Left info panel — hidden ────────────────────────────────────── */
+.left-panel { display: none !important; }
 
 /* ── Right cockpit panel ─────────────────────────────────────────── */
 .cockpit-panel {
@@ -275,8 +270,8 @@ if ($activeOrder) {
 /* ── Central empty-state overlay ────────────────────────────────── */
 #map-empty-state {
     position: absolute;
-    top: 52px; /* below dash-topbar */
-    left: calc(14px + 218px + 12px); /* clear left panel */
+    top: 52px;
+    left: 14px;
     right: calc(14px + 420px + 14px); /* clear right panel */
     bottom: 0;
     z-index: 6;
