@@ -425,26 +425,6 @@ if ($activeOrder) {
 <div id="worker-map"></div>
 <div id="worker-map-overlay"></div>
 
-{{-- ─────────── Central empty-state map overlay ───────────────────── --}}
-@if(!$activeOrder)
-<div id="map-empty-state">
-    <div class="map-empty-card">
-        <div class="mec-radar">
-            <div class="mec-ring r1"></div>
-            <div class="mec-ring r2"></div>
-            <div class="mec-ring r3"></div>
-            <div class="mec-dot"></div>
-        </div>
-        <p class="mec-title">Waiting for dispatch</p>
-        <p class="mec-sub">No real order assigned yet</p>
-        <div class="mec-pills">
-            <span class="mec-pill mec-pill-green">Pilot coverage: Narvik + Ballangen</span>
-            <span class="mec-pill mec-pill-muted">GPS marker appears only after browser consent</span>
-            <span class="mec-pill mec-pill-muted">No live route until real assignment</span>
-        </div>
-    </div>
-</div>
-@endif
 
 
 {{-- ─────────── Left info panel ──────────────────────────────────── --}}
