@@ -33,6 +33,19 @@ $todayEarnings = $chart[$todayKey] ?? 0;
 $chartMax      = max(max(array_values($chart) ?: [0]), 1);
 $lastPingFmt   = $lastPing ? $lastPing->created_at->diffForHumans() : null;
 $initial       = mb_strtoupper(mb_substr($firstName, 0, 1));
+
+// Navigation destination — resolves based on current milestone
+$navDest  = null;
+$navLabel = 'Destination';
+if ($activeOrder) {
+    $navIntake   = $activeOrder->metadata['intake'] ?? [];
+    $navEvents   = $activeOrder->events->pluck('event_type')->toArray();
+    $navPickedUp = in_array('worker.picked_up', $navEvents);
+    $navDest     = $navPickedUp
+        ? ($navIntake['dropoff_address']   ?? $navIntake['destination_address'] ?? null)
+        : ($navIntake['pickup_address']    ?? $navIntake['vehicle_location']    ?? $navIntake['task_location'] ?? null);
+    $navLabel    = $navPickedUp ? 'Drop-off' : 'Pickup';
+}
 @endphp
 
 {{-- ─────────── Leaflet CSS ─────────── --}}
@@ -689,6 +702,19 @@ $initial       = mb_strtoupper(mb_substr($firstName, 0, 1));
                     <p style="margin:0;font-size:.8rem;color:#d4ecff;line-height:1.4">{{ $dropoff }}</p>
                 </div>
                 @endif
+                {{-- Navigation button --}}
+                <button type="button" @click="openNav()"
+                    class="cp-btn"
+                    style="margin-bottom:8px;background:{{ $navDest ? 'rgba(85,217,255,.1)' : 'rgba(148,163,184,.05)' }};color:{{ $navDest ? '#a0e0ff' : 'var(--muted)' }};border-color:{{ $navDest ? 'rgba(85,217,255,.3)' : 'rgba(148,163,184,.15)' }};font-size:.84rem;gap:8px"
+                    @if(!$navDest) disabled @endif
+                    title="{{ $navDest ? 'Open navigation to '.$navLabel : 'No pickup/dropoff address in this assignment yet' }}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                    @if($navDest)
+                        Open navigation → {{ $navLabel }}
+                    @else
+                        Navigation available after address assigned
+                    @endif
+                </button>
                 <a href="{{ route('worker.orders.show', $activeOrder) }}" class="cp-btn cp-btn-primary">
                     Open assignment details →
                 </a>
@@ -708,6 +734,11 @@ $initial       = mb_strtoupper(mb_substr($firstName, 0, 1));
                 <p style="color:#e2f7f0;font-size:.9rem;font-weight:850;margin:0 0 5px">Dispatch standby</p>
                 <p style="color:var(--muted);font-size:.76rem;margin:0;line-height:1.5">You are online. Dispatch has not assigned a task yet. Assignments will appear here when ready.</p>
                 <a href="{{ route('worker.orders.index') }}" style="display:inline-block;margin-top:10px;color:var(--green);font-size:.76rem;font-weight:750;text-decoration:none">View assignment queue →</a>
+                {{-- Navigation disabled state --}}
+                <div style="margin-top:12px;padding:8px 11px;border-radius:9px;background:rgba(148,163,184,.05);border:1px solid rgba(148,163,184,.1);display:flex;align-items:center;gap:7px">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,.5)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                    <p style="color:rgba(143,165,189,.65);font-size:.68rem;margin:0;line-height:1.4;text-align:left">Navigation available after Dispatch assigns an order with pickup/dropoff address.</p>
+                </div>
             </div>
             @endif
 
@@ -771,6 +802,81 @@ $initial       = mb_strtoupper(mb_substr($firstName, 0, 1));
     </div>
 </div>
 
+{{-- ─────────── Navigation picker bottom sheet ────────────────────── --}}
+<div x-data="navSheet">
+    {{-- Backdrop --}}
+    <div x-show="open"
+         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"  x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+         class="nav-backdrop" @click.self="close()" x-cloak></div>
+
+    {{-- Sheet / modal --}}
+    <div x-show="open"
+         x-transition:enter="transition ease-out duration-250" x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"  x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8"
+         class="nav-sheet" x-cloak>
+
+        <div class="nav-handle"></div>
+
+        {{-- Destination heading --}}
+        <p class="nav-sheet-title">Navigation</p>
+        <h3 style="font-size:1rem;font-weight:950;color:#fff;margin:0 0 4px" x-text="'Navigate to ' + label"></h3>
+        <p class="nav-sheet-dest" x-text="dest"></p>
+
+        {{-- Recommended --}}
+        <p class="nav-section-label">Recommended</p>
+        <template x-for="app in apps.filter(a => a.rec)" :key="app.id">
+            <button type="button"
+                    @click="choice = app.id"
+                    :class="choice === app.id ? 'nav-app-row selected' : 'nav-app-row'">
+                <div class="nav-app-icon" :style="'background:' + app.bg">
+                    <span x-text="app.icon"></span>
+                </div>
+                <div>
+                    <span class="nav-app-name" x-text="app.name"></span>
+                    <span class="nav-app-sub"  x-text="app.sub"></span>
+                </div>
+                <div x-show="choice === app.id" class="nav-app-check">✓</div>
+                <div x-show="choice !== app.id" class="nav-badge-rec">DEFAULT</div>
+            </button>
+        </template>
+
+        {{-- Other options --}}
+        <p class="nav-section-label" style="margin-top:14px">Other options</p>
+        <template x-for="app in apps.filter(a => !a.rec)" :key="app.id">
+            <button type="button"
+                    @click="choice = app.id"
+                    :class="choice === app.id ? 'nav-app-row selected' : 'nav-app-row'">
+                <div class="nav-app-icon" :style="'background:' + app.bg">
+                    <span x-text="app.icon"></span>
+                </div>
+                <div>
+                    <span class="nav-app-name" x-text="app.name"></span>
+                    <span class="nav-app-sub"  x-text="app.sub"></span>
+                </div>
+                <div x-show="choice === app.id" class="nav-app-check">✓</div>
+            </button>
+        </template>
+
+        {{-- Remember choice --}}
+        <label class="nav-remember">
+            <input type="checkbox" x-model="remember">
+            Remember my choice
+        </label>
+
+        {{-- Launch CTA --}}
+        <button type="button" class="nav-launch-btn" @click="launch()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            <span>Open in </span><span x-text="apps.find(a=>a.id===choice)?.name || 'navigation app'"></span>
+        </button>
+
+        <p class="nav-disclaimer">
+            Opens the external app on your device. BiKuBe does not track your in-app route.
+            No GPS data is sent to external apps by BiKuBe.
+        </p>
+    </div>
+</div>
+
 {{-- ─────────── Scripts ────────────────────────────────────────────── --}}
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
@@ -812,6 +918,8 @@ document.addEventListener('alpine:init', function () {
             map: null, marker: null, circle: null, zoneCircle: null,
             pingIntervalMs: {{ (int)($pingSeconds * 1000) }},
             maxAccuracy: {{ (int)$maxAccuracy }},
+            navDest: @json($navDest ?? null),
+            navLabel: @json($navLabel ?? 'Destination'),
 
             init() {
                 this.$nextTick(() => this.initMap());
@@ -1055,7 +1163,76 @@ document.addEventListener('alpine:init', function () {
                         captured_at: new Date(pos.timestamp).toISOString(), consent: true
                     })
                 }).catch(function () {});
+            },
+
+            openNav() {
+                if (!this.navDest) return;
+                window.dispatchEvent(new CustomEvent('bkb:nav-open', {
+                    detail: { dest: this.navDest, label: this.navLabel }
+                }));
             }
+        };
+    });
+
+    /* ── Navigation picker sheet ──────────────────────────────────── */
+    Alpine.data('navSheet', function () {
+        return {
+            open: false,
+            dest: '',
+            label: 'Destination',
+            choice: localStorage.getItem('bkb_nav_default') || 'google',
+            remember: true,
+
+            apps: [
+                {
+                    id: 'google', name: 'Google Maps',
+                    sub: 'Recommended for Norway — works on any device',
+                    icon: '🗺', bg: 'rgba(66,133,244,.15)', rec: true
+                },
+                {
+                    id: 'apple', name: 'Apple Maps',
+                    sub: 'Best on iPhone, iPad, and macOS',
+                    icon: '🍎', bg: 'rgba(255,255,255,.07)', rec: false
+                },
+                {
+                    id: 'waze', name: 'Waze',
+                    sub: 'Driver-optimised, real-time traffic',
+                    icon: '🚗', bg: 'rgba(54,195,127,.15)', rec: false
+                },
+                {
+                    id: 'here', name: 'HERE WeGo',
+                    sub: 'Offline maps — works without mobile data',
+                    icon: '📡', bg: 'rgba(0,177,227,.12)', rec: false
+                }
+            ],
+
+            init() {
+                var self = this;
+                window.addEventListener('bkb:nav-open', function (e) {
+                    self.dest  = e.detail.dest  || '';
+                    self.label = e.detail.label || 'Destination';
+                    self.open  = true;
+                });
+            },
+
+            buildUrl(app) {
+                if (!this.dest) return '#';
+                var enc = encodeURIComponent(this.dest);
+                if (app === 'google') return 'https://www.google.com/maps/dir/?api=1&destination=' + enc + '&travelmode=driving';
+                if (app === 'waze')   return 'https://waze.com/ul?q=' + enc + '&navigate=yes&utm_source=bikube';
+                if (app === 'apple')  return 'http://maps.apple.com/?daddr=' + enc + '&dirflg=d';
+                if (app === 'here')   return 'https://wego.here.com/directions/mix//' + enc;
+                return '#';
+            },
+
+            launch() {
+                if (!this.dest) return;
+                if (this.remember) localStorage.setItem('bkb_nav_default', this.choice);
+                window.open(this.buildUrl(this.choice), '_blank', 'noopener,noreferrer');
+                this.open = false;
+            },
+
+            close() { this.open = false; }
         };
     });
 });
@@ -1066,5 +1243,110 @@ document.addEventListener('alpine:init', function () {
 .bkb-tip { background: rgba(4,10,22,.92) !important; color: #d0e8f8 !important; border: 1px solid rgba(52,230,154,.3) !important; font-size: 11px !important; font-weight: 700 !important; letter-spacing: .05em !important; padding: 4px 10px !important; border-radius: 6px !important; box-shadow: none !important; }
 .bkb-tip::before { display: none !important; }
 .leaflet-control-zoom a { background: rgba(4,10,22,.88) !important; color: #d0e8f8 !important; border-color: rgba(148,163,184,.18) !important; }
+
+/* ── Navigation picker — bottom sheet (mobile) / centered modal (desktop) ── */
+.nav-backdrop {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+.nav-sheet {
+    position: fixed; z-index: 201;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(6,16,32,.98);
+    border-radius: 22px 22px 0 0;
+    border: 1px solid rgba(148,163,184,.16);
+    border-bottom: none;
+    box-shadow: 0 -24px 80px rgba(0,0,0,.6);
+    padding: 12px 20px 36px;
+    max-height: 92dvh;
+    overflow-y: auto;
+}
+.nav-handle {
+    width: 40px; height: 4px; border-radius: 2px;
+    background: rgba(148,163,184,.25); margin: 0 auto 20px;
+}
+.nav-sheet-title {
+    font-size: .6rem; font-weight: 900; color: var(--green);
+    text-transform: uppercase; letter-spacing: .1em; margin: 0 0 3px;
+}
+.nav-sheet-dest {
+    font-size: .82rem; color: var(--muted); margin: 0 0 18px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nav-section-label {
+    font-size: .58rem; font-weight: 900; color: rgba(148,163,184,.5);
+    text-transform: uppercase; letter-spacing: .1em;
+    margin: 0 0 7px; padding: 0 2px;
+}
+.nav-app-row {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; padding: 11px 13px; border-radius: 13px;
+    background: rgba(255,255,255,.04); border: 1.5px solid rgba(148,163,184,.1);
+    text-align: left; cursor: pointer; font-family: inherit;
+    transition: background .12s, border-color .12s;
+    margin-bottom: 7px;
+}
+.nav-app-row:hover { background: rgba(255,255,255,.07); }
+.nav-app-row.selected {
+    background: rgba(52,230,154,.07);
+    border-color: rgba(52,230,154,.3);
+}
+.nav-app-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: grid; place-items: center; flex-shrink: 0;
+    font-size: 17px;
+}
+.nav-app-name { font-size: .88rem; font-weight: 750; color: #e2ecf8; display: block; }
+.nav-app-sub  { font-size: .68rem; color: var(--muted); display: block; margin-top: 1px; }
+.nav-app-check {
+    margin-left: auto; flex-shrink: 0;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(52,230,154,.15); border: 1.5px solid rgba(52,230,154,.45);
+    display: grid; place-items: center;
+    color: var(--green); font-size: 10px; font-weight: 900;
+}
+.nav-badge-rec {
+    margin-left: auto; flex-shrink: 0;
+    padding: 2px 7px; border-radius: 999px;
+    background: rgba(52,230,154,.1); border: 1px solid rgba(52,230,154,.25);
+    color: var(--green); font-size: 9px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: .06em;
+}
+.nav-remember {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 2px; margin-bottom: 14px;
+    font-size: .76rem; color: var(--muted); cursor: pointer;
+}
+.nav-remember input[type=checkbox] {
+    width: 16px; height: 16px; accent-color: var(--green); cursor: pointer;
+}
+.nav-launch-btn {
+    width: 100%; padding: 15px; border-radius: 14px; cursor: pointer;
+    background: linear-gradient(135deg,#25c889,#0c7c5b);
+    color: #fff; border: 1px solid rgba(52,230,154,.35);
+    font-weight: 850; font-size: .95rem; font-family: inherit;
+    box-shadow: 0 6px 24px rgba(52,230,154,.25);
+    transition: opacity .15s, transform .1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.nav-launch-btn:active { transform: scale(.98); opacity: .9; }
+.nav-disclaimer {
+    font-size: .68rem; color: rgba(148,163,184,.5);
+    text-align: center; margin-top: 10px; line-height: 1.5;
+}
+
+/* Desktop: centered modal instead of bottom sheet */
+@media (min-width: 861px) {
+    .nav-backdrop { display: flex; align-items: center; justify-content: center; }
+    .nav-sheet {
+        position: static;
+        width: 380px; border-radius: 20px;
+        border: 1px solid rgba(148,163,184,.18); border-bottom: revert;
+        padding: 18px 24px 28px;
+        max-height: 80dvh;
+    }
+    .nav-handle { display: none; }
+}
 </style>
 @endsection
