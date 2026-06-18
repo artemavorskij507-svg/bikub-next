@@ -37,6 +37,12 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/public-site-preview/{page}', PublicSitePreviewController::class)->name('admin.public-site-preview');
 });
 Route::get('/p/{slug}', [PublicCmsController::class, 'page'])->name('public.cms.page');
+Route::get('/services/social-help', fn () => view('public.social'))->name('public.social');
+Route::get('/classifieds', fn () => view('public.classifieds'))->name('public.classifieds-landing');
+    Route::get('/services/food', fn () => view('public.food'))->name('public.food');
+    Route::get('/services/tow', fn () => view('public.tow'))->name('public.tow');
+    Route::get('/services/personal-task', fn () => view('public.personal-task'))->name('public.personal-task');
+Route::get('/services/moving', fn () => view('public.moving'))->name('public.moving');
 Route::get('/services/{serviceSlug}', [PublicCmsController::class, 'servicePage'])->name('public.cms.service-page');
 Route::get('/services/{serviceSlug}/request', [PublicOrderRequestController::class, 'create'])->name('public.orders.request');
 Route::post('/services/{serviceSlug}/request', [PublicOrderRequestController::class, 'store'])->name('public.orders.store');
@@ -71,6 +77,17 @@ Route::middleware(['auth', 'approved.worker'])->prefix('worker')->name('worker.'
     Route::post('/payout-reviews/{type}/submit', [WorkerPayoutReviewController::class, 'submit'])->whereIn('type',['identity','tax','payout_compliance'])->name('payout-reviews.submit');
     Route::post('/payout-reviews/{review}/evidence', [WorkerPayoutEvidenceController::class, 'upload'])->name('payout-reviews.evidence.upload');
     Route::get('/payout-reviews/evidence/{evidence}/download', [WorkerPayoutEvidenceController::class, 'download'])->name('payout-reviews.evidence.download');
+        // Worker notifications
+    Route::get('/notifications', [\App\Http\Controllers\WorkerNotificationsController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\WorkerNotificationsController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\WorkerNotificationsController::class, 'markRead'])->name('notifications.read');
+    // Worker profile
+    Route::get('/profile', [\App\Http\Controllers\WorkerProfileController::class, 'index'])->name('profile.index');
+    Route::patch('/profile', [\App\Http\Controllers\WorkerProfileController::class, 'update'])->name('profile.update');
+    // Worker schedule
+    Route::get('/schedule', [\App\Http\Controllers\WorkerScheduleController::class, 'index'])->name('schedule.index');
+    // Worker finances
+    Route::get('/wallet', [\App\Http\Controllers\WorkerWalletController::class, 'index'])->name('wallet.index');
     Route::get('/support', [WorkerSupportController::class, 'index'])->name('support.index');
     Route::get('/support/{ticket}', [WorkerSupportController::class, 'show'])->name('support.show');
     Route::post('/support/{ticket}/reply', [WorkerSupportController::class, 'reply'])->name('support.reply');

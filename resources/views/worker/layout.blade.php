@@ -26,6 +26,10 @@
         ['route' => 'worker.orders.index', 'label' => 'Assignments', 'hint' => 'Assigned orders'],
         ['route' => 'worker.payout-profile.show', 'label' => 'Payout profile', 'hint' => 'Masked readiness'],
         ['route' => 'worker.payout-reviews.index', 'label' => 'Reviews', 'hint' => 'Tax and identity'],
+        ['route' => 'worker.notifications.index', 'label' => 'Notifications', 'hint' => 'Updates and alerts'],
+        ['route' => 'worker.profile.index',        'label' => 'Profile',       'hint' => 'Account information'],
+        ['route' => 'worker.schedule.index',       'label' => 'Schedule',      'hint' => 'Availability and shifts'],
+        ['route' => 'worker.wallet.index',         'label' => 'Finances',      'hint' => 'Earnings and payouts'],
         ['route' => 'worker.support.index', 'label' => 'Support', 'hint' => 'Worker support'],
     ];
 @endphp
