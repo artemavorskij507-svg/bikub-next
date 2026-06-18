@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLF MaT Visual Reference Board</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #d4af37;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #888;
+        }
+        .status-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .status-item {
+            padding: 1rem;
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 3px solid #d4af37;
+            border-radius: 4px;
+        }
+        .status-item strong {
+            color: #d4af37;
+        }
+        .section {
+            margin-bottom: 4rem;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            color: #d4af37;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #333;
+        }
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .image-card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .image-card:hover {
+            border-color: #d4af37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+        .image-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border-bottom: 1px solid #333;
+            color: #555;
+        }
+        .image-card img {
+            width: 100%;
+            display: block;
+            border-bottom: 1px solid #333;
+        }
+        .image-info {
+            padding: 1.5rem;
+        }
+        .image-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #d4af37;
+            margin-bottom: 0.5rem;
+        }
+        .image-dimensions {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 1rem;
+        }
+        .image-description {
+            font-size: 0.95rem;
+            color: #bbb;
+            margin-bottom: 1rem;
+            min-height: 60px;
+        }
+        .design-notes {
+            background: rgba(212, 175, 55, 0.05);
+            padding: 1rem;
+            border-radius: 4px;
+            border-left: 3px solid #d4af37;
+        }
+        .design-notes strong {
+            color: #d4af37;
+        }
+        .notes-list {
+            list-style: none;
+            padding: 1rem 0;
+        }
+        .notes-list li {
+            padding: 0.5rem 0;
+            color: #ccc;
+        }
+        .notes-list li:before {
+            content: "→ ";
+            color: #d4af37;
+            margin-right: 0.5rem;
+        }
+        .color-palette {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        .color-swatch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .color-box {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            cursor: crosshair;
+        }
+        .color-label {
+            font-size: 0.85rem;
+            text-align: center;
+            max-width: 100px;
+        }
+        .gap-analysis {
+            background: #1a1a1a;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #333;
+            margin-top: 2rem;
+        }
+        .gap-row {
+            display: grid;
+            grid-template-columns: 150px 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #333;
+        }
+        .gap-row:last-child {
+            border-bottom: none;
+        }
+        .gap-label {
+            font-weight: 600;
+            color: #d4af37;
+            padding-top: 0.5rem;
+        }
+        .gap-content {
+            color: #bbb;
+            font-size: 0.95rem;
+        }
+        .gap-content strong {
+            color: #fff;
+        }
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #333;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        .instruction {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            border-left: 4px solid #d4af37;
+        }
+        .instruction strong {
+            color: #d4af37;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ GLF MaT Visual Reference Board</h1>
+            <p class="subtitle">Design comparison & gap analysis for partner landing page redesign</p>
+            <p class="subtitle">Issue: CMPAAA-141 GLF MaT | Created: 2026-06-18</p>
+        </header>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <strong>Reference Images:</strong>
+                <br>4 provided by owner
+            </div>
+            <div class="status-item">
+                <strong>Current Screenshots:</strong>
+                <br>Pending (browser unavailable)
+            </div>
+            <div class="status-item">
+                <strong>Gap Analysis:</strong>
+                <br>Ready after screenshots
+            </div>
+        </div>
+
+        <div class="instruction">
+            <strong>📋 How to use this board:</strong>
+            <br>1. Owner uploads reference images (1.png, 2.png, 3.png, 4.png) to input/ folder
+            <br>2. Agent analyzes and fills in design notes below
+            <br>3. Owner takes current page screenshots (desktop, tablet, mobile)
+            <br>4. Agent creates gap analysis comparing reference vs current
+            <br>5. Owner approves gaps before implementation
+        </div>
+
+        <!-- REFERENCE IMAGES SECTION -->
+        <section class="section">
+            <h2 class="section-title">Reference Images (Owner Provided)</h2>
+            <div class="images-grid">
+                <div class="image-card">
+                    <div class="image-placeholder">📸</div>
+                    <div class="image-info">
+                        <div class="image-name">1.png — Hero/Landing</div>
+                        <div class="image-dimensions">Awaiting file upload</div>
+                        <div class="image-description">
+                            Main hero section. Should show:<br>
+                            • Background style (light/dark)<br>
+                            • Main image (photo/art)<br>
+                            • CTA placement
+                        </div>
+                        <div class="design-notes">
+                            <strong>Owner notes:</strong>
+                            <p style="margin-top: 0.5rem; color: #888;">[To be filled by owner]</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="image-card">
+                    <div class="image-placeholder">📸</div>
+                    <div class="image-info">
+                        <div class="image-name">2.png — Menu/Categories</div>
+                        <div class="image-dimensions">Awaiting file upload</div>
+                        <div class="image-description">
+                            Menu structure and cards. Should show:<br>
+                            • Category layout<br>
+                            • Card design<br>
+                            • Typography
+                        </div>
+                        <div class="design-notes">
+                            <strong>Owner notes:</strong>
+                            <p style="margin-top: 0.5rem; color: #888;">[To be filled by owner]</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="image-card">
+                    <div class="image-placeholder">📸</div>
+                    <div class="image-info">
+                        <div class="image-name">3.png — Forms/Actions</div>
+                        <div class="image-dimensions">Awaiting file upload</div>
+                        <div class="image-description">
+                            Call-to-action and forms. Should show:<br>
+                            • Button style<br>
+                            • Form layout<br>
+                            • Input styling
+                        </div>
+                        <div class="design-notes">
+                            <strong>Owner notes:</strong>
+                            <p style="margin-top: 0.5rem; color: #888;">[To be filled by owner]</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="image-card">
+                    <div class="image-placeholder">📸</div>
+                    <div class="image-info">
+                        <div class="image-name">4.png — Mobile/Responsive</div>
+                        <div class="image-dimensions">Awaiting file upload</div>
+                        <div class="image-description">
+                            Mobile view. Should show:<br>
+                            • Stack/layout on mobile<br>
+                            • Touch targets<br>
+                            • Navigation
+                        </div>
+                        <div class="design-notes">
+                            <strong>Owner notes:</strong>
+                            <p style="margin-top: 0.5rem; color: #888;">[To be filled by owner]</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DESIGN ANALYSIS SECTION -->
+        <section class="section">
+            <h2 class="section-title">Design System Notes</h2>
+
+            <div class="design-notes" style="margin-bottom: 2rem;">
+                <strong>Color Palette (Extract from reference images)</strong>
+                <div class="color-palette">
+                    <div class="color-swatch">
+                        <div class="color-box" style="background: #d4af37; border-color: #d4af37;"></div>
+                        <div class="color-label">Primary Gold<br>#d4af37</div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-box" style="background: #000; border-color: #555;"></div>
+                        <div class="color-label">Background<br>[awaiting]</div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-box" style="background: #333; border-color: #555;"></div>
+                        <div class="color-label">Card BG<br>[awaiting]</div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-box" style="background: #fff; border-color: #888;"></div>
+                        <div class="color-label">Text<br>[awaiting]</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="design-notes">
+                <strong>Typography & Components</strong>
+                <ul class="notes-list">
+                    <li>Hero heading: [size, weight, letter-spacing]</li>
+                    <li>Body text: [size, line-height, weight]</li>
+                    <li>Card title: [size, weight, color]</li>
+                    <li>Button: [padding, radius, font-weight, hover state]</li>
+                    <li>Input field: [border, radius, height, focus state]</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- GAP ANALYSIS SECTION (Template) -->
+        <section class="section">
+            <h2 class="section-title">Visual Gap Analysis (Pending Screenshots)</h2>
+
+            <div class="gap-analysis">
+                <p style="color: #888; margin-bottom: 2rem;">
+                    This section will be filled after owner provides current page screenshots.
+                </p>
+
+                <div class="gap-row">
+                    <div class="gap-label">Hero</div>
+                    <div class="gap-content">
+                        <strong>Reference:</strong>
+                        <br><span style="color: #888;">[layout, colors, imagery]</span>
+                    </div>
+                    <div class="gap-content">
+                        <strong>Current:</strong>
+                        <br><span style="color: #888;">[layout, colors, imagery]</span>
+                    </div>
+                </div>
+
+                <div class="gap-row">
+                    <div class="gap-label">Colors</div>
+                    <div class="gap-content">
+                        <strong>Reference palette:</strong>
+                        <br><span style="color: #888;">[dominant colors]</span>
+                    </div>
+                    <div class="gap-content">
+                        <strong>Current palette:</strong>
+                        <br><span style="color: #888;">[dominant colors]</span>
+                    </div>
+                </div>
+
+                <div class="gap-row">
+                    <div class="gap-label">Typography</div>
+                    <div class="gap-content">
+                        <strong>Reference:</strong>
+                        <br><span style="color: #888;">[heading size, weights, hierarchy]</span>
+                    </div>
+                    <div class="gap-content">
+                        <strong>Current:</strong>
+                        <br><span style="color: #888;">[heading size, weights, hierarchy]</span>
+                    </div>
+                </div>
+
+                <div class="gap-row">
+                    <div class="gap-label">Cards</div>
+                    <div class="gap-content">
+                        <strong>Reference:</strong>
+                        <br><span style="color: #888;">[shape, shadow, border, background]</span>
+                    </div>
+                    <div class="gap-content">
+                        <strong>Current:</strong>
+                        <br><span style="color: #888;">[shape, shadow, border, background]</span>
+                    </div>
+                </div>
+
+                <div class="gap-row">
+                    <div class="gap-label">CTA Buttons</div>
+                    <div class="gap-content">
+                        <strong>Reference:</strong>
+                        <br><span style="color: #888;">[placement, style, text, color]</span>
+                    </div>
+                    <div class="gap-content">
+                        <strong>Current:</strong>
+                        <br><span style="color: #888;">[placement, style, text, color]</span>
+                    </div>
+                </div>
+
+                <div class="gap-row">
+                    <div class="gap-label">Forms</div>
+                    <div class="gap-content">
+                        <strong>Reference:</strong>
+                        <br><span style="color: #888;">[layout, input style, validation state]</span>
+                    </div>
+                    <div class="gap-content">
+                        <strong>Current:</strong>
+                        <br><span style="color: #888;">[layout, input style, validation state]</span>
+                    </div>
+                </div>
+
+                <div class="gap-row">
+                    <div class="gap-label">Mobile</div>
+                    <div class="gap-content">
+                        <strong>Reference:</strong>
+                        <br><span style="color: #888;">[viewport behavior, stacking, nav]</span>
+                    </div>
+                    <div class="gap-content">
+                        <strong>Current:</strong>
+                        <br><span style="color: #888;">[viewport behavior, stacking, nav]</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEXT STEPS -->
+        <section class="section">
+            <h2 class="section-title">Next Steps</h2>
+            <div class="instruction">
+                <strong>📋 Owner checklist:</strong>
+                <br>☐ Upload reference images (1.png, 2.png, 3.png, 4.png) to `input/` folder
+                <br>☐ Provide design notes (colors, style, key differences)
+                <br>☐ Take current page screenshots (desktop/tablet/mobile)
+                <br>☐ Review gap analysis when ready
+                <br>☐ Approve visual changes before implementation
+                <br>
+                <br><strong>📊 Current Status:</strong>
+                <br>✅ Reference board template created
+                <br>✅ Directory structure ready
+                <br>⏳ Awaiting reference images
+                <br>⏳ Awaiting current screenshots
+                <br>⏳ Gap analysis pending
+            </div>
+        </section>
+
+        <footer>
+            <p>
+                GLF MaT Visual Reference Board
+                <br>Agent: Валера (Claude Haiku 4.5)
+                <br>Issue: CMPAAA-141
+                <br>Generated: 2026-06-18
+            </p>
+            <p style="margin-top: 1rem; font-size: 0.85rem; color: #666;">
+                ⚠️ This board will be updated as owner provides reference images and screenshots.
+                <br>Do not implement design changes until visual gaps are approved by owner.
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
