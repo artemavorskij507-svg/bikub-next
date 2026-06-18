@@ -13,6 +13,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\Action;
 use App\Services\Support\SupportTicketService;
 use App\Filament\Resources\SupportTickets\SupportTicketResource;
+use App\Enums\OrderStatus;
 use Filament\Forms\Components\Select;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
@@ -108,7 +109,29 @@ class OrderResource extends Resource
         ])->filters([
             SelectFilter::make('status')->options(array_combine(array_map(fn($s) => $s->value, \App\Enums\OrderStatus::cases()), array_map(fn($s) => ucfirst(str_replace('_', ' ', $s->value)), \App\Enums\OrderStatus::cases()))),
             SelectFilter::make('payment_status')->options(['not_required'=>'Not required','pending'=>'Pending']),
-        ])->recordActions([ViewAction::make(), Action::make('create_support')->label('Create support ticket')->schema([TextInput::make('subject')->default(fn(Order $record)=>'Order issue: '.$record->order_number)->required(),Select::make('category')->options(SupportTicketResource::categories())->default('order_issue')->required(),Select::make('priority')->options(SupportTicketResource::priorities())->default('normal')->required(),Textarea::make('summary'),Textarea::make('internal_note')])->action(function(Order $record,array $data){$assignment=$record->activeDispatchAssignment();$ticket=app(SupportTicketService::class)->createTicket(['subject'=>$data['subject'],'category'=>$data['category'],'priority'=>$data['priority'],'summary'=>$data['summary']??null,'source'=>'admin','visibility'=>'internal','order_id'=>$record->id,'dispatch_assignment_id'=>$assignment?->id,'worker_profile_id'=>$assignment?->assignedUser?->workerProfile?->id],auth()->user());if(filled($data['internal_note']??null))app(SupportTicketService::class)->addMessage($ticket,['body'=>$data['internal_note'],'message_type'=>'internal_note','visibility'=>'internal'],auth()->user());redirect(SupportTicketResource::getUrl('view',['record'=>$ticket]));}), EditAction::make()]);
+        ])->recordActions([
+            Action::make('confirm_order')
+                ->label('Confirm Order')
+                ->icon('heroicon-m-check-circle')
+                ->visible(fn(Order $record) => $record->status === 'pending')
+                ->requiresConfirmation()
+                ->modalHeading('Confirm Order')
+                ->modalDescription('This will approve the order and notify the customer. BiKuBe workers will be assigned automatically.')
+                ->modalSubmitActionLabel('Yes, confirm')
+                ->action(function(Order $record) {
+                    $record->update(['status' => 'confirmed']);
+                    $record->events()->create([
+                        'event_type' => 'confirmed',
+                        'from_status' => 'pending',
+                        'to_status' => 'confirmed',
+                        'metadata' => ['confirmed_by' => 'admin', 'admin_id' => auth()->id()],
+                    ]);
+                    return true;
+                })
+                ->color('success'),
+
+            ViewAction::make(),
+            Action::make('create_support')->label('Create support ticket')->schema([TextInput::make('subject')->default(fn(Order $record)=>'Order issue: '.$record->order_number)->required(),Select::make('category')->options(SupportTicketResource::categories())->default('order_issue')->required(),Select::make('priority')->options(SupportTicketResource::priorities())->default('normal')->required(),Textarea::make('summary'),Textarea::make('internal_note')])->action(function(Order $record,array $data){$assignment=$record->activeDispatchAssignment();$ticket=app(SupportTicketService::class)->createTicket(['subject'=>$data['subject'],'category'=>$data['category'],'priority'=>$data['priority'],'summary'=>$data['summary']??null,'source'=>'admin','visibility'=>'internal','order_id'=>$record->id,'dispatch_assignment_id'=>$assignment?->id,'worker_profile_id'=>$assignment?->assignedUser?->workerProfile?->id],auth()->user());if(filled($data['internal_note']??null))app(SupportTicketService::class)->addMessage($ticket,['body'=>$data['internal_note'],'message_type'=>'internal_note','visibility'=>'internal'],auth()->user());redirect(SupportTicketResource::getUrl('view',['record'=>$ticket]));}), EditAction::make()]);
     }
 
     public static function infolist(Schema $schema): Schema

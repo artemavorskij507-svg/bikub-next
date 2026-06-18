@@ -66,6 +66,7 @@ class AdminPanelProvider extends PanelProvider
                 'gray' => Color::Slate,
             ])
            ->navigationGroups([
+    'Partners',
     __('bikube.admin.operations'),
     __('bikube.admin.dispatch'),
     __('bikube.admin.orders'),
