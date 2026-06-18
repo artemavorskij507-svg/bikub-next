@@ -50,8 +50,13 @@ if ($activeOrder) {
 
 {{-- ─────────── Leaflet CSS ─────────── --}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+{{-- ─────────── Alpine.js ──────────── --}}
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
 
 <style>
+/* Alpine cloak — hide before Alpine initialises */
+[x-cloak] { display: none !important; }
+
 /* ── Full-bleed dashboard: hide sidebar & topbar ─────────────────── */
 .wk-dash .worker-sidebar,
 .wk-dash .worker-topbar { display: none !important; }
@@ -806,14 +811,13 @@ if ($activeOrder) {
 <div x-data="navSheet">
     {{-- Backdrop --}}
     <div x-show="open"
-         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-150"  x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+         x-transition.opacity.duration.200ms
          class="nav-backdrop" @click.self="close()" x-cloak></div>
 
     {{-- Sheet / modal --}}
     <div x-show="open"
-         x-transition:enter="transition ease-out duration-250" x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0"
-         x-transition:leave="transition ease-in duration-200"  x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8"
+         x-transition:enter.duration.250ms
+         x-transition:leave.duration.180ms
          class="nav-sheet" x-cloak>
 
         <div class="nav-handle"></div>
