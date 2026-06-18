@@ -356,17 +356,19 @@ if ($activeOrder) {
     .map-empty-card { max-width: 280px; padding: 20px 18px 18px; }
 }
 
-/* ── Map overlay badges ──────────────────────────────────────────── */
-.map-badge {
-    position: absolute; z-index: 5;
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 12px; border-radius: 999px;
-    background: rgba(4,10,22,.88); border: 1px solid rgba(148,163,184,.18);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    font-size: 10.5px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: #e8f4ff;
-    transition: all .3s;
+/* ── Mobile collapse tab (only on mobile) ────────────────────────── */
+.cp-mobile-tab { display: none; }
+@media (max-width: 860px) {
+    .cp-mobile-tab {
+        display: block; padding: 10px 20px 4px; cursor: pointer; user-select: none; flex-shrink: 0;
+    }
+    .cockpit-panel {
+        transition: max-height .32s cubic-bezier(.4,0,.2,1);
+        overflow: hidden;
+    }
+    .cockpit-panel.cp-collapsed { max-height: 54px !important; }
+    .cockpit-panel.cp-collapsed .panel-scroll { overflow: hidden; }
 }
-.map-badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
 /* ── Animations ──────────────────────────────────────────────────── */
 @keyframes msPulse { 0%,100%{box-shadow:0 0 5px rgba(245,189,84,.4)} 50%{box-shadow:0 0 12px rgba(245,189,84,.8)} }
@@ -449,19 +451,6 @@ if ($activeOrder) {
 </div>
 @endif
 
-{{-- ─────────── GPS/Zone overlay badges ──────────────────────────── --}}
-<div class="map-badge" id="gps-badge" style="top:64px;left:14px;margin-top:8px">
-    <span class="map-badge-dot" id="gps-dot" style="{{ $isOnline ? 'background:var(--green);box-shadow:0 0 6px rgba(52,230,154,.7)' : 'background:var(--danger)' }}"></span>
-    <span id="gps-text">{{ $isOnline ? 'GPS READY' : 'OFFLINE' }}</span>
-</div>
-<div class="map-badge map-badge-zone" style="top:64px;left:14px;margin-top:44px">
-    <span style="color:var(--green);font-size:9px">◎</span>
-    <span>NARVIK PILOT</span>
-</div>
-<div class="map-badge" style="top:64px;left:14px;margin-top:80px">
-    <span style="color:#55d9ff;font-size:9px">◎</span>
-    <span style="color:#b0d4f5">BALLANGEN</span>
-</div>
 
 {{-- ─────────── Left info panel ──────────────────────────────────── --}}
 <div class="left-panel" style="top:118px">
@@ -475,7 +464,8 @@ if ($activeOrder) {
                 <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">{{ $workerType }}</div>
             </div>
         </div>
-        <div x-data="{ isOn: {{ $isOnline ? 'true' : 'false' }} }" x-init="window.__bkbIsOn = isOn">
+        <div x-data="{ isOn: {{ $isOnline ? 'true' : 'false' }} }"
+             x-init="window.addEventListener('bkb:status', function(e){ isOn = e.detail.isOn; })">
             <span class="s-badge" :class="isOn ? 's-online' : 's-offline'">
                 <span class="s-dot" :style="isOn ? 'background:var(--green);box-shadow:0 0 6px rgba(52,230,154,.7)' : 'background:var(--danger)'"></span>
                 <span x-text="isOn ? 'Online' : 'Offline'">{{ $isOnline ? 'Online' : 'Offline' }}</span>
@@ -567,7 +557,18 @@ if ($activeOrder) {
 </div>
 
 {{-- ─────────── Right cockpit panel ───────────────────────────────── --}}
-<div class="cockpit-panel" x-data="cockpitApp">
+<div class="cockpit-panel" x-data="cockpitApp" :class="panelOpen ? '' : 'cp-collapsed'">
+
+    {{-- Mobile collapse/expand tab ─────────────────────── --}}
+    <div class="cp-mobile-tab" @click="panelOpen = !panelOpen">
+        <div style="width:36px;height:4px;border-radius:2px;background:rgba(148,163,184,.25);margin:0 auto 7px"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:.78rem;font-weight:850;color:#c8daf0;letter-spacing:.01em">Partner Cockpit</span>
+            <span :style="isOn ? 'color:var(--green)' : 'color:var(--muted)'"
+                  style="font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em"
+                  x-text="panelOpen ? '▼ collapse' : '▲ expand'">▼ collapse</span>
+        </div>
+    </div>
 
     <div class="panel-scroll">
 
@@ -924,6 +925,7 @@ document.addEventListener('alpine:init', function () {
             maxAccuracy: {{ (int)$maxAccuracy }},
             navDest: @json($navDest ?? null),
             navLabel: @json($navLabel ?? 'Destination'),
+            panelOpen: true,
 
             init() {
                 this.$nextTick(() => this.initMap());
@@ -1106,10 +1108,7 @@ document.addEventListener('alpine:init', function () {
                     headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json', 'Accept': 'application/json' }
                 }).finally(function () {
                     self.isOn = true; self.loading = null;
-                    var dot = document.getElementById('gps-dot');
-                    var txt = document.getElementById('gps-text');
-                    if (dot) { dot.style.background='var(--green)'; dot.style.boxShadow='0 0 8px rgba(52,230,154,.7)'; }
-                    if (txt) txt.textContent = hadGps ? 'GPS READY' : 'ONLINE / NO GPS';
+                    window.dispatchEvent(new CustomEvent('bkb:status', { detail: { isOn: true } }));
                 });
             },
 
@@ -1120,10 +1119,7 @@ document.addEventListener('alpine:init', function () {
                     headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json', 'Accept': 'application/json' }
                 }).finally(function () {
                     self.isOn = false; self.loading = null;
-                    var dot = document.getElementById('gps-dot');
-                    var txt = document.getElementById('gps-text');
-                    if (dot) { dot.style.background='var(--danger)'; dot.style.boxShadow='none'; }
-                    if (txt) txt.textContent = 'OFFLINE';
+                    window.dispatchEvent(new CustomEvent('bkb:status', { detail: { isOn: false } }));
                     if (self.map && self.marker && self.map.hasLayer(self.marker)) {
                         self.map.removeLayer(self.marker); self.map.removeLayer(self.circle);
                     }
