@@ -33,7 +33,7 @@
         ['route' => 'worker.support.index', 'label' => 'Support', 'hint' => 'Worker support'],
     ];
 @endphp
-<body>
+<body class="@yield('body-class')">
 <div class="worker-shell">
     <aside class="worker-sidebar" aria-label="Worker cockpit navigation">
         <a class="worker-brand" href="{{ route('worker.dashboard') }}">
