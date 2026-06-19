@@ -30,265 +30,286 @@
             $OrderStatus::Completed->value => 'success',
             $OrderStatus::Cancelled->value => 'danger',
         ];
-        $colorClasses = [
-            'gray'    => 'bg-gray-100 text-gray-700 dark:bg-gray-700/40 dark:text-gray-200',
-            'warning' => 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200',
-            'info'    => 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200',
-            'primary' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200',
-            'success' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200',
-            'danger'  => 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200',
-        ];
 
         $hasDispatch = \Illuminate\Support\Facades\Route::has('filament.admin.pages.dispatch-center');
         $hasWorkerOrders = \Illuminate\Support\Facades\Route::has('worker.orders.index');
     @endphp
 
-    {{-- ===================== HEADER COCKPIT ===================== --}}
-    <div class="rounded-xl border border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/30 dark:to-slate-900 p-5 mb-6">
-        <div class="flex flex-wrap items-start justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="text-2xl">🍽️</span>
-                    <h2 class="text-xl font-bold text-slate-900 dark:text-white">GLF MaT — партнерський модуль</h2>
+    <style>
+        /* Scoped, inline-compiled CSS for the GLF MaT cockpit.
+           Deliberately NOT using Tailwind utility classes here: this admin panel's
+           CSS bundle is pre-built ahead of time and does not get rebuilt when this
+           file changes (no node_modules / build pipeline on this server), so any
+           Tailwind classes not already present in the compiled bundle render as
+           plain unstyled text. Plain CSS below has no such dependency. */
+        .glf-wrap{font-family:inherit;color:#e7e9ec}
+        .glf-card{border-radius:14px;border:1px solid rgba(196,163,90,.22);background:#181410;margin-bottom:22px;overflow:hidden}
+        .glf-header{background:linear-gradient(135deg,rgba(196,163,90,.14),rgba(20,16,12,.4));padding:20px 22px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:flex-start}
+        .glf-header h2{margin:0 0 4px;font-size:1.25rem;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px}
+        .glf-header p{margin:0;font-size:.85rem;color:#b9b2a6}
+        .glf-badge-mode{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:4px 12px;border-radius:999px;background:rgba(196,163,90,.18);color:#e8c98a;font-size:.72rem;font-weight:700}
+        .glf-dot{width:6px;height:6px;border-radius:50%;background:#e8c98a;flex-shrink:0}
+        .glf-links{display:flex;flex-wrap:wrap;gap:8px}
+        .glf-link{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:#221c16;border:1px solid rgba(196,163,90,.2);color:#ddd5c7;font-size:.82rem;font-weight:600;text-decoration:none;transition:border-color .2s}
+        .glf-link:hover{border-color:rgba(196,163,90,.6)}
+        .glf-section-label{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#8d8475;margin:0 0 12px}
+        .glf-board{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+        @media(max-width:900px){.glf-board{grid-template-columns:1fr}}
+        .glf-col{border-radius:12px;border:1px solid rgba(196,163,90,.18);background:#181410;overflow:hidden}
+        .glf-col-head{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-size:.85rem;font-weight:700}
+        .glf-col-head.pending{background:rgba(245,189,84,.1);color:#f5bd54}
+        .glf-col-head.active{background:rgba(85,168,217,.1);color:#7cc4f5}
+        .glf-col-head.done{background:rgba(52,168,110,.1);color:#5fd99a}
+        .glf-count{font-size:.72rem;font-weight:800;padding:2px 9px;border-radius:999px;background:rgba(255,255,255,.08)}
+        .glf-col-body{padding:10px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+        .glf-row{display:block;padding:9px 11px;border-radius:9px;border:1px solid rgba(255,255,255,.06);text-decoration:none;color:inherit;transition:border-color .2s}
+        .glf-row:hover{border-color:rgba(196,163,90,.4)}
+        .glf-row-top{display:flex;justify-content:space-between;font-family:monospace;font-size:.7rem;color:#8d8475;margin-bottom:3px}
+        .glf-row-name{font-size:.85rem;font-weight:600;color:#e7e9ec}
+        .glf-empty{text-align:center;font-size:.78rem;color:#8d8475;padding:24px 12px}
+        .glf-empty-banner{margin-top:14px;padding:18px;border-radius:12px;border:1px dashed rgba(196,163,90,.3);text-align:center;font-size:.85rem;color:#b9b2a6}
+        .glf-empty-banner a{color:#e8c98a;font-weight:700;text-decoration:none}
+        .glf-table{width:100%;font-size:.85rem;border-collapse:collapse}
+        .glf-table thead th{text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:#8d8475;padding:10px 16px;border-bottom:1px solid rgba(196,163,90,.18)}
+        .glf-table tbody td{padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.05);color:#e7e9ec}
+        .glf-table tbody tr:hover{background:rgba(196,163,90,.05)}
+        .glf-pill{display:inline-block;padding:2px 9px;border-radius:6px;font-size:.7rem;font-weight:700}
+        .glf-pill.delivery{background:rgba(52,168,110,.16);color:#5fd99a}
+        .glf-pill.booking{background:rgba(168,110,232,.16);color:#c9a3f5}
+        .glf-pill.gray{background:rgba(255,255,255,.08);color:#b9b2a6}
+        .glf-pill.warning{background:rgba(245,189,84,.16);color:#f5bd54}
+        .glf-pill.info{background:rgba(85,168,217,.16);color:#7cc4f5}
+        .glf-pill.primary{background:rgba(129,140,248,.16);color:#a5b4fc}
+        .glf-pill.success{background:rgba(52,168,110,.16);color:#5fd99a}
+        .glf-pill.danger{background:rgba(244,114,114,.16);color:#f59999}
+        .glf-table a.open{color:#e8c98a;font-weight:700;text-decoration:none}
+        .glf-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        @media(max-width:900px){.glf-grid2{grid-template-columns:1fr}}
+        .glf-panel{padding:18px}
+        .glf-panel h3{margin:0 0 4px;font-size:.95rem;font-weight:800;color:#fff}
+        .glf-panel .sub{font-size:.75rem;color:#8d8475;margin:0 0 12px}
+        .glf-panel code{font-family:monospace;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:4px;font-size:.78rem}
+        .glf-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+        .glf-item:last-child{border-bottom:none}
+        .glf-item-name{font-size:.85rem;font-weight:600;color:#e7e9ec}
+        .glf-item-sub{font-size:.74rem;color:#8d8475}
+        .glf-note{padding:18px;font-size:.85rem;line-height:1.6;color:#b9b2a6}
+        .glf-workflow{padding:18px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+        .glf-step{padding:8px 14px;border-radius:9px;font-size:.82rem;font-weight:700;background:rgba(255,255,255,.06);color:#ddd5c7}
+        .glf-step.s2{background:rgba(245,189,84,.14);color:#f5bd54}
+        .glf-step.s3{background:rgba(85,168,217,.14);color:#7cc4f5}
+        .glf-step.s4{background:rgba(129,140,248,.14);color:#a5b4fc}
+        .glf-step.s5{background:rgba(52,168,110,.14);color:#5fd99a}
+        .glf-arrow{color:#8d8475}
+        .glf-reality{border-color:rgba(244,114,114,.3)!important}
+        .glf-reality .glf-panel{padding:18px}
+        .glf-reality h3{color:#f59999}
+        .glf-reality ul{margin:0;padding-left:0;list-style:none;font-size:.85rem;color:#e2b3b3;line-height:1.8}
+    </style>
+
+    <div class="glf-wrap">
+
+        {{-- ===================== HEADER COCKPIT ===================== --}}
+        <div class="glf-card">
+            <div class="glf-header">
+                <div>
+                    <h2><span>🍽️</span> GLF MaT — партнерський модуль</h2>
+                    <p>Доставка страв + бронювання столу · Кухні світу, битва смаків</p>
+                    <span class="glf-badge-mode"><span class="glf-dot"></span> Режим ручного підтвердження</span>
                 </div>
-                <p class="text-sm text-slate-600 dark:text-slate-400">Доставка страв + бронювання столу · Кухні світу, битва смаків</p>
-                <span class="inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-full bg-amber-200/70 dark:bg-amber-800/40 text-amber-900 dark:text-amber-200 text-xs font-semibold">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-600 dark:bg-amber-300"></span>
-                    Режим ручного підтвердження
-                </span>
-            </div>
-            <div class="flex flex-wrap gap-2">
-                <a href="/services/food" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 hover:border-amber-400 transition">
-                    🔗 Публічна сторінка
-                </a>
-                <a href="{{ route('filament.admin.resources.orders.index') }}" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 hover:border-amber-400 transition">
-                    📋 Усі замовлення
-                </a>
-                @if($hasDispatch)
-                <a href="{{ route('filament.admin.pages.dispatch-center') }}" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 hover:border-amber-400 transition">
-                    🛰️ Dispatch Center
-                </a>
-                @endif
-                @if($hasWorkerOrders)
-                <a href="{{ route('worker.orders.index') }}" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 hover:border-amber-400 transition">
-                    🧑‍🔧 Замовлення воркерів
-                </a>
-                @endif
+                <div class="glf-links">
+                    <a href="/services/food" target="_blank" class="glf-link">🔗 Публічна сторінка</a>
+                    <a href="{{ route('filament.admin.resources.orders.index') }}" class="glf-link">📋 Усі замовлення</a>
+                    @if($hasDispatch)
+                    <a href="{{ route('filament.admin.pages.dispatch-center') }}" class="glf-link">🛰️ Dispatch Center</a>
+                    @endif
+                    @if($hasWorkerOrders)
+                    <a href="{{ route('worker.orders.index') }}" class="glf-link">🧑‍🔧 Замовлення воркерів</a>
+                    @endif
+                </div>
             </div>
         </div>
-    </div>
 
-    {{-- ===================== KPI WIDGET ===================== --}}
-    <div class="mb-6">
-        @livewire(\App\Filament\Widgets\GLFMaTStatsOverview::class)
-    </div>
+        {{-- ===================== KPI WIDGET ===================== --}}
+        <div style="margin-bottom:22px">
+            @livewire(\App\Filament\Widgets\GLFMaTStatsOverview::class)
+        </div>
 
-    {{-- ===================== OPERATIONS BOARD ===================== --}}
-    <div class="mb-6">
-        <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-3">Операційна дошка</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {{-- ===================== OPERATIONS BOARD ===================== --}}
+        <p class="glf-section-label">Операційна дошка</p>
+        <div class="glf-board">
 
-            <div class="rounded-xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-slate-800 overflow-hidden">
-                <div class="px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 flex items-center justify-between">
-                    <span class="font-semibold text-amber-900 dark:text-amber-200 text-sm">⏳ Очікують підтвердження</span>
-                    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100">{{ $pending->count() }}</span>
+            <div class="glf-col">
+                <div class="glf-col-head pending">
+                    <span>⏳ Очікують підтвердження</span>
+                    <span class="glf-count">{{ $pending->count() }}</span>
                 </div>
-                <div class="p-3 space-y-2 max-h-72 overflow-y-auto">
+                <div class="glf-col-body">
                     @forelse($pending->take(8) as $order)
-                        <a href="{{ route('filament.admin.resources.orders.view', $order) }}" class="block p-2.5 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-amber-300 transition">
-                            <div class="flex justify-between text-xs font-mono text-slate-400">
-                                <span>{{ $order->order_number }}</span>
-                                <span>{{ $order->created_at->diffForHumans() }}</span>
-                            </div>
-                            <div class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ $order->customer_name ?? 'Без імені' }}</div>
+                        <a href="{{ route('filament.admin.resources.orders.view', $order) }}" class="glf-row">
+                            <div class="glf-row-top"><span>{{ $order->order_number }}</span><span>{{ $order->created_at->diffForHumans() }}</span></div>
+                            <div class="glf-row-name">{{ $order->customer_name ?? 'Без імені' }}</div>
                         </a>
                     @empty
-                        <p class="text-xs text-slate-400 text-center py-6">Немає заявок, що очікують підтвердження.</p>
+                        <p class="glf-empty">Немає заявок, що очікують підтвердження.</p>
                     @endforelse
                 </div>
             </div>
 
-            <div class="rounded-xl border border-sky-200 dark:border-sky-800 bg-white dark:bg-slate-800 overflow-hidden">
-                <div class="px-4 py-3 bg-sky-50 dark:bg-sky-900/20 border-b border-sky-200 dark:border-sky-800 flex items-center justify-between">
-                    <span class="font-semibold text-sky-900 dark:text-sky-200 text-sm">▶️ Підтверджені / в роботі</span>
-                    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-sky-200 dark:bg-sky-800 text-sky-900 dark:text-sky-100">{{ $active->count() }}</span>
+            <div class="glf-col">
+                <div class="glf-col-head active">
+                    <span>▶️ Підтверджені / в роботі</span>
+                    <span class="glf-count">{{ $active->count() }}</span>
                 </div>
-                <div class="p-3 space-y-2 max-h-72 overflow-y-auto">
+                <div class="glf-col-body">
                     @forelse($active->take(8) as $order)
-                        <a href="{{ route('filament.admin.resources.orders.view', $order) }}" class="block p-2.5 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-sky-300 transition">
-                            <div class="flex justify-between text-xs font-mono text-slate-400">
-                                <span>{{ $order->order_number }}</span>
-                                <span>{{ $statusLabel[$order->status->value] ?? $order->status->value }}</span>
-                            </div>
-                            <div class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ $order->customer_name ?? 'Без імені' }}</div>
+                        <a href="{{ route('filament.admin.resources.orders.view', $order) }}" class="glf-row">
+                            <div class="glf-row-top"><span>{{ $order->order_number }}</span><span>{{ $statusLabel[$order->status->value] ?? $order->status->value }}</span></div>
+                            <div class="glf-row-name">{{ $order->customer_name ?? 'Без імені' }}</div>
                         </a>
                     @empty
-                        <p class="text-xs text-slate-400 text-center py-6">Немає активних замовлень.</p>
+                        <p class="glf-empty">Немає активних замовлень.</p>
                     @endforelse
                 </div>
             </div>
 
-            <div class="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800 overflow-hidden">
-                <div class="px-4 py-3 bg-emerald-50 dark:bg-emerald-900/20 border-b border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
-                    <span class="font-semibold text-emerald-900 dark:text-emerald-200 text-sm">✅ Виконано</span>
-                    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100">{{ $completed->count() }}</span>
+            <div class="glf-col">
+                <div class="glf-col-head done">
+                    <span>✅ Виконано</span>
+                    <span class="glf-count">{{ $completed->count() }}</span>
                 </div>
-                <div class="p-3 space-y-2 max-h-72 overflow-y-auto">
+                <div class="glf-col-body">
                     @forelse($completed->take(8) as $order)
-                        <a href="{{ route('filament.admin.resources.orders.view', $order) }}" class="block p-2.5 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-emerald-300 transition">
-                            <div class="flex justify-between text-xs font-mono text-slate-400">
-                                <span>{{ $order->order_number }}</span>
-                                <span>{{ $order->completed_at?->diffForHumans() }}</span>
-                            </div>
-                            <div class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ $order->customer_name ?? 'Без імені' }}</div>
+                        <a href="{{ route('filament.admin.resources.orders.view', $order) }}" class="glf-row">
+                            <div class="glf-row-top"><span>{{ $order->order_number }}</span><span>{{ $order->completed_at?->diffForHumans() }}</span></div>
+                            <div class="glf-row-name">{{ $order->customer_name ?? 'Без імені' }}</div>
                         </a>
                     @empty
-                        <p class="text-xs text-slate-400 text-center py-6">Ще немає виконаних замовлень.</p>
+                        <p class="glf-empty">Ще немає виконаних замовлень.</p>
                     @endforelse
                 </div>
             </div>
         </div>
 
         @if($glfOrders->isEmpty())
-        <div class="mt-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center">
-            <p class="text-sm text-slate-500 dark:text-slate-400">
-                Ще немає жодної реальної заявки GLF MaT.
-                Надішліть форму на <a href="/services/food" target="_blank" class="text-amber-600 dark:text-amber-400 font-semibold hover:underline">/services/food</a>, щоб створити першу заявку.
-            </p>
+        <div class="glf-empty-banner">
+            Ще немає жодної реальної заявки GLF MaT.
+            Надішліть форму на <a href="/services/food" target="_blank">/services/food</a>, щоб створити першу заявку.
         </div>
         @endif
-    </div>
 
-    {{-- ===================== LATEST REQUESTS TABLE ===================== --}}
-    <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 mb-6 overflow-hidden">
-        <div class="px-5 py-3 border-b border-slate-200 dark:border-slate-700">
-            <h3 class="font-semibold text-slate-800 dark:text-slate-100">Останні заявки (10)</h3>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="border-b border-slate-200 dark:border-slate-700 text-left text-xs uppercase text-slate-500 dark:text-slate-400">
-                        <th class="px-5 py-2.5">№</th>
-                        <th class="px-5 py-2.5">Тип</th>
-                        <th class="px-5 py-2.5">Клієнт</th>
-                        <th class="px-5 py-2.5">Телефон</th>
-                        <th class="px-5 py-2.5">Статус</th>
-                        <th class="px-5 py-2.5">Створено</th>
-                        <th class="px-5 py-2.5"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($glfOrders->take(10) as $order)
-                        @php
-                            $isDelivery = $order->service_scenario_key === 'delivery.meals';
-                            $statusVal = $order->status->value;
-                        @endphp
-                        <tr class="border-b border-slate-100 dark:border-slate-700/60 hover:bg-slate-50 dark:hover:bg-slate-700/30">
-                            <td class="px-5 py-3 font-mono text-xs">{{ $order->order_number }}</td>
-                            <td class="px-5 py-3">
-                                <span class="px-2 py-0.5 rounded text-xs font-semibold {{ $isDelivery ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200' }}">
-                                    {{ $isDelivery ? 'Доставка' : 'Бронювання' }}
-                                </span>
-                            </td>
-                            <td class="px-5 py-3">{{ $order->customer_name ?? '—' }}</td>
-                            <td class="px-5 py-3">{{ $order->customer_phone ?? '—' }}</td>
-                            <td class="px-5 py-3">
-                                <span class="px-2 py-0.5 rounded text-xs font-semibold {{ $colorClasses[$statusColor[$statusVal] ?? 'gray'] }}">
-                                    {{ $statusLabel[$statusVal] ?? $statusVal }}
-                                </span>
-                            </td>
-                            <td class="px-5 py-3 text-slate-500 dark:text-slate-400">{{ $order->created_at->format('d.m H:i') }}</td>
-                            <td class="px-5 py-3">
-                                <a href="{{ route('filament.admin.resources.orders.view', $order) }}" class="text-amber-600 dark:text-amber-400 font-medium hover:underline">Відкрити</a>
-                            </td>
-                        </tr>
-                    @empty
+        {{-- ===================== LATEST REQUESTS TABLE ===================== --}}
+        <div class="glf-card" style="margin-top:22px">
+            <div style="padding:14px 18px;border-bottom:1px solid rgba(196,163,90,.18)">
+                <h3 style="margin:0;font-size:.95rem;font-weight:800;color:#fff">Останні заявки (10)</h3>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="glf-table">
+                    <thead>
                         <tr>
-                            <td colspan="7" class="px-5 py-8 text-center text-slate-400 text-sm">
-                                Жодної заявки GLF MaT поки немає.
-                            </td>
+                            <th>№</th><th>Тип</th><th>Клієнт</th><th>Телефон</th><th>Статус</th><th>Створено</th><th></th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($glfOrders->take(10) as $order)
+                            @php
+                                $isDelivery = $order->service_scenario_key === 'delivery.meals';
+                                $statusVal = $order->status->value;
+                                $colorKey = $statusColor[$statusVal] ?? 'gray';
+                            @endphp
+                            <tr>
+                                <td style="font-family:monospace;font-size:.78rem">{{ $order->order_number }}</td>
+                                <td><span class="glf-pill {{ $isDelivery ? 'delivery' : 'booking' }}">{{ $isDelivery ? 'Доставка' : 'Бронювання' }}</span></td>
+                                <td>{{ $order->customer_name ?? '—' }}</td>
+                                <td>{{ $order->customer_phone ?? '—' }}</td>
+                                <td><span class="glf-pill {{ $colorKey }}">{{ $statusLabel[$statusVal] ?? $statusVal }}</span></td>
+                                <td style="color:#8d8475">{{ $order->created_at->format('d.m H:i') }}</td>
+                                <td><a href="{{ route('filament.admin.resources.orders.view', $order) }}" class="open">Відкрити</a></td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="7" style="text-align:center;padding:28px;color:#8d8475">Жодної заявки GLF MaT поки немає.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    {{-- ===================== BOOKING + DELIVERY PANELS ===================== --}}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-
-        <div class="rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 p-5">
-            <h3 class="font-semibold text-purple-900 dark:text-purple-200 mb-1">🍽️ Бронювання столів</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Сценарій <code class="font-mono">restaurant.booking</code> — дата, час, кількість гостей зберігаються в Order.metadata.intake.</p>
-            @forelse($booking->take(5) as $order)
-                @php $intake = $order->metadata['intake'] ?? []; @endphp
-                <div class="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-700 last:border-0">
-                    <div>
-                        <div class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ $order->customer_name ?? '—' }} · {{ $intake['guest_count'] ?? '?' }} гост.</div>
-                        <div class="text-xs text-slate-500 dark:text-slate-400">{{ $intake['booking_date'] ?? '—' }} {{ $intake['booking_time'] ?? '' }}</div>
+        {{-- ===================== BOOKING + DELIVERY PANELS ===================== --}}
+        <div class="glf-grid2" style="margin-top:22px">
+            <div class="glf-card glf-panel">
+                <h3>🍽️ Бронювання столів</h3>
+                <p class="sub">Сценарій <code>restaurant.booking</code> — дата, час, кількість гостей зберігаються в Order.metadata.intake.</p>
+                @forelse($booking->take(5) as $order)
+                    @php $intake = $order->metadata['intake'] ?? []; $colorKey = $statusColor[$order->status->value] ?? 'gray'; @endphp
+                    <div class="glf-item">
+                        <div>
+                            <div class="glf-item-name">{{ $order->customer_name ?? '—' }} · {{ $intake['guest_count'] ?? '?' }} гост.</div>
+                            <div class="glf-item-sub">{{ $intake['booking_date'] ?? '—' }} {{ $intake['booking_time'] ?? '' }}</div>
+                        </div>
+                        <span class="glf-pill {{ $colorKey }}">{{ $statusLabel[$order->status->value] ?? $order->status->value }}</span>
                     </div>
-                    <span class="px-2 py-0.5 rounded text-xs font-semibold {{ $colorClasses[$statusColor[$order->status->value] ?? 'gray'] }}">{{ $statusLabel[$order->status->value] ?? $order->status->value }}</span>
-                </div>
-            @empty
-                <p class="text-xs text-slate-400 py-4">Запитів на бронювання ще немає. Календар столів не підключено — підтвердження виключно вручну.</p>
-            @endforelse
-        </div>
+                @empty
+                    <p class="glf-empty" style="text-align:left;padding:12px 0">Запитів на бронювання ще немає. Календар столів не підключено — підтвердження виключно вручну.</p>
+                @endforelse
+            </div>
 
-        <div class="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800 p-5">
-            <h3 class="font-semibold text-emerald-900 dark:text-emerald-200 mb-1">🚚 Координація доставки</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Сценарій <code class="font-mono">delivery.meals</code> — воркер призначається через Dispatch Center лише після підтвердження.</p>
-            @forelse($delivery->take(5) as $order)
-                @php $intake = $order->metadata['intake'] ?? []; @endphp
-                <div class="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-700 last:border-0">
-                    <div>
-                        <div class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ $order->customer_name ?? '—' }}</div>
-                        <div class="text-xs text-slate-500 dark:text-slate-400">{{ \Illuminate\Support\Str::limit($intake['dropoff_address'] ?? '—', 40) }}</div>
+            <div class="glf-card glf-panel">
+                <h3>🚚 Координація доставки</h3>
+                <p class="sub">Сценарій <code>delivery.meals</code> — воркер призначається через Dispatch Center лише після підтвердження.</p>
+                @forelse($delivery->take(5) as $order)
+                    @php $intake = $order->metadata['intake'] ?? []; $colorKey = $statusColor[$order->status->value] ?? 'gray'; @endphp
+                    <div class="glf-item">
+                        <div>
+                            <div class="glf-item-name">{{ $order->customer_name ?? '—' }}</div>
+                            <div class="glf-item-sub">{{ \Illuminate\Support\Str::limit($intake['dropoff_address'] ?? '—', 40) }}</div>
+                        </div>
+                        <span class="glf-pill {{ $colorKey }}">{{ $statusLabel[$order->status->value] ?? $order->status->value }}</span>
                     </div>
-                    <span class="px-2 py-0.5 rounded text-xs font-semibold {{ $colorClasses[$statusColor[$order->status->value] ?? 'gray'] }}">{{ $statusLabel[$order->status->value] ?? $order->status->value }}</span>
-                </div>
-            @empty
-                <p class="text-xs text-slate-400 py-4">Запитів на доставку ще немає.</p>
-            @endforelse
+                @empty
+                    <p class="glf-empty" style="text-align:left;padding:12px 0">Запитів на доставку ще немає.</p>
+                @endforelse
+            </div>
         </div>
-    </div>
 
-    {{-- ===================== MENU / PARTNER CONTENT LIMITATION ===================== --}}
-    <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 p-5 mb-6">
-        <h3 class="font-semibold text-slate-700 dark:text-slate-200 mb-1">📖 Меню та контент партнера</h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400">
-            Меню на публічній сторінці — статичний preview (8 страв, захардкоджені дані в Blade), без таблиці БД.
-            Управління меню з адмінки наразі недоступне. Реальна модель меню (категорії, страви, опції) описана
-            в <code class="font-mono text-xs">docs/GLF_MAT_MODEL_ARCHITECTURE.md</code> як майбутній етап, що потребує
-            окремого підтвердження власника перед створенням міграцій.
-        </p>
-    </div>
-
-    {{-- ===================== MANUAL WORKFLOW ===================== --}}
-    <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 mb-6">
-        <h3 class="font-semibold text-slate-800 dark:text-slate-100 mb-4">🔁 Ручний робочий процес</h3>
-        <div class="flex flex-wrap items-center gap-2 text-sm">
-            <span class="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 font-medium">1. Клієнт надсилає форму</span>
-            <span class="text-slate-400">→</span>
-            <span class="px-3 py-2 rounded-lg bg-amber-100 dark:bg-amber-900/40 font-medium">2. Адмін підтверджує заявку</span>
-            <span class="text-slate-400">→</span>
-            <span class="px-3 py-2 rounded-lg bg-sky-100 dark:bg-sky-900/40 font-medium">3. Dispatch призначає воркера</span>
-            <span class="text-slate-400">→</span>
-            <span class="px-3 py-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 font-medium">4. Воркер виконує</span>
-            <span class="text-slate-400">→</span>
-            <span class="px-3 py-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 font-medium">5. Підтвердження виконання</span>
+        {{-- ===================== MENU / PARTNER CONTENT LIMITATION ===================== --}}
+        <div class="glf-card" style="margin-top:22px">
+            <div class="glf-note">
+                <h3 style="margin:0 0 6px;font-size:.9rem;color:#fff">📖 Меню та контент партнера</h3>
+                Меню на публічній сторінці — статичний preview (8 страв, захардкоджені дані в Blade), без таблиці БД.
+                Управління меню з адмінки наразі недоступне. Реальна модель меню (категорії, страви, опції) описана
+                в <code style="background:rgba(255,255,255,.07);padding:1px 5px;border-radius:4px">docs/GLF_MAT_MODEL_ARCHITECTURE.md</code> як майбутній етап, що потребує
+                окремого підтвердження власника перед створенням міграцій.
+            </div>
         </div>
-    </div>
 
-    {{-- ===================== REALITY BLOCK ===================== --}}
-    <div class="rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/15 p-5">
-        <h3 class="font-semibold text-rose-900 dark:text-rose-200 mb-2">⚠️ Чесний стан системи (без вигадок)</h3>
-        <ul class="text-sm text-rose-800 dark:text-rose-200 space-y-1.5">
-            <li>• <strong>Оплата:</strong> ручна / провайдер не підключено. Готівка або домовленість з рестораном.</li>
-            <li>• <strong>Календар столів:</strong> не підключено. Кожне бронювання підтверджується людиною вручну.</li>
-            <li>• <strong>ETA / GPS:</strong> з'являється лише після призначення воркера через Dispatch Center.</li>
-            <li>• <strong>Партнерський акаунт GLF MaT:</strong> налаштування ще не завершено (немає окремої моделі Partner/RestaurantProfile).</li>
-            <li>• Жодних фейкових замовлень, відгуків, рейтингів чи трекінгу на цій сторінці немає.</li>
-        </ul>
-    </div>
+        {{-- ===================== MANUAL WORKFLOW ===================== --}}
+        <div class="glf-card" style="margin-top:22px">
+            <div class="glf-workflow">
+                <span class="glf-step">1. Клієнт надсилає форму</span>
+                <span class="glf-arrow">→</span>
+                <span class="glf-step s2">2. Адмін підтверджує заявку</span>
+                <span class="glf-arrow">→</span>
+                <span class="glf-step s3">3. Dispatch призначає воркера</span>
+                <span class="glf-arrow">→</span>
+                <span class="glf-step s4">4. Воркер виконує</span>
+                <span class="glf-arrow">→</span>
+                <span class="glf-step s5">5. Підтвердження виконання</span>
+            </div>
+        </div>
 
+        {{-- ===================== REALITY BLOCK ===================== --}}
+        <div class="glf-card glf-reality" style="margin-top:22px">
+            <div class="glf-panel">
+                <h3>⚠️ Чесний стан системи (без вигадок)</h3>
+                <ul>
+                    <li>• <strong>Оплата:</strong> ручна / провайдер не підключено. Готівка або домовленість з рестораном.</li>
+                    <li>• <strong>Календар столів:</strong> не підключено. Кожне бронювання підтверджується людиною вручну.</li>
+                    <li>• <strong>ETA / GPS:</strong> з'являється лише після призначення воркера через Dispatch Center.</li>
+                    <li>• <strong>Партнерський акаунт GLF MaT:</strong> налаштування ще не завершено (немає окремої моделі Partner/RestaurantProfile).</li>
+                    <li>• Жодних фейкових замовлень, відгуків, рейтингів чи трекінгу на цій сторінці немає.</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
 </x-filament-panels::page>
