@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="BiKuBe Їжа — українська та азербайджанська кухня з доставкою в Києві. Автентичні страви, свіжі інгредієнти, доставка за 30–60 хвилин.">
-    <meta name="keywords" content="українська кухня, азербайджанська кухня, доставка їжі Київ, ресторан Київ, BiKuBe">
-    <meta property="og:title" content="BiKuBe Їжа — Дві кухні, один смачний світ">
+    <meta name="description" content="GLF MaT — кухні світу, битва смаків. Українська та азербайджанська кухні з доставкою в Києві. Автентичні страви, свіжі інгредієнти, доставка за 30–60 хвилин.">
+    <meta name="keywords" content="українська кухня, азербайджанська кухня, доставка їжі Київ, ресторан Київ, GLF MaT">
+    <meta property="og:title" content="GLF MaT — Дві кухні, один смачний світ">
     <meta property="og:description" content="Замовляйте автентичні українські та азербайджанські страви з доставкою або бронюйте стіл у ресторані.">
     <meta property="og:image" content="/images/bikube/home/v2/category-food.png">
-    <title>BiKuBe Їжа — Українська &amp; Азербайджанська кухня</title>
+    <title>GLF MaT — Українська &amp; Азербайджанська кухня</title>
     <link rel="icon" href="/images/bikube/home/v2/category-food.png" type="image/png">
     <style>
         /* ===== BASE ===== */
@@ -79,14 +79,11 @@
         .gf-hero{min-height:100vh;position:relative;display:flex;align-items:center;overflow:hidden;padding-top:70px}
         .gf-hero-bg{position:absolute;inset:0;z-index:0}
         .gf-hero-bg-overlay{position:absolute;inset:0;z-index:2;background:linear-gradient(135deg,rgba(12,10,6,.9) 0%,rgba(20,16,10,.6) 50%,rgba(12,10,6,.8) 100%)}
-        .gf-hero-bg-img{position:absolute;inset:0;z-index:1;transform:scale(1.06);transition:transform 8s ease;background:
-            radial-gradient(ellipse 90% 80% at 68% 45%, rgba(210,120,20,.78), transparent 48%),
-            radial-gradient(ellipse 50% 60% at 78% 65%, rgba(160,70,10,.55), transparent 45%),
-            radial-gradient(ellipse 40% 40% at 85% 20%, rgba(240,170,30,.38), transparent 40%),
-            radial-gradient(ellipse 35% 35% at 52% 52%, rgba(180,100,15,.32), transparent 38%),
-            radial-gradient(ellipse 50% 40% at 20% 80%, rgba(120,45,8,.45), transparent 48%),
-            radial-gradient(ellipse 30% 30% at 40% 20%, rgba(200,130,20,.22), transparent 35%),
-            radial-gradient(circle at 50% 50%, #221008 0%, #140a04 55%, #080402 100%)}
+        .gf-hero-bg-img{position:absolute;inset:0;z-index:1;transform:scale(1.06);transition:transform 8s ease;background-image:
+            radial-gradient(ellipse 90% 80% at 68% 45%, rgba(210,120,20,.35), transparent 48%),
+            radial-gradient(ellipse 50% 60% at 78% 65%, rgba(160,70,10,.25), transparent 45%),
+            linear-gradient(135deg, rgba(8,4,2,.55), rgba(8,4,2,.78)),
+            url('https://images.unsplash.com/photo-1432139509613-5c4255815697?auto=format&fit=crop&w=1600&q=75');background-size:cover;background-position:center}
         .gf-hero-particles{position:absolute;inset:0;z-index:3;background-image:
             radial-gradient(ellipse 70% 55% at 68% 40%,rgba(196,163,90,.25),transparent 52%),
             radial-gradient(ellipse 40% 50% at 10% 80%,rgba(197,48,48,.12),transparent 52%),
@@ -116,15 +113,15 @@
         .gf-hero-card-price{font-size:26px;color:var(--gold)}
         .gf-hero-scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);animation:fadeUp 1s ease .8s both}
         /* ===== CSS ART — DISHES ===== */
-        .gf-dish-art,.gf-hero-card-art{background:#1a1208}
-        .gf-dish-art-1,.gf-hero-card-art{background:radial-gradient(circle at 50% 55%,rgba(245,240,220,.65) 0%,transparent 25%),radial-gradient(circle at 50% 50%,#8b1a1a 0%,#c53030 38%,#6b1010 65%,#2a0808 100%)}
-        .gf-dish-art-2{background:radial-gradient(circle at 55% 38%,rgba(255,220,100,.45) 0%,transparent 28%),radial-gradient(ellipse at 50% 50%,#1e1200 0%,#5a3e08 40%,#8b6914 65%,#c4a35a 100%)}
-        .gf-dish-art-3{background:radial-gradient(circle at 40% 35%,rgba(255,255,200,.5) 0%,transparent 22%),radial-gradient(circle at 60% 65%,rgba(200,180,120,.4) 0%,transparent 18%),radial-gradient(circle at 50% 50%,#201408 0%,#6a5030 45%,#d4c89a 90%)}
-        .gf-dish-art-4{background:radial-gradient(circle at 45% 40%,rgba(200,160,80,.45) 0%,transparent 28%),radial-gradient(circle at 50% 50%,#2a1a08 0%,#6a3a10 50%,#a06020 80%,#c4a35a 100%)}
-        .gf-dish-art-5{background:radial-gradient(circle at 35% 40%,rgba(200,180,120,.4) 0%,transparent 22%),radial-gradient(circle at 70% 60%,rgba(160,80,40,.4) 0%,transparent 20%),radial-gradient(circle at 50% 50%,#1a1208 0%,#5a3a18 50%,#8a6a30 80%)}
-        .gf-dish-art-6{background:radial-gradient(circle at 40% 35%,rgba(180,140,80,.5) 0%,transparent 25%),radial-gradient(circle at 60% 55%,rgba(80,140,60,.3) 0%,transparent 18%),radial-gradient(circle at 50% 50%,#100a02 0%,#3a2a08 50%,#b89448 85%)}
-        .gf-dish-art-7{background:radial-gradient(circle at 30% 40%,rgba(200,140,40,.5) 0%,transparent 22%),radial-gradient(circle at 65% 60%,rgba(80,40,10,.4) 0%,transparent 18%),radial-gradient(circle at 50% 50%,#0a0602 0%,#3a2008 45%,#8a5010 75%,#c4903a 100%)}
-        .gf-dish-art-8{background:radial-gradient(circle at 50% 35%,rgba(200,180,120,.35) 0%,transparent 22%),radial-gradient(circle at 50% 50%,#0e0804 0%,#201208 55%,#5a3010 80%,#8a5820 100%)}
+        .gf-dish-art,.gf-hero-card-art{background:#1a1208;background-size:cover;background-position:center}
+        .gf-dish-art-1,.gf-hero-card-art{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.32)),url('https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=900&q=70')}
+        .gf-dish-art-2{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.32)),url('https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=70')}
+        .gf-dish-art-3{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.32)),url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=70')}
+        .gf-dish-art-4{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.32)),url('https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=900&q=70')}
+        .gf-dish-art-5{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.32)),url('https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=900&q=70')}
+        .gf-dish-art-6{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.32)),url('https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=900&q=70')}
+        .gf-dish-art-7{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.32)),url('https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=900&q=70')}
+        .gf-dish-art-8{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.32)),url('https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=900&q=70')}
         /* ===== STEPS ===== */
         .gf-steps{padding:72px 0;background:var(--bg2);border-bottom:1px solid var(--line)}
         .gf-steps-inner{max-width:1360px;margin:0 auto;padding:0 clamp(16px,3vw,44px)}
@@ -203,11 +200,11 @@
         .gf-promo-card{background:var(--card2);border:1px solid var(--line);border-radius:18px;overflow:hidden;position:relative;transition:transform .35s,box-shadow .35s;cursor:pointer}
         .gf-promo-card:hover{transform:translateY(-6px) scale(1.015);box-shadow:var(--shadow)}
         .gf-promo-discount{position:absolute;top:14px;right:14px;z-index:2;background:var(--red);color:#fff;font-family:sans-serif;font-size:12px;font-weight:700;padding:4px 10px;border-radius:50px}
-        .gf-promo-art{height:160px;width:100%}
-        .gf-promo-art--combo-lunch{background:radial-gradient(circle at 45% 45%,rgba(220,200,120,.55),rgba(100,60,10,.7) 55%,rgba(10,8,2,.95))}
-        .gf-promo-art--combo-azerbaijan{background:radial-gradient(circle at 55% 40%,rgba(180,80,20,.5),rgba(60,20,8,.8) 55%,rgba(8,4,2,.95))}
-        .gf-promo-art--combo-family{background:radial-gradient(circle at 40% 55%,rgba(160,120,40,.5),rgba(60,40,8,.8) 55%,rgba(10,6,2,.95))}
-        .gf-promo-art--combo-grill{background:radial-gradient(circle at 50% 40%,rgba(200,80,20,.6),rgba(80,20,4,.8) 55%,rgba(8,4,2,.95))}
+        .gf-promo-art{height:160px;width:100%;background-size:cover;background-position:center}
+        .gf-promo-art--combo-lunch{background-image:linear-gradient(rgba(10,8,4,.18),rgba(10,8,4,.4)),url('https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=700&q=70')}
+        .gf-promo-art--combo-azerbaijan{background-image:linear-gradient(rgba(10,8,4,.18),rgba(10,8,4,.4)),url('https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=700&q=70')}
+        .gf-promo-art--combo-family{background-image:linear-gradient(rgba(10,8,4,.18),rgba(10,8,4,.4)),url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=700&q=70')}
+        .gf-promo-art--combo-grill{background-image:linear-gradient(rgba(10,8,4,.18),rgba(10,8,4,.4)),url('https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=700&q=70')}
         .gf-promo-body{padding:18px 20px 22px}
         .gf-promo-title{font-size:18px;margin-bottom:6px}
         .gf-promo-sub{font-family:sans-serif;font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:14px}
@@ -241,9 +238,10 @@
         .gf-atmo-img{border-radius:12px;overflow:hidden;position:relative;transition:transform .4s}
         .gf-atmo-img:hover{transform:scale(1.03)}
         .gf-atmo-img--large{grid-row:span 1}
-        .gf-atmo-img--1{background:radial-gradient(ellipse 80% 60% at 35% 45%,rgba(180,100,20,.55),rgba(10,8,4,.95) 70%)}
-        .gf-atmo-img--2{background:radial-gradient(ellipse 60% 80% at 70% 30%,rgba(160,80,10,.45),rgba(8,6,2,.95) 70%)}
-        .gf-atmo-img--3{background:radial-gradient(ellipse 100% 60% at 50% 60%,rgba(140,70,10,.5),rgba(6,4,2,.95) 75%)}
+        .gf-atmo-img{background-size:cover;background-position:center}
+        .gf-atmo-img--1{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.42)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=70')}
+        .gf-atmo-img--2{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.42)),url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=700&q=70')}
+        .gf-atmo-img--3{background-image:linear-gradient(rgba(10,8,4,.12),rgba(10,8,4,.42)),url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=700&q=70')}
         .gf-atmo-info{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:4px}
         .gf-atmo-info-item{display:flex;align-items:center;gap:10px;font-family:sans-serif;font-size:13px;color:var(--muted)}
         .gf-atmo-info-icon{font-size:18px;flex-shrink:0}
@@ -270,7 +268,11 @@
         .gf-review-text{font-family:sans-serif;font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:20px;font-style:italic}
         .gf-review-text p{margin:0}
         .gf-review-author{display:flex;align-items:center;gap:12px}
-        .gf-review-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--card2),var(--bg3));border:1.5px solid rgba(196,163,90,.28);display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-size:13px;font-weight:600;color:var(--gold);flex-shrink:0}
+        .gf-review-avatar{width:44px;height:44px;border-radius:50%;background-size:cover;background-position:center;border:1.5px solid rgba(196,163,90,.28);display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-size:13px;font-weight:600;color:transparent;flex-shrink:0}
+        .gf-review-avatar--1{background-image:url('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=70')}
+        .gf-review-avatar--2{background-image:url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=70')}
+        .gf-review-avatar--3{background-image:url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=70')}
+        .gf-review-avatar--4{background-image:url('https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=200&q=70')}
         .gf-review-name{font-size:15px}
         .gf-reviews-write{margin-top:30px;text-align:center}
         /* ===== GALLERY ===== */
@@ -279,14 +281,14 @@
         .gf-gallery-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:280px 280px;gap:12px;margin-top:32px}
         .gf-gallery-item{border-radius:14px;overflow:hidden;position:relative;cursor:pointer}
         .gf-gallery-item--1{grid-row:span 2}
-        .gf-gallery-art{width:100%;height:100%;transition:transform .5s;background:var(--card2)}
+        .gf-gallery-art{width:100%;height:100%;transition:transform .5s;background:var(--card2);background-size:cover;background-position:center}
         .gf-gallery-item:hover .gf-gallery-art{transform:scale(1.06)}
-        .gf-gallery-art--1{background:radial-gradient(ellipse 80% 60% at 35% 45%,rgba(180,100,20,.6),rgba(10,8,4,.95))}
-        .gf-gallery-art--2{background:radial-gradient(circle at 60% 40%,rgba(140,70,10,.5),rgba(8,5,2,.95))}
-        .gf-gallery-art--3{background:radial-gradient(ellipse 80% 80% at 40% 60%,rgba(100,50,8,.6),rgba(6,4,2,.95))}
-        .gf-gallery-art--4{background:radial-gradient(circle at 55% 35%,rgba(160,100,20,.5),rgba(10,8,4,.95))}
-        .gf-gallery-art--5{background:radial-gradient(ellipse 60% 80% at 30% 50%,rgba(120,60,8,.6),rgba(8,6,2,.95))}
-        .gf-gallery-art--6{background:radial-gradient(circle at 50% 45%,rgba(200,130,20,.4),rgba(10,8,4,.95))}
+        .gf-gallery-art--1{background-image:linear-gradient(rgba(10,8,4,.1),rgba(10,8,4,.38)),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=70')}
+        .gf-gallery-art--2{background-image:linear-gradient(rgba(10,8,4,.1),rgba(10,8,4,.38)),url('https://images.unsplash.com/photo-1432139509613-5c4255815697?auto=format&fit=crop&w=700&q=70')}
+        .gf-gallery-art--3{background-image:linear-gradient(rgba(10,8,4,.1),rgba(10,8,4,.38)),url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=700&q=70')}
+        .gf-gallery-art--4{background-image:linear-gradient(rgba(10,8,4,.1),rgba(10,8,4,.38)),url('https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=700&q=70')}
+        .gf-gallery-art--5{background-image:linear-gradient(rgba(10,8,4,.1),rgba(10,8,4,.38)),url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=700&q=70')}
+        .gf-gallery-art--6{background-image:linear-gradient(rgba(10,8,4,.1),rgba(10,8,4,.5)),url('https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=700&q=70')}
         .gf-gallery-item--center{display:flex;align-items:center;justify-content:center}
         .gf-gallery-play{position:absolute;width:58px;height:58px;border-radius:50%;border:2px solid rgba(255,255,255,.7);background:rgba(12,10,6,.45);backdrop-filter:blur(8px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .3s,box-shadow .3s;z-index:2;opacity:0;transform:scale(.8);transition:opacity .35s,transform .35s,background .3s}
         .gf-gallery-item:hover .gf-gallery-play{opacity:1;transform:scale(1)}
@@ -306,7 +308,9 @@
         .gf-chefs-list{display:flex;flex-direction:column;gap:18px}
         .gf-chef-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;transition:border-color .3s}
         .gf-chef-card:hover{border-color:rgba(196,163,90,.35)}
-        .gf-chef-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--card2),var(--bg3));border:2px solid rgba(196,163,90,.28);display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-size:18px;font-weight:700;color:var(--gold);margin-bottom:14px}
+        .gf-chef-avatar{width:52px;height:52px;border-radius:50%;background-size:cover;background-position:center;border:2px solid rgba(196,163,90,.28);display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-size:18px;font-weight:700;color:transparent;margin-bottom:14px}
+        .gf-chef-avatar--1{background-image:url('https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=200&q=70')}
+        .gf-chef-avatar--2{background-image:url('https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=200&q=70')}
         .gf-chef-name{font-size:17px;margin-bottom:2px}
         .gf-chef-role{font-family:sans-serif;font-size:12px;color:var(--gold);font-weight:600;margin-bottom:2px}
         .gf-chef-cuisine{font-family:sans-serif;font-size:12px;color:var(--muted);margin-bottom:10px}
@@ -578,7 +582,7 @@
 <header class="gf-header" id="gf-header">
     <div class="gf-header-inner">
 
-        <a href="/services/food" class="gf-logo" aria-label="BiKuBe Їжа — на головну">
+        <a href="/services/food" class="gf-logo" aria-label="GLF MaT — на головну">
             <span class="gf-logo-crest" aria-hidden="true">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                     <circle cx="20" cy="20" r="19" stroke="currentColor" stroke-width="1"/>
@@ -587,7 +591,7 @@
                 </svg>
             </span>
             <span class="gf-logo-textblock">
-                <span class="gf-logo-main">BiKuBe Їжа</span>
+                <span class="gf-logo-main">GLF MaT</span>
                 <span class="gf-logo-sub">Кухні світу — битва смаків</span>
             </span>
         </a>
@@ -847,8 +851,8 @@
         <div class="gf-about-banner-media">
             <div class="gf-about-banner-img" role="img" aria-label="Наш ресторан та кухня">
                 <img
-                    src="/images/bikube/home/v2/category-delivery.png"
-                    alt="Доставка BiKuBe — свіжа їжа до вашого порогу"
+                    src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1100&q=75"
+                    alt="Ресторан GLF MaT — затишна атмосфера за вечерею"
                     loading="lazy"
                     width="560"
                     height="400"
@@ -860,7 +864,7 @@
                 </svg>
             </button>
             <div class="gf-about-banner-badge" aria-hidden="true">
-                <span class="gf-rotating-text">BIKUBE · ЇЖА · ДОСТАВКА · РЕСТОРАН ·</span>
+                <span class="gf-rotating-text">GLF MAT · КУХНІ СВІТУ · ДОСТАВКА · РЕСТОРАН ·</span>
             </div>
         </div>
 
@@ -870,7 +874,7 @@
                 Де зустрічаються дві великі кулінарні традиції
             </h2>
             <p class="gf-about-banner-text">
-                BiKuBe Їжа народилася з любові до двох культур. Ми поєднали теплоту та щедрість <strong>української кухні</strong> — борщі, вареники, котлети — із багатством і ароматом <strong>азербайджанської кулінарії</strong>: пловами, кебабами, долмою.
+                GLF MaT народився з любові до двох культур. Ми поєднали теплоту та щедрість <strong>української кухні</strong> — борщі, вареники, котлети — із багатством і ароматом <strong>азербайджанської кулінарії</strong>: пловами, кебабами, долмою.
             </p>
             <p class="gf-about-banner-text">
                 Кожна страва готується з душею. Наші шефи — носії справжніх сімейних рецептів, що передавались через покоління. Ми не йдемо на компроміси в якості — тільки свіжі продукти, тільки справжній смак.
@@ -961,7 +965,7 @@
                 <h2 class="gf-section-title">Бронювання столу</h2>
                 <p class="gf-section-sub">Оберіть зручний час — ми підготуємо все до вашого приходу</p>
             </div>
-            <form class="gf-booking-form" action="/services/food/booking" method="POST" aria-label="Форма бронювання столу" novalidate>
+            <form class="gf-booking-form" action="{{ route('public.orders.store', 'restaurant-booking') }}" method="POST" aria-label="Форма бронювання столу" novalidate>
                 @csrf
                 <div class="gf-form-row">
                     <div class="gf-form-group">
@@ -969,7 +973,7 @@
                         <input
                             type="date"
                             id="booking-date"
-                            name="date"
+                            name="intake[booking_date]"
                             class="gf-form-input"
                             required
                             aria-required="true"
@@ -978,28 +982,21 @@
                     </div>
                     <div class="gf-form-group">
                         <label for="booking-time" class="gf-form-label">Час <span aria-hidden="true">*</span></label>
-                        <select id="booking-time" name="time" class="gf-form-input" required aria-required="true">
+                        <select id="booking-time" name="intake[booking_time]" class="gf-form-input" required aria-required="true">
                             <option value="" disabled selected>Оберіть час</option>
                             <option value="12:00">12:00</option>
                             <option value="12:30">12:30</option>
                             <option value="13:00">13:00</option>
-                            <option value="13:30">13:30</option>
                             <option value="14:00">14:00</option>
-                            <option value="14:30">14:30</option>
-                            <option value="15:00">15:00</option>
                             <option value="18:00">18:00</option>
-                            <option value="18:30">18:30</option>
                             <option value="19:00">19:00</option>
-                            <option value="19:30">19:30</option>
                             <option value="20:00">20:00</option>
-                            <option value="20:30">20:30</option>
-                            <option value="21:00">21:00</option>
                         </select>
                     </div>
                 </div>
                 <div class="gf-form-group">
                     <label for="booking-guests" class="gf-form-label">Кількість гостей <span aria-hidden="true">*</span></label>
-                    <select id="booking-guests" name="guests" class="gf-form-input" required aria-required="true">
+                    <select id="booking-guests" name="intake[guest_count]" class="gf-form-input" required aria-required="true">
                         <option value="" disabled selected>Оберіть кількість</option>
                         <option value="1">1 особа</option>
                         <option value="2">2 особи</option>
@@ -1016,7 +1013,7 @@
                     <input
                         type="tel"
                         id="booking-phone"
-                        name="phone"
+                        name="customer_phone"
                         class="gf-form-input"
                         placeholder="+38 (0XX) XXX-XX-XX"
                         required
@@ -1025,13 +1022,15 @@
                     >
                 </div>
                 <div class="gf-form-group">
-                    <label for="booking-name" class="gf-form-label">Ваше ім'я</label>
+                    <label for="booking-name" class="gf-form-label">Ваше ім'я <span aria-hidden="true">*</span></label>
                     <input
                         type="text"
                         id="booking-name"
-                        name="name"
+                        name="customer_name"
                         class="gf-form-input"
                         placeholder="Як вас звати?"
+                        required
+                        aria-required="true"
                         autocomplete="given-name"
                     >
                 </div>
@@ -1039,7 +1038,7 @@
                     <label for="booking-comment" class="gf-form-label">Коментар / побажання</label>
                     <textarea
                         id="booking-comment"
-                        name="comment"
+                        name="customer_notes"
                         class="gf-form-input gf-form-textarea"
                         rows="3"
                         placeholder="Алергії, особливі побажання, привід..."
@@ -1065,7 +1064,7 @@
             <h2 class="gf-section-title" id="gf-atmo-heading">Атмосфера</h2>
             <p class="gf-section-sub">Затишний простір для зустрічей і свят</p>
             <div class="gf-atmo-grid" role="list">
-                <div class="gf-atmo-img gf-atmo-img--1 gf-atmo-img--large" role="listitem" aria-label="Інтер'єр ресторану BiKuBe"></div>
+                <div class="gf-atmo-img gf-atmo-img--1 gf-atmo-img--large" role="listitem" aria-label="Інтер'єр ресторану GLF MaT"></div>
                 <div class="gf-atmo-img gf-atmo-img--2"                     role="listitem" aria-label="Відкрита кухня ресторану"></div>
                 <div class="gf-atmo-img gf-atmo-img--3"                     role="listitem" aria-label="Банкетний зал"></div>
             </div>
@@ -1144,14 +1143,122 @@
                 </li>
             </ul>
 
-            <div class="gf-delivery-map" role="img" aria-label="Карта зон доставки BiKuBe по Києву">
+            <div class="gf-delivery-map" role="img" aria-label="Карта зон доставки GLF MaT по Києву">
                 <div class="gf-delivery-map-placeholder">
                     <span aria-hidden="true">🗺️</span>
                     <span>Карта зон доставки</span>
                 </div>
             </div>
 
-            <a href="#menu" class="gf-btn gf-btn-primary">Замовити зараз</a>
+            <!-- DELIVERY FORM -->
+            <form class="gf-delivery-form" action="{{ route('public.orders.store', 'delivery-meals') }}" method="POST" aria-label="Форма замовлення доставки" novalidate
+                  onsubmit="document.getElementById('delivery-contact-phone').value=document.getElementById('delivery-phone').value">
+                @csrf
+                <div class="gf-form-group">
+                    <label for="delivery-name" class="gf-form-label">Ваше ім'я <span aria-hidden="true">*</span></label>
+                    <input
+                        type="text"
+                        id="delivery-name"
+                        name="customer_name"
+                        class="gf-form-input"
+                        placeholder="Як вас звати?"
+                        required
+                        aria-required="true"
+                        autocomplete="given-name"
+                    >
+                </div>
+                <input type="hidden" id="delivery-contact-phone" name="intake[contact_phone]">
+                <div class="gf-form-group">
+                    <label for="delivery-phone" class="gf-form-label">Ваш телефон <span aria-hidden="true">*</span></label>
+                    <input
+                        type="tel"
+                        id="delivery-phone"
+                        name="customer_phone"
+                        class="gf-form-input"
+                        placeholder="+47 XXX XX XXX"
+                        required
+                        aria-required="true"
+                        autocomplete="tel"
+                        oninput="document.getElementById('delivery-contact-phone').value=this.value"
+                    >
+                </div>
+                <div class="gf-form-group">
+                    <label for="delivery-address" class="gf-form-label">Адреса доставки <span aria-hidden="true">*</span></label>
+                    <input
+                        type="text"
+                        id="delivery-address"
+                        name="intake[dropoff_address]"
+                        class="gf-form-input"
+                        placeholder="вулиця, номер будинку, номер квартири"
+                        required
+                        aria-required="true"
+                        autocomplete="street-address"
+                    >
+                </div>
+                <div class="gf-form-group">
+                    <label for="delivery-restaurant" class="gf-form-label">Ресторан <span aria-hidden="true">*</span></label>
+                    <input
+                        type="text"
+                        id="delivery-restaurant"
+                        name="intake[restaurant_name]"
+                        class="gf-form-input"
+                        value="GLF MaT"
+                        required
+                        aria-required="true"
+                        readonly
+                    >
+                </div>
+                <div class="gf-form-group">
+                    <label for="delivery-pickup" class="gf-form-label">Адреса ресторану (отримання) <span aria-hidden="true">*</span></label>
+                    <input
+                        type="text"
+                        id="delivery-pickup"
+                        name="intake[pickup_address]"
+                        class="gf-form-input"
+                        value="GLF MaT, Київ — точна адреса буде підтверджена диспетчером"
+                        required
+                        aria-required="true"
+                        readonly
+                    >
+                    <p class="gf-form-hint" style="font-family:sans-serif;font-size:11px;color:var(--muted);margin-top:5px">
+                        Партнерська адреса в процесі підключення — диспетчер уточнить деталі при підтвердженні.
+                    </p>
+                </div>
+                <div class="gf-form-group">
+                    <label for="delivery-time" class="gf-form-label">Бажаний час доставки <span aria-hidden="true">*</span></label>
+                    <input
+                        type="datetime-local"
+                        id="delivery-time"
+                        name="intake[delivery_window]"
+                        class="gf-form-input"
+                        required
+                        aria-required="true"
+                    >
+                </div>
+                <div class="gf-form-group">
+                    <label for="delivery-comment" class="gf-form-label">Що замовити? Коментарі...</label>
+                    <textarea
+                        id="delivery-comment"
+                        name="customer_notes"
+                        class="gf-form-input gf-form-textarea"
+                        rows="3"
+                        placeholder="Назви страв, кількість, особливі побажання (без майонезу тощо), як краще дістатися..."
+                    ></textarea>
+                </div>
+                <button type="submit" class="gf-btn gf-btn-primary" style="width:100%;justify-content:center;padding:13px 20px;border-radius:9px;">
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    Замовити доставку
+                </button>
+                <p class="gf-booking-note">
+                    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    Замовлення обробляється диспетчером вручну. Ви отримаєте підтвердження та деталі доставки телефоном.
+                </p>
+            </form>
         </div>
 
     </div>
@@ -1193,7 +1300,7 @@
                     <p>"{{ $review['text'] }}"</p>
                 </blockquote>
                 <footer class="gf-review-author">
-                    <div class="gf-review-avatar" aria-hidden="true">{{ $review['initials'] }}</div>
+                    <div class="gf-review-avatar gf-review-avatar--{{ $loop->iteration }}" aria-hidden="true">{{ $review['initials'] }}</div>
                     <div class="gf-review-name">{{ $review['name'] }}</div>
                 </footer>
             </article>
@@ -1212,20 +1319,20 @@
     <div class="gf-gallery-inner">
 
         <div class="gf-section-header">
-            <h2 class="gf-section-title" id="gf-gallery-heading">Атмосфера BiKuBe</h2>
+            <h2 class="gf-section-title" id="gf-gallery-heading">Атмосфера GLF MaT</h2>
             <p class="gf-section-sub">Зазирніть на нашу кухню та в зал ресторану</p>
         </div>
 
         <div class="gf-gallery-grid" role="list">
             <div class="gf-gallery-item gf-gallery-item--1" role="listitem">
-                <div class="gf-gallery-art gf-gallery-art--1" role="img" aria-label="Страва ресторану BiKuBe"></div>
+                <div class="gf-gallery-art gf-gallery-art--1" role="img" aria-label="Страва ресторану GLF MaT"></div>
             </div>
             <div class="gf-gallery-item gf-gallery-item--2" role="listitem">
                 <div class="gf-gallery-art gf-gallery-art--2" role="img" aria-label="Кухня ресторану"></div>
             </div>
             <div class="gf-gallery-item gf-gallery-item--3 gf-gallery-item--center" role="listitem">
                 <div class="gf-gallery-art gf-gallery-art--3" role="img" aria-label="Шеф-кухар за роботою"></div>
-                <button class="gf-gallery-play" aria-label="Дивитися відео про кухню BiKuBe" type="button">
+                <button class="gf-gallery-play" aria-label="Дивитися відео про кухню GLF MaT" type="button">
                     <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
                         <polygon points="5 3 19 12 5 21 5 3"/>
                     </svg>
@@ -1244,8 +1351,8 @@
 
         <div class="gf-gallery-social">
             <span>Стежте за нами в Instagram</span>
-            <a href="https://instagram.com/bikube_food" class="gf-social-link" target="_blank" rel="noopener noreferrer" aria-label="BiKuBe Їжа в Instagram">
-                @bikube_food
+            <a href="https://instagram.com/glfmat_official" class="gf-social-link" target="_blank" rel="noopener noreferrer" aria-label="GLF MaT в Instagram">
+                @glfmat_official
             </a>
         </div>
 
@@ -1259,7 +1366,7 @@
         <!-- COL 1: About text + Stats -->
         <div class="gf-about-text-col">
             <div class="gf-eyebrow-tag">Про нас</div>
-            <h2 class="gf-section-title" id="gf-about-us-heading">BiKuBe Їжа — більше ніж ресторан</h2>
+            <h2 class="gf-section-title" id="gf-about-us-heading">GLF MaT — більше ніж ресторан</h2>
             <p class="gf-about-us-p">
                 Ми — команда однодумців, закоханих у кулінарну культуру України та Азербайджану. З 2019 року ми несемо автентичні смаки до столів наших гостей — у залі ресторану чи вдома.
             </p>
@@ -1283,7 +1390,7 @@
             <div class="gf-chefs-list" role="list">
                 @foreach ($chefs as $chef)
                 <div class="gf-chef-card" role="listitem" aria-label="Шеф-кухар {{ $chef['name'] }}">
-                    <div class="gf-chef-avatar" aria-hidden="true">{{ $chef['initial'] }}</div>
+                    <div class="gf-chef-avatar gf-chef-avatar--{{ $loop->iteration }}" aria-hidden="true">{{ $chef['initial'] }}</div>
                     <div class="gf-chef-info">
                         <h4 class="gf-chef-name">{{ $chef['name'] }}</h4>
                         <p class="gf-chef-role">{{ $chef['role'] }}</p>
@@ -1340,36 +1447,36 @@
 
             <!-- Logo + tagline + social -->
             <div class="gf-footer-brand">
-                <a href="/services/food" class="gf-logo" aria-label="BiKuBe Їжа — на головну">
+                <a href="/services/food" class="gf-logo" aria-label="GLF MaT — на головну">
                     <span class="gf-logo-icon" aria-hidden="true">
                         <img src="/images/bikube/home/v2/category-food.png" alt="" width="32" height="32">
                     </span>
-                    <span class="gf-logo-text">BiKuBe <strong>Їжа</strong></span>
+                    <span class="gf-logo-text">GLF <strong>MaT</strong></span>
                 </a>
                 <p class="gf-footer-tagline">
-                    Українська &amp; Азербайджанська кухня.<br>
+                    Кухні світу — битва смаків.<br>
                     Доставка та ресторан у Києві.
                 </p>
                 <nav class="gf-social-row" aria-label="Соціальні мережі">
-                    <a href="https://instagram.com/bikube_food" class="gf-social-icon" target="_blank" rel="noopener noreferrer" aria-label="Instagram BiKuBe Їжа">
+                    <a href="https://instagram.com/glfmat_official" class="gf-social-icon" target="_blank" rel="noopener noreferrer" aria-label="Instagram GLF MaT">
                         <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                             <circle cx="12" cy="12" r="4"/>
                             <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
                         </svg>
                     </a>
-                    <a href="https://facebook.com/bikubefood" class="gf-social-icon" target="_blank" rel="noopener noreferrer" aria-label="Facebook BiKuBe Їжа">
+                    <a href="https://facebook.com/glfmat" class="gf-social-icon" target="_blank" rel="noopener noreferrer" aria-label="Facebook GLF MaT">
                         <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                         </svg>
                     </a>
-                    <a href="https://t.me/bikube_food" class="gf-social-icon" target="_blank" rel="noopener noreferrer" aria-label="Telegram BiKuBe Їжа">
+                    <a href="https://t.me/glfmat" class="gf-social-icon" target="_blank" rel="noopener noreferrer" aria-label="Telegram GLF MaT">
                         <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <line x1="22" y1="2" x2="11" y2="13"/>
                             <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                         </svg>
                     </a>
-                    <a href="viber://chat?number=380XXXXXXXXX" class="gf-social-icon" aria-label="Viber BiKuBe Їжа">
+                    <a href="viber://chat?number=380XXXXXXXXX" class="gf-social-icon" aria-label="Viber GLF MaT">
                         <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
@@ -1427,7 +1534,7 @@
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                             <polyline points="22,6 12,13 2,6"/>
                         </svg>
-                        <a href="mailto:food@bikube.ua" class="gf-footer-email">food@bikube.ua</a>
+                        <a href="mailto:food@glfmat.ua" class="gf-footer-email">food@glfmat.ua</a>
                     </li>
                     <li class="gf-footer-contact-item">
                         <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -1445,7 +1552,7 @@
     <div class="gf-footer-bottom">
         <div class="gf-footer-bottom-inner">
             <p class="gf-copyright">
-                &copy; {{ date('Y') }} BiKuBe Platform. Усі права захищені.
+                &copy; {{ date('Y') }} GLF MaT. Усі права захищені.
             </p>
             <div class="gf-footer-bottom-links">
                 <a href="/privacy" class="gf-footer-bottom-link">Конфіденційність</a>
@@ -1598,24 +1705,7 @@
         track.addEventListener('mouseleave', function(){ reviewAuto=setInterval(function(){ scrollReviews(1); },5000); });
       }
 
-      // 8. BOOKING FORM
-      var bform = document.querySelector('.gf-booking-form');
-      if (bform) bform.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var ok = true;
-        bform.querySelectorAll('[required]').forEach(function (f) {
-          if (!f.value.trim()) {
-            ok = false;
-            f.classList.add('gf-invalid');
-          } else {
-            f.classList.remove('gf-invalid');
-          }
-        });
-        if (!ok) return;
-        bform.innerHTML = '<div class="gf-booking-success" role="alert">✅ Столик заброньовано!<br><small style="font-family:sans-serif;font-size:14px;color:var(--muted)">Підтвердження надійде SMS протягом 5 хвилин.</small></div>';
-      });
-
-      // 9. CART
+      // 8. CART
       var cartCount = document.querySelector('.gf-cart-count');
       var count = 0;
       document.querySelectorAll('.gf-add-btn').forEach(function (btn) {
@@ -1650,7 +1740,7 @@
           var ov = document.createElement('div');
           ov.setAttribute('role','dialog');
           ov.setAttribute('aria-modal','true');
-          ov.setAttribute('aria-label','Відео BiKuBe');
+          ov.setAttribute('aria-label','Відео GLF MaT');
           ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;animation:fadeUp .25s ease';
           ov.innerHTML='<div style="color:#f5e6c8;font-family:Georgia,serif;text-align:center;padding:48px"><span style="font-size:72px">🎬</span><h2 style="font-size:2rem;margin:20px 0 10px;font-weight:400">Відео незабаром</h2><p style="font-family:sans-serif;font-size:15px;color:#9a8a72">Натисніть будь-де або Esc для закриття</p></div>';
           document.body.appendChild(ov);
