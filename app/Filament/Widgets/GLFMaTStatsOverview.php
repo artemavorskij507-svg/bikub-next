@@ -18,6 +18,17 @@ class GLFMaTStatsOverview extends BaseWidget
      */
     private const SCENARIO_KEYS = ['delivery.meals', 'restaurant.booking'];
 
+    protected function getColumns(): int|array
+    {
+        // Explicit grid (matches the 3→2→1 breakpoint rhythm used by the
+        // rest of the dashboard) instead of relying on Filament's default.
+        return [
+            'default' => 1,
+            'sm' => 2,
+            'lg' => 3,
+        ];
+    }
+
     protected function getStats(): array
     {
         $base = Order::whereIn('service_scenario_key', self::SCENARIO_KEYS);
