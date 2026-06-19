@@ -38,6 +38,11 @@ class OrderEngine
     public function submit(Order $order): Order { return $this->transition($order, OrderStatus::Submitted, 'order.submitted', ['submitted_at' => now()]); }
     public function cancel(Order $order, ?string $reason): Order { return $this->transition($order, OrderStatus::Cancelled, 'order.cancelled', ['cancelled_at' => now()], $reason); }
 
+    public function transitionTo(Order $order, OrderStatus $next, string $event, array $attributes = [], ?string $note = null): Order
+    {
+        return $this->transition($order, $next, $event, $attributes, $note);
+    }
+
     public function recordEvent(Order $order, string $eventType, array $payload = [], ?string $from = null, ?string $to = null, ?string $note = null): OrderEvent
     {
         return $order->events()->create(['event_type' => $eventType, 'from_status' => $from, 'to_status' => $to, 'payload' => $payload ?: null, 'note' => $note, 'actor_type' => auth()->check() ? get_class(auth()->user()) : null, 'actor_id' => auth()->id()]);

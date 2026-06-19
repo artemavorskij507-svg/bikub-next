@@ -4,6 +4,7 @@ namespace App\Services\Workers;
 
 use App\Enums\OrderStatus;
 use App\Models\{Order, User};
+use App\Services\Orders\OrderEngine;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -35,7 +36,7 @@ class WorkerOrderWorkflowService
                     ? ['key' => 'picked-up', 'label' => 'Confirm pickup']
                     : (! $this->hasEvent($order, 'worker.arrived_dropoff')
                         ? ['key' => 'arrived-dropoff', 'label' => 'Arrived at drop-off']
-                        : ['key' => 'complete', 'label' => 'Complete order'])),
+                        : ['key' => null, 'label' => 'Submit completion proof before final completion'])),
             default => null,
         };
     }
@@ -50,11 +51,21 @@ class WorkerOrderWorkflowService
     private function transition(User $worker, Order $order, string $event, OrderStatus $next): void
     {
         $this->assertOwnership($worker, $order);
-        if (! $order->canTransitionTo($next)) throw ValidationException::withMessages(['status' => "Order cannot transition from {$order->status->value} to {$next->value}."]);
+
         DB::transaction(function () use ($worker, $order, $event, $next) {
             $from = $order->status->value;
-            $order->update(['status' => $next, ...($next === OrderStatus::Accepted ? ['accepted_at' => now()] : []), ...($next === OrderStatus::Completed ? ['completed_at' => now()] : [])]);
-            $order->events()->create(['actor_type' => User::class, 'actor_id' => $worker->id, 'event_type' => $event, 'from_status' => $from, 'to_status' => $next->value, 'created_at' => now()]);
+
+            app(OrderEngine::class)->transitionTo(
+                $order,
+                $next,
+                $event,
+                [
+                    ...($next === OrderStatus::Accepted ? ['accepted_at' => now()] : []),
+                    ...($next === OrderStatus::Completed ? ['completed_at' => now()] : []),
+                ],
+            );
+
+            $order->refresh();
             $order->dispatchEvents()->create(['dispatch_assignment_id' => $order->activeDispatchAssignment()?->id, 'actor_type' => User::class, 'actor_id' => $worker->id, 'event_type' => $event, 'from_status' => $from, 'to_status' => $next->value]);
         });
     }

@@ -27,7 +27,7 @@
 {{-- Next action — most prominent --}}
 <section class="worker-card" style="border-color:rgba(52,230,154,.32);background:linear-gradient(145deg,rgba(12,40,30,.9),rgba(5,20,14,.9));margin-bottom:1rem">
     <p class="worker-hero-eyebrow" style="margin-bottom:.5rem">Next action</p>
-    @if($nextAction)
+    @if($nextAction && filled($nextAction['key'] ?? null))
         <form method="post" action="{{ route('worker.orders.'.$nextAction['key'], $order) }}">
             @csrf
             <button class="btn primary" style="width:100%;font-size:1rem;min-height:3rem">
@@ -37,6 +37,13 @@
         <p class="muted" style="margin-top:.55rem;font-size:.78rem">
             Only the next valid delivery step is shown. Every action is recorded in the order and dispatch audit trail.
         </p>
+    @elseif($nextAction)
+        <div style="padding:.85rem;border-radius:10px;border:1px solid rgba(250,204,21,.24);background:rgba(113,63,18,.22)">
+            <strong style="display:block;color:#fde68a">{{ $nextAction['label'] }}</strong>
+            <p class="muted" style="margin:.35rem 0 0;font-size:.78rem">
+                Final completion is intentionally disabled until completion proof and customer/admin review are authoritative.
+            </p>
+        </div>
     @else
         <p class="muted">No further worker action is available for this order.</p>
     @endif
