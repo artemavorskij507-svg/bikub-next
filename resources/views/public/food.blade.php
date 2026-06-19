@@ -213,9 +213,10 @@
         .gf-promo-price{font-size:26px;color:var(--gold)}
         .gf-promo-cta{width:100%;justify-content:center;border-radius:9px;padding:11px 20px}
         /* ===== LOWER ===== */
-        .gf-lower{padding:80px 0;border-bottom:1px solid var(--line);background:var(--bg2)}
-        .gf-lower-inner{max-width:1360px;margin:0 auto;padding:0 clamp(16px,3vw,44px);display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px;align-items:start}
-        .gf-booking,.gf-delivery{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px 28px}
+        .gf-lower{padding:80px 0;border-bottom:1px solid var(--line);background:var(--bg2);position:relative;overflow:hidden}
+        .gf-lower::before{content:'';position:absolute;inset:0;z-index:0;background-image:linear-gradient(180deg,rgba(12,10,6,.68),rgba(12,10,6,.85)),url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1600&q=60');background-size:cover;background-position:center 30%}
+        .gf-lower-inner{position:relative;z-index:1;max-width:1360px;margin:0 auto;padding:0 clamp(16px,3vw,44px);display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px;align-items:start}
+        .gf-booking,.gf-delivery{background:rgba(26,18,8,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(196,163,90,.16);border-radius:18px;padding:32px 28px;box-shadow:0 24px 60px rgba(0,0,0,.4)}
         .gf-booking-header,.gf-delivery-header{margin-bottom:26px}
         .gf-booking-icon,.gf-delivery-icon img{display:block;margin-bottom:10px}
         .gf-booking-header .gf-section-title,.gf-delivery-header .gf-section-title{font-size:22px;margin-bottom:6px}
@@ -232,7 +233,7 @@
         .gf-booking-submit{width:100%;justify-content:center;margin-top:4px;border-radius:9px;padding:13px 20px}
         .gf-booking-note{font-family:sans-serif;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-top:12px;line-height:1.4}
         .gf-booking-success{text-align:center;padding:40px 20px;font-size:22px;color:var(--gold);animation:fadeUp .5s ease}
-        .gf-atmo{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:16px}
+        .gf-atmo{background:rgba(26,18,8,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(196,163,90,.16);border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:16px;box-shadow:0 24px 60px rgba(0,0,0,.4)}
         .gf-atmo .gf-section-title{font-size:22px;margin-bottom:4px}
         .gf-atmo-grid{display:grid;grid-template-rows:180px 120px 120px;gap:10px}
         .gf-atmo-img{border-radius:12px;overflow:hidden;position:relative;transition:transform .4s}
