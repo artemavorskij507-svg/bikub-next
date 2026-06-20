@@ -7,199 +7,124 @@
     $profileApproved = $profileStatus === 'approved';
     $availabilityStatus = $availability?->status ?? 'offline';
     $online = in_array($availabilityStatus, ['online', 'available'], true);
-    $ordersCount = $orders->count();
-    $activeStatus = $activeOrder?->status?->value ?? null;
     $activeAssignment = $activeOrder?->activeDispatchAssignment();
+    $events = $activeOrder ? $activeOrder->events->pluck('event_type')->all() : [];
+    $hasAccepted = in_array('worker.assignment.accepted', $events, true) || in_array('worker.started', $events, true) || in_array('worker.arrived_pickup', $events, true) || in_array('worker.picked_up', $events, true) || in_array('worker.arrived_dropoff', $events, true);
+    $hasPickedUp = in_array('worker.picked_up', $events, true);
+    $hasArrivedDropoff = in_array('worker.arrived_dropoff', $events, true);
+    $hasCompletionProof = $activeOrder ? $activeOrder->completionProofs->isNotEmpty() : false;
+    $uiState = ! $online ? 'Offline' : 'Waiting';
+    if ($online && $activeOrder) {
+        $uiState = match (true) {
+            $hasArrivedDropoff && ! $hasCompletionProof => 'Completion Proof',
+            $hasPickedUp => 'Navigate to Dropoff',
+            $hasAccepted => 'Navigate to Pickup',
+            default => 'Assigned',
+        };
+    }
+    $intake = $activeOrder?->metadata['intake'] ?? [];
+    $pickup = $intake['pickup_address'] ?? $intake['vehicle_location'] ?? $intake['task_location'] ?? null;
+    $dropoff = $intake['dropoff_address'] ?? $intake['destination_address'] ?? null;
+    $pickupLat = $intake['pickup_latitude'] ?? $intake['pickup_lat'] ?? null;
+    $pickupLng = $intake['pickup_longitude'] ?? $intake['pickup_lng'] ?? null;
+    $dropoffLat = $intake['dropoff_latitude'] ?? $intake['dropoff_lat'] ?? $intake['destination_latitude'] ?? null;
+    $dropoffLng = $intake['dropoff_longitude'] ?? $intake['dropoff_lng'] ?? $intake['destination_longitude'] ?? null;
     $lastPingAge = $lastPing?->created_at ? now()->diffInSeconds($lastPing->created_at) : null;
     $staleSeconds = (int) ($mapConfig['stale_seconds'] ?? 120);
     $gpsFresh = ! is_null($lastPingAge) && $lastPingAge <= $staleSeconds;
-    $gpsState = $gpsFresh ? 'Fresh' : ($lastPing ? 'Stale' : 'Not sharing');
-    $gpsPill = $gpsFresh ? 'ok' : ($lastPing ? 'warn' : 'danger');
+    $gpsState = $gpsFresh ? 'Fresh' : ($lastPing ? 'Stale' : 'No ping');
     $gpsAgeLabel = $lastPing ? $lastPing->created_at->diffForHumans() : 'No real ping yet';
     $gpsAccuracyLabel = $lastPing?->accuracy_meters ? number_format((float) $lastPing->accuracy_meters, 0).' m' : 'Unavailable';
     $payoutReady = (bool) ($payoutProfile['ready'] ?? false);
-    $payoutBlockers = collect($payoutProfile['blockers'] ?? []);
-    $readyAmount = (float) ($earnings['ready_amount'] ?? 0);
-    $paidAmount = (float) ($earnings['paid_amount'] ?? 0);
-    $blockedCount = (int) ($earnings['blocked_count'] ?? 0);
-    $todayEntries = collect($earnings['entries'] ?? [])->filter(fn ($entry) => $entry->created_at?->isToday());
-    $todayAmount = (float) $todayEntries->sum('worker_amount');
     $readiness = [
-        ['label' => 'Approved worker profile', 'ok' => $profileApproved, 'detail' => str($profileStatus)->replace('_',' ')->title()],
-        ['label' => 'Work mode', 'ok' => $online, 'detail' => $online ? 'Online and visible to dispatch' : 'Offline — not receiving work'],
-        ['label' => 'GPS readiness', 'ok' => $gpsFresh, 'detail' => $lastPing ? $gpsState.' · '.$lastPing->created_at->diffForHumans() : 'No recent location ping'],
-        ['label' => 'Payout profile', 'ok' => $payoutReady, 'detail' => $payoutReady ? 'Ready for settlement review' : 'Review required before payout'],
+        ['label' => 'Worker profile', 'ok' => $profileApproved, 'detail' => str($profileStatus)->replace('_',' ')->title()],
+        ['label' => 'Presence', 'ok' => $online, 'detail' => $online ? 'Online — visible to dispatch' : 'Offline — not receiving work'],
+        ['label' => 'GPS', 'ok' => $gpsFresh, 'detail' => $gpsAgeLabel.' · '.$gpsAccuracyLabel],
+        ['label' => 'Payout profile', 'ok' => $payoutReady, 'detail' => $payoutReady ? 'Ready for settlement review' : 'Manual review required'],
+    ];
+    $mapPayload = [
+        'center' => [(float)($mapConfig['center_lat'] ?? 68.4385), (float)($mapConfig['center_lng'] ?? 17.4272)],
+        'zoom' => (int)($mapConfig['default_zoom'] ?? 11),
+        'csrf' => csrf_token(),
+        'pingUrl' => route('worker.location-pings.store'),
+        'orderId' => $activeOrder?->id,
+        'online' => $online,
+        'lastPing' => $lastPing ? ['lat'=>(float)$lastPing->latitude,'lng'=>(float)$lastPing->longitude,'accuracy'=>(float)$lastPing->accuracy_meters,'label'=>$gpsAgeLabel] : null,
+        'pickup' => ($pickupLat && $pickupLng) ? ['lat'=>(float)$pickupLat,'lng'=>(float)$pickupLng,'label'=>'Pickup'] : null,
+        'dropoff' => ($dropoffLat && $dropoffLng) ? ['lat'=>(float)$dropoffLat,'lng'=>(float)$dropoffLng,'label'=>'Drop-off'] : null,
     ];
 @endphp
 
 @push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQeq9Uq4ik9xkclle2n2E1Jb2fYFhI4=" crossorigin="">
 <style>
-    .wk-dashboard{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,.75fr);gap:1rem;align-items:start}.wk-hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,rgba(12,31,50,.96),rgba(5,16,29,.96));padding:1.25rem;box-shadow:0 26px 80px rgba(0,0,0,.28)}.wk-hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 22%,rgba(var(--brand-rgb),.19),transparent 28%),linear-gradient(90deg,rgba(85,217,255,.06),transparent);pointer-events:none}.wk-hero>*{position:relative}.wk-hero h2{margin:.25rem 0 0;font-size:clamp(2rem,5vw,3.5rem);line-height:1;font-weight:950;letter-spacing:-.04em}.wk-status-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin-top:1rem}.wk-stat span{display:block;color:var(--muted);font-size:.68rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em}.wk-stat strong{display:block;margin-top:.35rem;font-size:1.35rem}.wk-section{display:grid;gap:1rem}.wk-current{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:center}.wk-current h3{margin:0;font-size:1.45rem}.wk-current-meta{display:flex;flex-wrap:wrap;gap:.5rem;margin:.8rem 0}.wk-readiness-list{display:grid;gap:.45rem}.wk-readiness-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.65rem;align-items:start;border-bottom:1px solid var(--line2);padding:.65rem 0}.wk-readiness-row:last-child{border-bottom:0}.wk-dot{display:grid;width:1.45rem;height:1.45rem;place-items:center;border-radius:999px;font-size:.72rem;font-weight:950}.wk-dot.ok{background:rgba(var(--brand-rgb),.13);border:1px solid rgba(var(--brand-rgb),.32);color:var(--green)}.wk-dot.warn{background:rgba(245,189,84,.10);border:1px solid rgba(245,189,84,.32);color:var(--amber)}.wk-empty{display:grid;place-items:center;min-height:16rem;text-align:center}.wk-empty-icon{display:grid;width:4.5rem;height:4.5rem;place-items:center;border-radius:999px;background:rgba(148,163,184,.08);border:1px solid var(--line);font-size:1.9rem;margin:0 auto .8rem}.wk-actions{display:flex;flex-wrap:wrap;gap:.6rem}.wk-secondary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.wk-loading{display:none}.wk-map-card{position:relative;overflow:hidden;min-height:360px;border-radius:22px;border:1px solid rgba(85,217,255,.2);background:radial-gradient(circle at 28% 32%,rgba(52,230,154,.22),transparent 0 9%,transparent 18%),radial-gradient(circle at 70% 64%,rgba(85,217,255,.18),transparent 0 11%,transparent 20%),linear-gradient(145deg,rgba(7,22,38,.96),rgba(4,12,23,.98));box-shadow:0 24px 70px rgba(0,0,0,.28)}.wk-map-card:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(148,163,184,.06) 1px,transparent 1px),linear-gradient(0deg,rgba(148,163,184,.06) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at center,#000,transparent 78%);pointer-events:none}.wk-map-road{position:absolute;border:1px solid rgba(226,232,240,.16);border-radius:999px;transform:rotate(-28deg);background:linear-gradient(90deg,transparent,rgba(226,232,240,.09),transparent)}.wk-map-road.one{width:120%;height:36px;left:-12%;top:47%}.wk-map-road.two{width:72%;height:24px;right:-14%;top:26%;transform:rotate(18deg)}.wk-zone{position:absolute;border-radius:999px;border:1px solid rgba(var(--brand-rgb),.28);background:rgba(var(--brand-rgb),.08);box-shadow:inset 0 0 32px rgba(var(--brand-rgb),.06)}.wk-zone.narvik{width:170px;height:118px;left:20%;top:22%}.wk-zone.ballangen{width:150px;height:96px;right:14%;bottom:18%;border-color:rgba(85,217,255,.28);background:rgba(85,217,255,.07)}.wk-map-label{position:absolute;display:inline-flex;align-items:center;gap:.4rem;border:1px solid rgba(148,163,184,.18);border-radius:999px;padding:.36rem .62rem;background:rgba(5,14,25,.82);backdrop-filter:blur(10px);font-size:.72rem;font-weight:900;color:#dce9f6}.wk-map-label.narvik{left:23%;top:20%}.wk-map-label.ballangen{right:12%;bottom:16%}.wk-map-panel{position:absolute;left:1rem;right:1rem;bottom:1rem;display:grid;gap:.75rem;border:1px solid rgba(148,163,184,.16);border-radius:16px;background:rgba(5,14,25,.86);backdrop-filter:blur(14px);padding:1rem}.wk-map-panel h3{margin:0;font-size:1.15rem}.wk-map-panel p{margin:.3rem 0 0}.wk-map-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem}.wk-map-metric{border:1px solid rgba(148,163,184,.12);border-radius:12px;background:rgba(255,255,255,.035);padding:.6rem}.wk-map-metric span{display:block;color:var(--muted);font-size:.64rem;font-weight:950;letter-spacing:.07em;text-transform:uppercase}.wk-map-metric strong{display:block;margin-top:.2rem;font-size:.82rem}.wk-mini-map{border:1px solid var(--line);border-radius:18px;min-height:190px;background:linear-gradient(135deg,rgba(85,217,255,.08),transparent),repeating-linear-gradient(35deg,rgba(148,163,184,.08) 0 1px,transparent 1px 42px),#06111e;position:relative;overflow:hidden}.wk-mini-map:after{content:"Narvik operations map readiness";position:absolute;left:1rem;bottom:1rem;color:var(--muted);font-size:.78rem}.wk-pin{position:absolute;left:52%;top:42%;width:14px;height:14px;border-radius:999px;background:var(--green);box-shadow:0 0 0 10px rgba(var(--brand-rgb),.12),0 0 30px rgba(var(--brand-rgb),.45)}.wk-pin.is-empty{background:var(--amber);box-shadow:0 0 0 10px rgba(245,189,84,.12),0 0 30px rgba(245,189,84,.38)}.wk-quick-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem}.wk-quick-links .worker-btn{width:100%}
-    @media(max-width:1100px){.wk-dashboard{grid-template-columns:1fr}.wk-secondary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wk-status-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:720px){.wk-current{grid-template-columns:1fr}.wk-secondary-grid{grid-template-columns:1fr}.wk-status-grid{grid-template-columns:1fr 1fr}.wk-hero{border-radius:18px;padding:1rem}.wk-map-card{min-height:420px;border-radius:18px}.wk-map-metrics{grid-template-columns:1fr}.wk-quick-links{grid-template-columns:1fr 1fr}.wk-actions .worker-btn,.wk-actions form{width:100%}.wk-actions form .worker-btn{width:100%}}
+.wv2{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(340px,.72fr);gap:1rem}.wv2-main,.wv2-side{display:grid;gap:1rem}.wv2-hero{position:relative;overflow:hidden;border:1px solid rgba(148,163,184,.15);border-radius:28px;background:linear-gradient(145deg,rgba(9,23,39,.98),rgba(4,10,19,.98));box-shadow:0 30px 90px rgba(0,0,0,.34);padding:1rem}.wv2-map-frame{position:relative;min-height:620px;border-radius:24px;overflow:hidden;border:1px solid rgba(85,217,255,.2);background:#06111e}.wv2-map{position:absolute;inset:0;z-index:1}.leaflet-container{background:#06111e;color:#dce9f6}.leaflet-tile{filter:brightness(.62) saturate(.7) contrast(1.15) hue-rotate(165deg)}.wv2-map-overlay{position:absolute;z-index:5;inset:1rem;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between}.wv2-top{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.wv2-title{max-width:38rem;border:1px solid rgba(148,163,184,.16);background:linear-gradient(135deg,rgba(5,14,25,.88),rgba(8,24,39,.74));backdrop-filter:blur(16px);border-radius:20px;padding:1rem}.wv2-title h2{margin:.15rem 0;font-size:clamp(2.1rem,4vw,4rem);line-height:.95;letter-spacing:-.055em}.wv2-title p{margin:.45rem 0 0}.wv2-state{display:flex;align-items:center;gap:.5rem;border:1px solid rgba(var(--brand-rgb),.25);background:rgba(5,14,25,.82);backdrop-filter:blur(14px);border-radius:999px;padding:.55rem .75rem;font-weight:950;color:var(--green);box-shadow:0 10px 30px rgba(0,0,0,.22)}.wv2-bottom{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:end}.wv2-panel{pointer-events:auto;border:1px solid rgba(148,163,184,.16);background:rgba(5,14,25,.88);backdrop-filter:blur(18px);border-radius:22px;padding:1rem}.wv2-panel h3{margin:.25rem 0 0;font-size:1.2rem}.wv2-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin-top:.8rem}.wv2-metric{border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);border-radius:14px;padding:.7rem}.wv2-metric span,.wv2-card-kicker{display:block;color:var(--muted);font-size:.67rem;font-weight:950;text-transform:uppercase;letter-spacing:.08em}.wv2-metric strong{display:block;margin-top:.25rem}.wv2-card{border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,rgba(12,25,42,.92),rgba(5,13,24,.94));box-shadow:0 20px 62px rgba(0,0,0,.26);padding:1rem}.wv2-card h3{margin:.25rem 0 .35rem;font-size:1.28rem}.wv2-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}.wv2-action{min-height:76px;justify-content:flex-start}.wv2-step{display:grid;grid-template-columns:2rem 1fr;gap:.7rem;padding:.7rem;border:1px solid rgba(148,163,184,.11);border-radius:15px;margin-top:.5rem}.wv2-step i{display:grid;place-items:center;width:2rem;height:2rem;border-radius:999px;background:rgba(148,163,184,.09);font-style:normal;font-weight:950}.wv2-step.is-current{border-color:rgba(var(--brand-rgb),.35);background:rgba(var(--brand-rgb),.07)}.wv2-step.is-current i{background:rgba(var(--brand-rgb),.16);color:var(--green)}.wv2-swipe{position:relative;user-select:none;touch-action:none;overflow:hidden;border:1px solid rgba(var(--brand-rgb),.28);border-radius:999px;background:rgba(3,12,22,.9);height:64px;display:flex;align-items:center;padding:6px}.wv2-swipe.is-offline{border-color:rgba(251,113,133,.3)}.wv2-swipe-track{position:absolute;inset:0;display:grid;place-items:center;font-weight:950;color:#dce9f6;letter-spacing:.02em}.wv2-swipe-knob{position:relative;z-index:2;width:52px;height:52px;border-radius:999px;border:0;background:linear-gradient(135deg,var(--brand-a),var(--brand-b));color:#fff;font-size:1.2rem;font-weight:950;box-shadow:0 12px 34px rgba(var(--brand-rgb),.28);cursor:grab}.wv2-swipe.is-offline .wv2-swipe-knob{background:linear-gradient(135deg,#fb7185,#b91c1c)}.wv2-swipe-status{margin:.55rem 0 0;font-size:.82rem}.wv2-job-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem;margin:.8rem 0}.wv2-job-meta div{border:1px solid rgba(148,163,184,.1);border-radius:13px;padding:.6rem}.wv2-waiting{display:grid;place-items:center;text-align:center;min-height:210px;border:1px dashed rgba(148,163,184,.18);border-radius:18px;background:rgba(255,255,255,.025)}.wv2-live-btn{border-color:rgba(85,217,255,.35);background:rgba(85,217,255,.1)}.wv2-marker-worker,.wv2-marker-last,.wv2-marker-stop{display:grid;place-items:center;width:30px;height:30px;border-radius:999px;color:#03120d;font-weight:950}.wv2-marker-worker{background:var(--green);box-shadow:0 0 0 10px rgba(var(--brand-rgb),.18),0 0 34px rgba(var(--brand-rgb),.5)}.wv2-marker-last{background:#55d9ff}.wv2-marker-stop{background:#f5bd54}.wv2-zone-label{font-size:.76rem;font-weight:950;color:#dce9f6;text-shadow:0 2px 8px #000}.wv2-loading{position:absolute;z-index:20;inset:auto 1rem 1rem 1rem;border-radius:14px;background:rgba(5,14,25,.88);border:1px solid rgba(148,163,184,.16);padding:.7rem;color:var(--muted)}
+@media(max-width:1180px){.wv2{grid-template-columns:1fr}.wv2-map-frame{min-height:560px}.wv2-bottom{grid-template-columns:1fr}.wv2-side{grid-template-columns:repeat(2,minmax(0,1fr))}.wv2-side .wv2-card:first-child{grid-column:1/-1}}
+@media(max-width:720px){.wv2{gap:.75rem}.wv2-map-frame{min-height:calc(100dvh - 190px);border-radius:20px}.wv2-map-overlay{inset:.65rem}.wv2-title{padding:.75rem;border-radius:16px}.wv2-title h2{font-size:2.15rem}.wv2-top{display:grid}.wv2-bottom{align-items:stretch}.wv2-metrics{grid-template-columns:1fr}.wv2-side{grid-template-columns:1fr}.wv2-action-grid{grid-template-columns:1fr}.wv2-job-meta{grid-template-columns:1fr}.wv2-panel{padding:.75rem;border-radius:17px}.wv2-state{justify-self:start}.worker-content{padding:.6rem .55rem 6.2rem!important}}
 </style>
 @endpush
 
-<div class="wk-dashboard">
-    <div class="wk-section">
-        <section class="wk-hero" aria-labelledby="worker-dashboard-title">
-            <p class="worker-hero-eyebrow">Worker Cockpit · Wave 3A foundation</p>
-            <h2 id="worker-dashboard-title">Hei, {{ $firstName }}</h2>
-            <p class="muted" style="max-width:58rem;margin:.8rem 0 0">Your production cockpit shows only real operational data: readiness, current assignment, existing GPS status and payout readiness. No fake work, GPS, ETA or earnings are generated.</p>
-            <div class="wk-status-grid" aria-label="Worker status summary">
-                <article class="worker-card wk-stat"><span>Work mode</span><strong>{{ str($availabilityStatus)->replace('_',' ')->title() }}</strong></article>
-                <article class="worker-card wk-stat"><span>Assignments</span><strong>{{ $ordersCount }}</strong></article>
-                <article class="worker-card wk-stat"><span>GPS</span><strong>{{ $gpsState }}</strong></article>
-                <article class="worker-card wk-stat"><span>Ready earnings</span><strong>{{ number_format($readyAmount, 2) }} NOK</strong></article>
-            </div>
-        </section>
-
-        <section class="wk-map-card" aria-labelledby="map-preview-title">
-            <span class="wk-map-road one" aria-hidden="true"></span>
-            <span class="wk-map-road two" aria-hidden="true"></span>
-            <span class="wk-zone narvik" aria-hidden="true"></span>
-            <span class="wk-zone ballangen" aria-hidden="true"></span>
-            <span class="wk-map-label narvik">● Narvik pilot zone</span>
-            <span class="wk-map-label ballangen">● Ballangen context</span>
-            @if($lastPing)
-                <span class="wk-pin" aria-hidden="true" title="Latest real GPS ping exists"></span>
-            @else
-                <span class="wk-pin is-empty" aria-hidden="true" title="No real worker GPS ping yet"></span>
-            @endif
-            <div class="wk-map-panel">
-                <div>
-                    <p class="worker-hero-eyebrow">Map preview</p>
-                    <h3 id="map-preview-title">Narvik / Ballangen worker context</h3>
-                    <p class="muted">Live GPS appears only after explicit worker consent and real location pings. BiKuBe does not create fake GPS, fake assignments or fake ETA.</p>
-                </div>
-                <div class="wk-map-metrics" aria-label="GPS summary">
-                    <div class="wk-map-metric"><span>GPS state</span><strong>{{ $gpsState }}</strong></div>
-                    <div class="wk-map-metric"><span>Last ping</span><strong>{{ $gpsAgeLabel }}</strong></div>
-                    <div class="wk-map-metric"><span>Accuracy</span><strong>{{ $gpsAccuracyLabel }}</strong></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="worker-card" aria-labelledby="current-assignment-title">
-            @if($activeOrder)
-                <div class="wk-current">
-                    <div>
-                        <p class="worker-hero-eyebrow">Current assignment</p>
-                        <h3 id="current-assignment-title">{{ $activeOrder->order_number }}</h3>
-                        <p class="muted" style="margin:.35rem 0 0">{{ $activeOrder->scenario?->title ?? $activeOrder->service_scenario_key ?? 'Assigned service' }}</p>
-                        <div class="wk-current-meta">
-                            <span class="status-pill ok">{{ str($activeStatus)->replace('_',' ')->title() }}</span>
-                            <span class="status-pill {{ $gpsPill }}">GPS {{ $gpsState }}</span>
-                            @if($activeAssignment)<span class="status-pill warn">Assignment {{ str($activeAssignment->status)->replace('_',' ')->title() }}</span>@endif
-                        </div>
-                    </div>
-                    <a class="worker-btn is-primary" href="{{ route('worker.orders.show', $activeOrder) }}">Open assignment</a>
-                </div>
-            @else
-                <div class="wk-empty">
-                    <div>
-                        <span class="wk-empty-icon" aria-hidden="true">📦</span>
-                        <h3 id="current-assignment-title" style="margin:.2rem 0">No active assignment</h3>
-                        <p class="muted" style="max-width:34rem;margin:.4rem auto 1rem">Stay online to receive real dispatches. Assignments appear here only when BiKuBe operations assigns work to you.</p>
-                        <div class="wk-actions" style="justify-content:center">
-                            <a class="worker-btn" href="{{ route('worker.orders.index') }}">View orders</a>
-                            <a class="worker-btn" href="{{ route('worker.support.index') }}">Contact support</a>
-                        </div>
-                    </div>
-                </div>
-            @endif
-        </section>
-
-        <section class="worker-card" aria-labelledby="worker-quick-links-title">
-            <p class="worker-hero-eyebrow">Quick actions</p>
-            <h3 id="worker-quick-links-title" style="margin:.35rem 0 1rem">Open the right worker area</h3>
-            <div class="wk-quick-links">
-                <a class="worker-btn" href="{{ route('worker.orders.index') }}">Orders</a>
-                <a class="worker-btn" href="{{ route('worker.wallet.index') }}">Wallet</a>
-                <a class="worker-btn" href="{{ route('worker.support.index') }}">Support</a>
-                <a class="worker-btn" href="{{ route('worker.notifications.index') }}">Notifications</a>
-            </div>
-        </section>
-
-        <section class="wk-secondary-grid" aria-label="Operational summary cards">
-            <article class="worker-card">
-                <p class="worker-hero-eyebrow">Today</p>
-                <h3 style="margin:.35rem 0 0">{{ number_format($todayAmount, 2) }} NOK</h3>
-                <p class="muted" style="margin:.3rem 0 0">{{ $todayEntries->count() }} real settlement entries today.</p>
-            </article>
-            <article class="worker-card">
-                <p class="worker-hero-eyebrow">Payout status</p>
-                <h3 style="margin:.35rem 0 0">{{ $payoutReady ? 'Ready' : 'Needs review' }}</h3>
-                <p class="muted" style="margin:.3rem 0 0">{{ $blockedCount }} blocked settlement entries.</p>
-            </article>
-            <article class="worker-card">
-                <p class="worker-hero-eyebrow">Support</p>
-                <h3 style="margin:.35rem 0 0">Help reachable</h3>
-                <p class="muted" style="margin:.3rem 0 0">Use support for assignment, GPS, payout or safety issues.</p>
-            </article>
-        </section>
-    </div>
-
-    <aside class="wk-section" aria-label="Readiness and status panel">
-        <section class="worker-card" aria-labelledby="readiness-title">
-            <div style="display:flex;justify-content:space-between;gap:1rem;align-items:flex-start">
-                <div>
-                    <p class="worker-hero-eyebrow">Ready to work?</p>
-                    <h3 id="readiness-title" style="margin:.35rem 0 0">{{ $profileApproved && $online ? 'Operational' : 'Action needed' }}</h3>
-                </div>
-                <span class="status-pill {{ $profileApproved && $online ? 'ok' : 'warn' }}">{{ $online ? 'Online' : 'Offline' }}</span>
-            </div>
-            <div class="wk-readiness-list" style="margin-top:.75rem">
-                @foreach($readiness as $item)
-                    <div class="wk-readiness-row">
-                        <span class="wk-dot {{ $item['ok'] ? 'ok' : 'warn' }}">{{ $item['ok'] ? '✓' : '!' }}</span>
-                        <div><strong>{{ $item['label'] }}</strong><br><span class="muted">{{ $item['detail'] }}</span></div>
-                    </div>
-                @endforeach
-            </div>
-            <div class="wk-actions" style="margin-top:1rem">
-                @if($online)
-                    <form method="POST" action="{{ route('worker.presence.offline') }}">@csrf<button class="worker-btn is-danger" type="submit">Go offline</button></form>
-                @else
-                    <form method="POST" action="{{ route('worker.presence.online') }}">@csrf<button class="worker-btn is-primary" type="submit" @disabled(! $profileApproved)>Go online</button></form>
-                @endif
-                <a class="worker-btn" href="{{ route('worker.profile.index') }}">Profile</a>
-            </div>
-            @unless($profileApproved)
-                <p class="muted" style="margin:.8rem 0 0;font-size:.85rem">Online mode is disabled until the worker profile is approved.</p>
-            @endunless
-        </section>
-
-        <section class="worker-card" aria-labelledby="gps-title">
-            <p class="worker-hero-eyebrow">GPS readiness</p>
-            <h3 id="gps-title" style="margin:.35rem 0 0">{{ $gpsState }}</h3>
-            <div class="wk-mini-map" aria-label="GPS readiness map placeholder"><span class="wk-pin" aria-hidden="true"></span></div>
-            <div class="kv"><span class="muted">Last ping</span><strong>{{ $gpsAgeLabel }}</strong></div>
-            <div class="kv"><span class="muted">Accuracy</span><strong>{{ $gpsAccuracyLabel }}</strong></div>
-            <div class="kv"><span class="muted">Stale after</span><strong>{{ $staleSeconds }} seconds</strong></div>
-            <p class="muted" style="margin:.85rem 0 0;font-size:.85rem">Map preview uses existing data only. Live GPS appears only after explicit worker consent and real location pings; this dashboard does not start tracking.</p>
-        </section>
-
-        <section class="worker-card" aria-labelledby="payout-title">
-            <p class="worker-hero-eyebrow">Payout readiness</p>
-            <h3 id="payout-title" style="margin:.35rem 0 0">{{ $payoutReady ? 'Ready for review' : 'Manual review required' }}</h3>
-            <div class="kv"><span class="muted">Ready amount</span><strong>{{ number_format($readyAmount, 2) }} NOK</strong></div>
-            <div class="kv"><span class="muted">Paid amount</span><strong>{{ number_format($paidAmount, 2) }} NOK</strong></div>
-            <div class="kv"><span class="muted">Blocked entries</span><strong>{{ $blockedCount }}</strong></div>
-            @if($payoutBlockers->isNotEmpty())
-                <div style="margin-top:.8rem;padding:.75rem;border:1px solid rgba(245,189,84,.28);border-radius:12px;background:rgba(72,50,10,.45)">
-                    <strong style="color:var(--amber)">Blockers</strong>
-                    <ul class="muted" style="margin:.45rem 0 0;padding-left:1.2rem;font-size:.85rem">
-                        @foreach($payoutBlockers as $blocker)<li>{{ $blocker }}</li>@endforeach
-                    </ul>
-                </div>
-            @endif
-            <div class="wk-actions" style="margin-top:1rem"><a class="worker-btn" href="{{ route('worker.wallet.index') }}">Open wallet</a></div>
-        </section>
-    </aside>
+<div class="wv2" data-dashboard-v2>
+  <main class="wv2-main">
+    @include('worker.dashboard.live-map')
+  </main>
+  <aside class="wv2-side">
+    @include('worker.dashboard.swipe-presence')
+    @include('worker.dashboard.state-machine-panel')
+    @include('worker.dashboard.active-job-card')
+    @include('worker.dashboard.readiness-panel')
+    @include('worker.dashboard.quick-actions')
+  </aside>
 </div>
 
-<noscript>
-    <div class="worker-alert worker-error" role="alert" style="margin-top:1rem">JavaScript is disabled. The cockpit still shows server-rendered readiness, but future interactive GPS/PWA features require browser JavaScript.</div>
-</noscript>
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(function(){
+ const cfg=@json($mapPayload), csrf=cfg.csrf;
+ const el=document.getElementById('worker-live-map'); if(!el || !window.L) return;
+ const map=L.map(el,{zoomControl:false,attributionControl:false}).setView(cfg.center,cfg.zoom||11);
+ L.control.zoom({position:'bottomright'}).addTo(map); L.control.attribution({prefix:false,position:'bottomleft'}).addTo(map);
+ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+ const narvik=[[68.54,17.18],[68.49,17.62],[68.35,17.69],[68.31,17.25]];
+ const ballangen=[[68.41,16.75],[68.35,17.05],[68.22,16.98],[68.26,16.68]];
+ L.polygon(narvik,{color:'#34e69a',weight:2,fillColor:'#34e69a',fillOpacity:.09,dashArray:'8 8'}).addTo(map);
+ L.polygon(ballangen,{color:'#55d9ff',weight:2,fillColor:'#55d9ff',fillOpacity:.08,dashArray:'8 8'}).addTo(map);
+ L.marker([68.4385,17.4272],{interactive:false,icon:L.divIcon({className:'wv2-zone-label',html:'Narvik / Ballangen work zone'})}).addTo(map);
+ const icon=(cls,txt)=>L.divIcon({className:'',html:'<span class="'+cls+'">'+txt+'</span>',iconSize:[30,30],iconAnchor:[15,15]});
+ let bounds=[];
+ function addMarker(point, cls, txt, popup){ if(!point) return; const m=L.marker([point.lat,point.lng],{icon:icon(cls,txt)}).addTo(map).bindPopup(popup); bounds.push([point.lat,point.lng]); return m; }
+ addMarker(cfg.lastPing,'wv2-marker-last','●','Last real GPS ping: '+(cfg.lastPing?.label||''));
+ addMarker(cfg.pickup,'wv2-marker-stop','P','Pickup marker from real coordinates');
+ addMarker(cfg.dropoff,'wv2-marker-stop','D','Drop-off marker from real coordinates');
+ if(bounds.length){ map.fitBounds(bounds,{padding:[80,80],maxZoom:14}); }
+ const status=document.getElementById('wv2-gps-status'), locate=document.getElementById('wv2-locate');
+ locate?.addEventListener('click',()=>{
+   if(!cfg.online){ status.textContent='Go online before sharing location.'; return; }
+   if(!window.isSecureContext){ status.textContent='Secure context required for browser GPS.'; return; }
+   if(!navigator.geolocation){ status.textContent='Browser geolocation unavailable.'; return; }
+   status.textContent='Requesting browser permission…';
+   navigator.geolocation.getCurrentPosition(async pos=>{
+     const p={lat:pos.coords.latitude,lng:pos.coords.longitude};
+     addMarker(p,'wv2-marker-worker','W','Current position from explicit browser permission'); map.setView([p.lat,p.lng],14);
+     try{
+       status.textContent='Sending one real GPS ping…';
+       const res=await fetch(cfg.pingUrl,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf,'Accept':'application/json'},body:JSON.stringify({order_id:cfg.orderId,latitude:p.lat,longitude:p.lng,accuracy_meters:pos.coords.accuracy,heading:pos.coords.heading,speed_mps:pos.coords.speed,captured_at:new Date(pos.timestamp).toISOString(),consent:true})});
+       const data=await res.json();
+       status.textContent=res.ok?'Current position shared. No background GPS is active.':'GPS rejected: '+Object.values(data.errors||{error:data.message||'server rejected ping'}).flat().join(' ');
+     }catch(e){ status.textContent='GPS request failed while contacting server.'; }
+   }, err=>{ status.textContent=err.code===1?'Location permission denied.':'GPS failed: '+err.message; }, {enableHighAccuracy:true,timeout:15000,maximumAge:0});
+ });
+ document.querySelectorAll('[data-swipe-presence]').forEach(root=>{
+   const knob=root.querySelector('.wv2-swipe-knob'), form=document.getElementById(root.dataset.form), label=root.querySelector('.wv2-swipe-track'); let dragging=false,start=0,x=0,max=0;
+   function set(v){x=Math.max(0,Math.min(v,max)); knob.style.transform='translateX('+x+'px)';}
+   function reset(){set(0)}
+   knob.addEventListener('pointerdown',e=>{dragging=true;start=e.clientX;max=root.clientWidth-knob.clientWidth-12;knob.setPointerCapture(e.pointerId);});
+   knob.addEventListener('pointermove',e=>{if(!dragging)return;set(e.clientX-start);});
+   knob.addEventListener('pointerup',()=>{if(!dragging)return;dragging=false;if(x>max*.72){label.textContent='Submitting…'; form?.submit();}else reset();});
+   knob.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault(); form?.submit();}});
+ });
+})();
+</script>
+@endpush
 @endsection

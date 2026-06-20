@@ -156,7 +156,7 @@ class WorkerCockpitController extends Controller
             $q->where('assigned_user_id', $request->user()->id)
               ->whereIn('status', ['assigned', 'accepted']);
         })
-        ->with(['scenario', 'priceQuotes', 'dispatchEvents', 'dispatchAssignments'])
+        ->with(['scenario', 'priceQuotes', 'dispatchEvents', 'dispatchAssignments', 'events', 'completionProofs'])
         ->latest('submitted_at')
         ->get();
     }
