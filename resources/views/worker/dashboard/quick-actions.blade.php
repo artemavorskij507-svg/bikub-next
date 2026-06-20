@@ -1,10 +1,6 @@
-<section class="wv2-card" aria-labelledby="quick-actions-title">
-  <p class="wv2-card-kicker">Quick actions</p>
-  <h3 id="quick-actions-title">Worker tools</h3>
-  <div class="wv2-action-grid">
-    <a class="worker-btn wv2-action" href="{{ route('worker.orders.index') }}">📦 Orders</a>
-    <a class="worker-btn wv2-action" href="{{ route('worker.schedule.index') }}">🗓 Schedule</a>
-    <a class="worker-btn wv2-action" href="{{ route('worker.support.index') }}">🛟 Support</a>
-    <a class="worker-btn wv2-action" href="{{ route('worker.notifications.index') }}">🔔 Notifications</a>
-  </div>
+<section class="wv2-floating" aria-labelledby="quick-actions-title">
+  <p class="wv2-card-kicker">Map tools</p>
+  <h3 id="quick-actions-title">Position</h3>
+  <button id="wv2-locate" class="worker-btn wv2-live-btn" type="button">Share current position</button>
+  <p id="wv2-gps-status" class="wv2-action-note">One real ping only. HTTPS is required for browser GPS permission.</p>
 </section>

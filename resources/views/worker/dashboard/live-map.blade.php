@@ -1,31 +1,38 @@
-<section class="wv2-hero" aria-labelledby="dashboard-v2-title">
-  <div class="wv2-map-frame">
-    <div id="worker-live-map" class="wv2-map" role="application" aria-label="Interactive Narvik and Ballangen worker map"></div>
-    <div class="wv2-map-overlay">
-      <div class="wv2-top">
-        <div class="wv2-title">
-          <p class="worker-hero-eyebrow">BiKuBe Worker Cockpit · Dashboard V2</p>
-          <h2 id="dashboard-v2-title">{{ $uiState }}</h2>
-          @if($uiState === 'Waiting')<div class="wv2-waiting-primary">You are online and waiting for assignment.</div>@else<p class="muted">Real map, real worker state, real GPS only. No fake ETA, no fake route, no fake orders.</p>@endif
-        </div>
-        <div class="wv2-state"><span class="worker-chip-dot"></span>{{ $online ? 'Online' : 'Offline' }}</div>
-      </div>
-      <div class="wv2-bottom">
-        <div class="wv2-panel is-map-status">
-          <p class="worker-hero-eyebrow">Live operations map</p>
-          <h3>Narvik / Ballangen working zone</h3>
-          <p class="muted">Keep app open. Share current position only if operations requests it.</p>
-          <div class="wv2-metrics">
-            <div class="wv2-metric"><span>GPS state</span><strong>{{ $gpsState }}</strong></div>
-            <div class="wv2-metric"><span>Last ping</span><strong>{{ $gpsAgeLabel }}</strong></div>
-            <div class="wv2-metric"><span>Accuracy</span><strong>{{ $gpsAccuracyLabel }}</strong></div>
-          </div>
-        </div>
-        <div class="wv2-panel is-map-action">
-          <button id="wv2-locate" class="worker-btn wv2-live-btn" type="button">Share current position</button>
-          <p id="wv2-gps-status" class="muted" style="margin:.55rem 0 0;max-width:22rem">One-time GPS only. No watchPosition and no background GPS.</p>
-        </div>
-      </div>
+<section class="wv2-map-stage" aria-labelledby="dashboard-v2-title">
+  <div id="worker-live-map" class="wv2-map" role="application" aria-label="Interactive Narvik and Ballangen worker map"></div>
+  <div class="wv2-map-vignette" aria-hidden="true"></div>
+  <header class="wv2-appbar" aria-label="Worker app bar">
+    <a class="wv2-brand" href="{{ route('worker.dashboard') }}">
+      <span class="wv2-logo">B</span><span><strong>BiKuBe Worker</strong><span>Courier cockpit</span></span>
+    </a>
+    <nav class="wv2-nav" aria-label="Worker primary navigation">
+      <a class="is-active" href="{{ route('worker.dashboard') }}">🏠 <span>Dashboard</span></a>
+      <a href="{{ route('worker.orders.index') }}">📦 <span>Orders</span></a>
+      <a href="{{ route('worker.schedule.index') }}">🗓 <span>Schedule</span></a>
+      <a href="{{ route('worker.wallet.index') }}">💳 <span>Wallet</span></a>
+      <a href="{{ route('worker.support.index') }}">🛟 <span>Help</span></a>
+    </nav>
+    <div class="wv2-presence"><span class="wv2-presence-dot"></span>{{ $online ? 'Online' : 'Offline' }}</div>
+  </header>
+  <section class="wv2-focus" aria-labelledby="dashboard-v2-title">
+    <div class="wv2-focus-card">
+      <p class="wv2-kicker">{{ $activeOrder ? 'Active assignment' : 'Pilot zone · Narvik / Ballangen' }}</p>
+      <h2 id="dashboard-v2-title">{{ $uiState }}</h2>
+      @if($uiState === 'Waiting')
+        <div class="wv2-primary">You are online and waiting for assignment.</div>
+        <p class="wv2-sub">Keep app open. Share current position only if operations requests it.</p>
+      @elseif($uiState === 'Offline')
+        <div class="wv2-primary">Swipe online when you are ready for work.</div>
+      @else
+        <div class="wv2-primary">Follow the active job steps. Use Current Job for execution.</div>
+      @endif
     </div>
-  </div>
+  </section>
+  <nav class="wv2-mobile-nav" aria-label="Worker bottom navigation">
+    <a class="is-active" href="{{ route('worker.dashboard') }}">🏠<span>Home</span></a>
+    <a href="{{ route('worker.orders.index') }}">📦<span>Orders</span></a>
+    <a href="{{ route('worker.wallet.index') }}">💳<span>Wallet</span></a>
+    <a href="{{ route('worker.support.index') }}">🛟<span>Help</span></a>
+    <a href="{{ route('worker.profile.index') }}">👤<span>More</span></a>
+  </nav>
 </section>
