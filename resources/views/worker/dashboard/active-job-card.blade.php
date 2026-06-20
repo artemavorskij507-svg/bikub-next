@@ -11,7 +11,7 @@
     </div>
     <a class="worker-btn is-primary" href="{{ route('worker.orders.show', $activeOrder) }}">Open Current Job</a>
   @else
-    <h3 id="active-job-title">Waiting for real assignment</h3>
-    <div class="wv2-waiting"><div><strong>No active order</strong><p class="muted">Stay online. BiKuBe will show an assignment here only when operations assigns real work.</p></div></div>
+    <h3 id="active-job-title">Waiting mode</h3>
+    <div class="wv2-waiting"><div><strong>No active assignment</strong><p class="muted">You are online. Keep the cockpit open; real work appears here when dispatch assigns it.</p></div></div>
   @endif
 </section>
