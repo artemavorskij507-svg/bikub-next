@@ -7,6 +7,6 @@
   @else
     <p class="wv2-kicker">{{ $online ? 'Waiting mode' : 'Ready check' }}</p>
     <h3 id="active-job-title">No active assignment</h3>
-    <p>{{ $online ? 'You are online. Real assignments appear here from dispatch.' : 'Swipe online to become visible to dispatch.' }}</p>
+    <p>{{ $online ? 'You are online and waiting for assignment.' : 'Swipe online when ready for work.' }}</p>
   @endif
 </section>

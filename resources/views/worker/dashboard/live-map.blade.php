@@ -19,7 +19,7 @@
     <h2 id="dashboard-v2-title">{{ $uiState }}</h2>
     <div class="wv2-primary">{{ $online ? 'You are online and waiting for assignment.' : 'Swipe online when ready for work.' }}</div>
   </section>
-  <div class="wv2-status-pill wv2-glass"><span>{{ $gpsState }}</span><b>{{ $gpsAgeLabel }}</b></div>
+  <div class="wv2-status-pill wv2-glass"><span>{{ $online ? 'Online' : 'Offline' }}</span><b>{{ $gpsState }}</b></div>
   <nav class="wv2-mobile-nav wv2-glass" aria-label="Worker bottom navigation">
     <a class="is-active" href="{{ route('worker.dashboard') }}">🏠<span>Home</span></a>
     <a href="{{ route('worker.orders.index') }}">📦<span>Orders</span></a>
