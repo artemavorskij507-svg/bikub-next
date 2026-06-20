@@ -12,7 +12,7 @@
     <div class="wv2-waiting-empty">
       <p class="wv2-card-kicker">Waiting mode</p>
       <strong id="active-job-title">No active assignment</strong>
-      <p class="muted">Stay online and wait for assignment. No fake dispatches are shown.</p>
+      <p class="muted">{{ $online ? 'You are online and waiting for assignment.' : 'Swipe online when ready for work.' }} No fake dispatches are shown.</p>
     </div>
   @endif
 </section>

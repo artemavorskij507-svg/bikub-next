@@ -22,7 +22,7 @@
         <div class="wv2-primary">You are online and waiting for assignment.</div>
         <p class="wv2-sub">Keep app open. Share current position only if operations requests it.</p>
       @elseif($uiState === 'Offline')
-        <div class="wv2-primary">Swipe online when you are ready for work.</div>
+        <div class="wv2-primary">Swipe online when ready for work.</div>
       @else
         <div class="wv2-primary">Follow the active job steps. Use Current Job for execution.</div>
       @endif
