@@ -1,0 +1,5 @@
+<section class="cj-card" id="gps-panel"><p class="worker-hero-eyebrow">GPS Control Panel</p><h2>Manual location sharing</h2>
+<div class="cj-grid3"><div><span>Permission</span><strong id="gps-permission">Not requested</strong></div><div><span>Last real ping</span><strong id="gps-last">{{ $lastPing?->captured_at?->diffForHumans() ?? 'No ping for this job' }}</strong></div><div><span>Accuracy</span><strong id="gps-accuracy">{{ $lastPing?->accuracy_meters ? number_format((float)$lastPing->accuracy_meters,0).' m' : 'Unavailable' }}</strong></div></div>
+<p class="muted">Manual only. “Share current location” and “Refresh location” send one real GPS ping after browser permission. Start Live Tracking / Stop Live Tracking are reserved for Wave 3C.</p>
+<div class="actions"><button class="worker-btn is-primary" id="gps-share" type="button">Share current location</button><button class="worker-btn" id="gps-refresh" type="button">Refresh location</button></div>
+<p class="muted" id="gps-sync">Sync status: idle. No background tracking is active.</p></section>

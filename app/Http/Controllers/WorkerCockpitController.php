@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\{Order, WorkerLocationPing};
 use App\Services\Workers\{WorkerAvailabilityService, WorkerLocationService, WorkerOrderWorkflowService};
+use App\Services\Orders\OrderCompletionService;
 use App\Services\Finance\{WorkerSettlementService, WorkerPayoutProfileService};
 use App\Settings\MapSettings;
 use Illuminate\Http\Request;
@@ -60,13 +61,19 @@ class WorkerCockpitController extends Controller
         return view('worker.orders.index', ['orders' => $this->orders($request)]);
     }
 
-    public function show(Request $request, Order $order, WorkerOrderWorkflowService $workflow)
+    public function show(Request $request, Order $order, WorkerOrderWorkflowService $workflow, OrderCompletionService $completion)
     {
         $workflow->assertOwnership($request->user(), $order);
+        $order->load(['scenario', 'events', 'dispatchEvents', 'priceQuotes', 'completionProofs.events', 'dispatchAssignments']);
+        $proofEligibility = $completion->canSubmitProof($order, $request->user());
+
         return view('worker.orders.show', [
-            'order'      => $order->load(['scenario', 'events', 'dispatchEvents', 'priceQuotes', 'completionProofs.events']),
-            'lastPing'   => WorkerLocationPing::where('user_id', $request->user()->id)->where('order_id', $order->id)->latest()->first(),
-            'nextAction' => $workflow->nextAction($order),
+            'order'            => $order,
+            'activeAssignment' => $order->activeDispatchAssignment(),
+            'lastPing'         => WorkerLocationPing::where('user_id', $request->user()->id)->where('order_id', $order->id)->latest()->first(),
+            'nextAction'       => $workflow->nextAction($order),
+            'executionState'   => $workflow->executionState($request->user(), $order, $proofEligibility),
+            'proofEligibility' => $proofEligibility,
         ]);
     }
 

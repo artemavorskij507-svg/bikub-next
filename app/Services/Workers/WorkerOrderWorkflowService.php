@@ -25,6 +25,35 @@ class WorkerOrderWorkflowService
         $this->transition($worker, $order, 'worker.completed', OrderStatus::Completed);
     }
 
+
+    public function executionState(User $worker, Order $order, array $proofEligibility = []): array
+    {
+        $this->assertOwnership($worker, $order);
+
+        $events = $order->events()->pluck('event_type')->all();
+        $has = fn (string $event): bool => in_array($event, $events, true);
+        $status = $order->status;
+
+        $steps = [
+            ['key' => 'accept', 'label' => 'Accept assignment', 'event' => 'worker.accepted', 'route' => 'worker.orders.accept', 'complete' => $status !== OrderStatus::Submitted, 'available' => $status === OrderStatus::Submitted, 'reason' => $status === OrderStatus::Submitted ? null : 'Assignment is already accepted or no longer awaiting acceptance.'],
+            ['key' => 'start', 'label' => 'Start job', 'event' => 'worker.started', 'route' => 'worker.orders.start', 'complete' => $status === OrderStatus::InProgress || $has('worker.started'), 'available' => $status === OrderStatus::Accepted, 'reason' => $status === OrderStatus::Accepted ? null : 'Accept the assignment before starting the job.'],
+            ['key' => 'arrived-pickup', 'label' => 'Arrived at pickup', 'event' => 'worker.arrived_pickup', 'route' => 'worker.orders.arrived-pickup', 'complete' => $has('worker.arrived_pickup'), 'available' => $status === OrderStatus::InProgress && $has('worker.started') && ! $has('worker.arrived_pickup'), 'reason' => $has('worker.started') ? 'Pickup arrival is already recorded or the job is not in progress.' : 'Start the job before recording pickup arrival.'],
+            ['key' => 'picked-up', 'label' => 'Confirm pickup', 'event' => 'worker.picked_up', 'route' => 'worker.orders.picked-up', 'complete' => $has('worker.picked_up'), 'available' => $status === OrderStatus::InProgress && $has('worker.arrived_pickup') && ! $has('worker.picked_up'), 'reason' => $has('worker.arrived_pickup') ? 'Pickup is already confirmed or the job is not in progress.' : 'Record arrival at pickup first.'],
+            ['key' => 'arrived-dropoff', 'label' => 'Arrived at drop-off', 'event' => 'worker.arrived_dropoff', 'route' => 'worker.orders.arrived-dropoff', 'complete' => $has('worker.arrived_dropoff'), 'available' => $status === OrderStatus::InProgress && $has('worker.picked_up') && ! $has('worker.arrived_dropoff'), 'reason' => $has('worker.picked_up') ? 'Drop-off arrival is already recorded or the job is not in progress.' : 'Confirm pickup before recording drop-off arrival.'],
+            ['key' => 'completion-proof', 'label' => 'Submit completion proof', 'event' => 'completion_proof.submitted', 'route' => 'worker.orders.completion-proof.submit', 'complete' => (bool) ($proofEligibility['submitted'] ?? false), 'available' => (bool) ($proofEligibility['allowed'] ?? false), 'reason' => $proofEligibility['reason'] ?? 'Complete the delivery steps before submitting proof.'],
+        ];
+
+        $next = collect($steps)->first(fn ($step) => $step['available'])
+            ?? collect($steps)->first(fn ($step) => ! $step['complete']);
+
+        return [
+            'steps' => $steps,
+            'next_action' => $next,
+            'events' => $events,
+            'assignment' => $order->activeDispatchAssignment(),
+        ];
+    }
+
     public function nextAction(Order $order): ?array
     {
         return match ($order->status) {

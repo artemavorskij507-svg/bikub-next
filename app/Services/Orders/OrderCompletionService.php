@@ -13,9 +13,21 @@ class OrderCompletionService
     {
         $assigned = $order->dispatchAssignments()->where('assigned_user_id', $worker->id)->whereIn('status', ['assigned', 'accepted'])->exists();
         $duplicate = $order->completionProofs()->whereIn('status', ['submitted', 'accepted'])->exists();
-        $allowed = $assigned && $order->status->value === 'in_progress' && ! $duplicate;
+        $arrivedDropoff = $order->events()->where('event_type', 'worker.arrived_dropoff')->exists();
+        $submitted = $order->completionProofs()->whereIn('status', ['submitted', 'accepted', 'disputed'])->exists();
+        $allowed = $assigned && $order->status->value === 'in_progress' && $arrivedDropoff && ! $duplicate;
 
-        return ['allowed' => $allowed, 'reason' => ! $assigned ? 'Worker is not assigned to this order.' : ($order->status->value !== 'in_progress' ? 'Order is not in progress.' : ($duplicate ? 'An active completion proof already exists.' : null))];
+        return [
+            'allowed' => $allowed,
+            'submitted' => $submitted,
+            'reason' => ! $assigned
+                ? 'Worker is not assigned to this order.'
+                : ($order->status->value !== 'in_progress'
+                    ? 'Order is not in progress.'
+                    : (! $arrivedDropoff
+                        ? 'Arrive at drop-off before submitting completion proof.'
+                        : ($duplicate ? 'An active completion proof already exists.' : null))),
+        ];
     }
 
     public function submitProof(Order $order, User $worker, array $data): OrderCompletionProof
