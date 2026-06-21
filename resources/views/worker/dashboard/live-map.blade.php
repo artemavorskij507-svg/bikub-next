@@ -17,7 +17,13 @@
   <section class="wv2-state-card wv2-glass" aria-labelledby="dashboard-v2-title">
     <p class="wv2-kicker">Pilot zone · Narvik / Ballangen</p>
     <h2 id="dashboard-v2-title">{{ $uiState }}</h2>
-    <div class="wv2-primary">{{ $online ? 'You are online and waiting for assignment.' : 'Swipe online when ready for work.' }}</div>
+    <div class="wv2-primary">
+      @if($activeOrder)
+        {{ $activeOrder->order_number }} · {{ $activeOrder->scenario?->title ?? $activeOrder->service_scenario_key ?? 'Assigned service' }}
+      @else
+        {{ $online ? 'You are online and waiting for assignment.' : 'Swipe online when ready for work.' }}
+      @endif
+    </div>
   </section>
   <div class="wv2-status-pill wv2-glass"><span>{{ $online ? 'Online' : 'Offline' }}</span><b>{{ $gpsState }}</b></div>
   <nav class="wv2-mobile-nav wv2-glass" aria-label="Worker bottom navigation">
