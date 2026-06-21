@@ -6,28 +6,29 @@
     $profile = $user->workerProfile;
     $availability = $user->workerAvailability;
     $capabilityRows = [
-        ['🛒','Grocery delivery from stores',(bool)($profile?->can_deliver),'Uses real can_deliver capability'],
-        ['🍔','Ready food delivery',(bool)($profile?->can_deliver),'Uses real can_deliver capability'],
-        ['🏗','Bulky / construction materials',(bool)($profile?->can_move),'Not configured until worker is approved for moving'],
-        ['🤝','Personal errands / assistant',(bool)($profile?->can_run_errands),'Not configured until worker is approved for errands'],
-        ['📍','Narvik / Ballangen pilot zone',($profile?->status === 'approved'),'Available after worker approval'],
+        ['🛒','Grocery delivery from stores',(bool)($profile?->can_deliver),'active/configured','not configured yet'],
+        ['🍔','Ready food delivery',(bool)($profile?->can_deliver),'active/configured','not configured yet'],
+        ['🏗','Bulky / construction materials',(bool)($profile?->can_move),'active/configured','partner approval needed'],
+        ['🤝','Personal errands / assistant',(bool)($profile?->can_run_errands),'active/configured','not configured yet'],
+        ['🛠','GLF ByGG simple tasks',false,'active/configured','partner approval + legal/accounting check needed'],
+        ['📍','Narvik / Ballangen pilot zone',($profile?->status === 'approved'),'active/configured','approval needed'],
     ];
 @endphp
 <style>
 .lk-profile-hero{display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:end;border:1px solid rgba(var(--brand-rgb),.2);border-radius:24px;background:radial-gradient(circle at 14% 10%,rgba(var(--brand-rgb),.16),transparent 34%),var(--panel);padding:1.1rem;margin-bottom:1rem;box-shadow:0 22px 60px rgba(0,0,0,.22)}
-.lk-avatar{width:64px;height:64px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand-a),var(--brand-b));color:#04120d;font-weight:950;font-size:1.35rem}.lk-service-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.55rem;margin-bottom:1rem}.lk-service-card{border:1px solid var(--line);border-radius:16px;background:var(--panel2);padding:.75rem;min-height:96px}.lk-service-card.is-on{border-color:rgba(var(--brand-rgb),.28);background:rgba(var(--brand-rgb),.08)}.lk-service-card strong{display:block;font-size:.82rem;line-height:1.15}.lk-service-card span{display:block;color:var(--muted);font-size:.7rem;margin-top:.35rem;line-height:1.25}@media(max-width:920px){.lk-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lk-profile-hero{grid-template-columns:1fr}}@media(max-width:520px){.lk-service-grid{grid-template-columns:1fr}}
+.lk-avatar{width:64px;height:64px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand-a),var(--brand-b));color:#04120d;font-weight:950;font-size:1.35rem}.lk-service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-bottom:1rem}.lk-service-card{border:1px solid var(--line);border-radius:16px;background:var(--panel2);padding:.75rem;min-height:96px}.lk-service-card.is-on{border-color:rgba(var(--brand-rgb),.28);background:rgba(var(--brand-rgb),.08)}.lk-service-card strong{display:block;font-size:.82rem;line-height:1.15}.lk-service-card span{display:block;color:var(--muted);font-size:.7rem;margin-top:.35rem;line-height:1.25}@media(max-width:920px){.lk-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lk-profile-hero{grid-template-columns:1fr}}@media(max-width:520px){.lk-service-grid{grid-template-columns:1fr}}
 </style>
 <section class="lk-profile-hero" aria-label="Worker readiness profile">
   <div>
     <p class="worker-hero-eyebrow">Worker readiness</p>
     <h1 style="margin:.25rem 0;font-size:clamp(1.8rem,7vw,3rem);line-height:.95">{{ $profile?->display_name ?? $user->name }}</h1>
-    <p class="muted" style="margin:0">{{ ucfirst($profile?->status ?? 'profile missing') }} · {{ $availability?->status ?? 'offline' }} · service capabilities from real worker profile.</p>
+    <p class="muted" style="margin:0">{{ ucfirst($profile?->status ?? 'profile missing') }} · {{ $availability?->status ?? 'offline' }} · BiKuBe V1 services · real worker capability state.</p>
   </div>
   <div class="lk-avatar" aria-hidden="true">{{ Str::upper(Str::substr($profile?->display_name ?? $user->name ?? 'W',0,1)) }}</div>
 </section>
 <section class="lk-service-grid" aria-label="Service capabilities">
  @foreach($capabilityRows as $row)
-  <article class="lk-service-card {{ $row[2] ? 'is-on' : '' }}"><strong>{{ $row[0] }} {{ $row[1] }}</strong><span>{{ $row[2] ? 'Configured' : $row[3] }}</span></article>
+  <article class="lk-service-card {{ $row[2] ? 'is-on' : '' }}"><strong>{{ $row[0] }} {{ $row[1] }}</strong><span>{{ $row[2] ? $row[3] : $row[4] }}</span></article>
  @endforeach
 </section>
 

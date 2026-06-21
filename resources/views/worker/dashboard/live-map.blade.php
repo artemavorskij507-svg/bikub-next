@@ -3,7 +3,7 @@
   <div class="wv2-vignette" aria-hidden="true"></div>
   <header class="wv2-appbar" aria-label="Worker app bar">
     <a class="wv2-brand wv2-glass" href="{{ route('worker.dashboard') }}">
-      <span class="wv2-logo">B</span><span><strong>BiKuBe Worker</strong><small>Courier cockpit</small></span>
+      <span class="wv2-logo">B</span><span><strong>BiKuBe V1</strong><small>Narvik worker app</small></span>
     </a>
     <nav class="wv2-nav wv2-glass" aria-label="Worker primary navigation">
       <a class="is-active" href="{{ route('worker.dashboard') }}">🏠 <span>Dashboard</span></a>
@@ -15,17 +15,18 @@
     <div class="wv2-presence wv2-glass"><span class="wv2-presence-dot"></span>{{ $online ? 'Online' : 'Offline' }}</div>
   </header>
   <section class="wv2-state-card wv2-glass" aria-labelledby="dashboard-v2-title">
-    <p class="wv2-kicker">Pilot zone · Narvik / Ballangen</p>
+    <p class="wv2-kicker">BiKuBe V1 · Narvik launch</p>
     <h2 id="dashboard-v2-title">{{ $uiState }}</h2>
     <div class="wv2-primary">
       @if($activeOrder)
         {{ $activeOrder->order_number }} · {{ $activeOrder->scenario?->title ?? $activeOrder->service_scenario_key ?? 'Assigned service' }}
       @else
-        {{ $online ? 'You are online and waiting for assignment.' : 'Swipe online when ready for work.' }}
+        {{ $online ? 'Delivery active · GLF/errands require approval.' : 'Swipe online when ready for configured services.' }}
       @endif
     </div>
   </section>
   <div class="wv2-status-pill wv2-glass"><span>{{ $online ? 'Online' : 'Offline' }}</span><b>{{ $gpsState }}</b></div>
+  <div class="wv2-v1-strip wv2-glass"><b>V1 services</b> · grocery · food · bulky · errands · GLF ByGG</div>
   <aside class="wv2-locgate wv2-glass" aria-label="Location readiness">
     <strong>{{ request()->secure() ? 'Location can be requested' : 'HTTPS needed for browser GPS' }}</strong>
     <p>BiKuBe asks for a real GPS ping only after your action. Presence and background tracking are separate.</p>
@@ -34,7 +35,8 @@
     @foreach($serviceLanes as $lane)
       <article class="wv2-service wv2-glass {{ $lane['enabled'] ? 'is-on' : 'is-off' }}">
         <b>{{ $lane['icon'] }} {{ $lane['label'] }}</b>
-        <span>{{ $lane['enabled'] ? $lane['key'].' · '.$lane['note'] : $lane['note'] }}</span>
+        <span>{{ $lane['state'] }}</span>
+        <small>{{ $lane['key'] }}</small>
       </article>
     @endforeach
   </section>

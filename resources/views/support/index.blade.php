@@ -156,7 +156,7 @@ $faqs = [
 
 @if($isWorker)
 <section style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem;margin:-.35rem 0 1.15rem" class="sp-issue-grid">
-  @foreach([['⚙️','Operational issue','Order buttons, proof or assignment problem'],['📍','GPS/location','Browser permission or map problem'],['💳','Payout issue','Settlement or payout readiness'],['🚨','Emergency','Use local emergency services first if safety is at risk']] as $item)
+  @foreach([['⚙️','Operational issue','Order buttons, proof or assignment problem'],['📍','GPS/location','Browser permission or map problem'],['💳','Payout issue','Settlement or payout readiness'],['🛠','GLF ByGG task','Partner jobs require approval before dispatch'],['🚨','Emergency','Use local emergency services first if safety is at risk']] as $item)
     <article style="border:1px solid var(--line);border-radius:16px;background:var(--panel2);padding:.82rem"><strong style="display:block;font-size:.86rem">{{ $item[0] }} {{ $item[1] }}</strong><span style="display:block;color:var(--muted);font-size:.72rem;margin-top:.22rem">{{ $item[2] }}</span></article>
   @endforeach
 </section>
