@@ -90,7 +90,8 @@
             @endforeach
         </nav>
         @if(session('status'))<div class="worker-alert" role="status">{{ session('status') }}</div>@endif
-        @if($errors->any())<div class="worker-alert worker-error" role="alert">{{ collect($errors->all())->join(' ') }}</div>@endif
+        @php($__workerErrors = $errors ?? null)
+        @if($__workerErrors && $__workerErrors->any())<div class="worker-alert worker-error" role="alert">{{ collect($__workerErrors->all())->join(' ') }}</div>@endif
         <main class="worker-content" id="worker-content">@yield('content')</main>
     </section>
 </div>
