@@ -68,16 +68,17 @@
                 <div class="ov2-real-map">
                     <span class="ov2-map-pin ov2-map-pin--pickup">●</span>
                     <span class="ov2-map-pin ov2-map-pin--drop">◆</span>
+                    <div class="ov2-leaflet-preview" data-pickup-lat="{{ $pickupLat }}" data-pickup-lng="{{ $pickupLng }}" data-dropoff-lat="{{ $dropLat }}" data-dropoff-lng="{{ $dropLng }}"></div>
                     <p>Real coordinate preview</p>
-                    <small>{{ $pickupLat }}, {{ $pickupLng }} → {{ $dropLat }}, {{ $dropLng }}</small>
+                    <small>Pickup and drop-off coordinates are available.</small>
                 </div>
             @else
                 <div class="ov2-route-empty">
                     <div class="ov2-fake-grid" aria-hidden="true"></div>
                     <span class="ov2-route-dot ov2-route-dot--a" aria-hidden="true"></span>
                     <span class="ov2-route-dot ov2-route-dot--b" aria-hidden="true"></span>
-                    <strong>Route preview unavailable</strong>
-                    <small>Real pickup/drop-off coordinates are missing.</small>
+                    <strong>Coordinates will appear after dispatch.</strong>
+                    <small>Pickup and drop-off addresses are shown below; no route, ETA or GPS is estimated.</small>
                 </div>
             @endif
         </div>
