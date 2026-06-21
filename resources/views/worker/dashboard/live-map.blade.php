@@ -26,6 +26,18 @@
     </div>
   </section>
   <div class="wv2-status-pill wv2-glass"><span>{{ $online ? 'Online' : 'Offline' }}</span><b>{{ $gpsState }}</b></div>
+  <aside class="wv2-locgate wv2-glass" aria-label="Location readiness">
+    <strong>{{ request()->secure() ? 'Location can be requested' : 'HTTPS needed for browser GPS' }}</strong>
+    <p>BiKuBe asks for a real GPS ping only after your action. Presence and background tracking are separate.</p>
+  </aside>
+  <section class="wv2-services" aria-label="BiKuBe service readiness">
+    @foreach($serviceLanes as $lane)
+      <article class="wv2-service wv2-glass {{ $lane['enabled'] ? 'is-on' : 'is-off' }}">
+        <b>{{ $lane['icon'] }} {{ $lane['label'] }}</b>
+        <span>{{ $lane['enabled'] ? $lane['key'].' · '.$lane['note'] : $lane['note'] }}</span>
+      </article>
+    @endforeach
+  </section>
   <nav class="wv2-mobile-nav wv2-glass" aria-label="Worker bottom navigation">
     <a class="is-active" href="{{ route('worker.dashboard') }}">🏠<span>Home</span></a>
     <a href="{{ route('worker.orders.index') }}">📦<span>Orders</span></a>

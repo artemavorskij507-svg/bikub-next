@@ -1,6 +1,36 @@
 @extends('worker.layout')
 @section('title', 'Profile')
 @section('content')
+
+@php
+    $profile = $user->workerProfile;
+    $availability = $user->workerAvailability;
+    $capabilityRows = [
+        ['🛒','Grocery delivery from stores',(bool)($profile?->can_deliver),'Uses real can_deliver capability'],
+        ['🍔','Ready food delivery',(bool)($profile?->can_deliver),'Uses real can_deliver capability'],
+        ['🏗','Bulky / construction materials',(bool)($profile?->can_move),'Not configured until worker is approved for moving'],
+        ['🤝','Personal errands / assistant',(bool)($profile?->can_run_errands),'Not configured until worker is approved for errands'],
+        ['📍','Narvik / Ballangen pilot zone',($profile?->status === 'approved'),'Available after worker approval'],
+    ];
+@endphp
+<style>
+.lk-profile-hero{display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:end;border:1px solid rgba(var(--brand-rgb),.2);border-radius:24px;background:radial-gradient(circle at 14% 10%,rgba(var(--brand-rgb),.16),transparent 34%),var(--panel);padding:1.1rem;margin-bottom:1rem;box-shadow:0 22px 60px rgba(0,0,0,.22)}
+.lk-avatar{width:64px;height:64px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand-a),var(--brand-b));color:#04120d;font-weight:950;font-size:1.35rem}.lk-service-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.55rem;margin-bottom:1rem}.lk-service-card{border:1px solid var(--line);border-radius:16px;background:var(--panel2);padding:.75rem;min-height:96px}.lk-service-card.is-on{border-color:rgba(var(--brand-rgb),.28);background:rgba(var(--brand-rgb),.08)}.lk-service-card strong{display:block;font-size:.82rem;line-height:1.15}.lk-service-card span{display:block;color:var(--muted);font-size:.7rem;margin-top:.35rem;line-height:1.25}@media(max-width:920px){.lk-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lk-profile-hero{grid-template-columns:1fr}}@media(max-width:520px){.lk-service-grid{grid-template-columns:1fr}}
+</style>
+<section class="lk-profile-hero" aria-label="Worker readiness profile">
+  <div>
+    <p class="worker-hero-eyebrow">Worker readiness</p>
+    <h1 style="margin:.25rem 0;font-size:clamp(1.8rem,7vw,3rem);line-height:.95">{{ $profile?->display_name ?? $user->name }}</h1>
+    <p class="muted" style="margin:0">{{ ucfirst($profile?->status ?? 'profile missing') }} · {{ $availability?->status ?? 'offline' }} · service capabilities from real worker profile.</p>
+  </div>
+  <div class="lk-avatar" aria-hidden="true">{{ Str::upper(Str::substr($profile?->display_name ?? $user->name ?? 'W',0,1)) }}</div>
+</section>
+<section class="lk-service-grid" aria-label="Service capabilities">
+ @foreach($capabilityRows as $row)
+  <article class="lk-service-card {{ $row[2] ? 'is-on' : '' }}"><strong>{{ $row[0] }} {{ $row[1] }}</strong><span>{{ $row[2] ? 'Configured' : $row[3] }}</span></article>
+ @endforeach
+</section>
+
 <style>
 .cockpit-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,330px);gap:1rem;align-items:start}
 .main-stack,.side-stack{display:grid;gap:.75rem}
@@ -9,21 +39,21 @@
 .panel-head{display:flex;justify-content:space-between;align-items:center;gap:.75rem;margin-bottom:.85rem}
 .panel-title{font-size:.96rem;font-weight:950;margin:0}
 .badge{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:.15rem .52rem;font-size:.68rem;font-weight:900;letter-spacing:.04em;color:var(--muted);background:rgba(148,163,184,.08)}
-.badge-green{border-color:rgba(52,230,154,.32);background:rgba(52,230,154,.1);color:var(--green)}
+.badge-green{border-color:rgba(var(--brand-rgb),.32);background:rgba(var(--brand-rgb),.1);color:var(--green)}
 .badge-blue{border-color:rgba(85,217,255,.28);background:rgba(85,217,255,.08);color:var(--blue)}
 .badge-amber{border-color:rgba(245,189,84,.28);background:rgba(245,189,84,.08);color:var(--amber)}
-.status-pill{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .75rem;border-radius:999px;border:1px solid rgba(52,230,154,.28);background:rgba(52,230,154,.08);color:var(--green);font-size:.75rem;font-weight:900;white-space:nowrap}
-.status-dot{width:.45rem;height:.45rem;border-radius:999px;background:var(--green);box-shadow:0 0 8px rgba(52,230,154,.6);flex-shrink:0}
+.status-pill{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .75rem;border-radius:999px;border:1px solid rgba(var(--brand-rgb),.28);background:rgba(var(--brand-rgb),.08);color:var(--green);font-size:.75rem;font-weight:900;white-space:nowrap}
+.status-dot{width:.45rem;height:.45rem;border-radius:999px;background:var(--green);box-shadow:0 0 8px rgba(var(--brand-rgb),.6);flex-shrink:0}
 .side-card{border:1px solid var(--line);border-radius:11px;background:var(--panel2);padding:.75rem}
 .list-row{display:flex;justify-content:space-between;align-items:center;gap:.75rem;padding:.55rem 0;border-bottom:1px solid var(--line)}
 .list-row:last-child{border-bottom:none}
 .card-list{display:grid;gap:.55rem}
 .a-btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.3rem;border:1px solid var(--line);border-radius:9px;background:rgba(14,30,49,.86);color:var(--text);padding:.45rem .8rem;font-weight:850;text-decoration:none;cursor:pointer;font-size:.82rem;white-space:nowrap;transition:background .15s}
-.a-btn-primary{border-color:rgba(52,230,154,.48);background:linear-gradient(135deg,#25c889,#0c7c5b);color:#fff}
+.a-btn-primary{border-color:rgba(var(--brand-rgb),.48);background:linear-gradient(135deg,var(--brand-a),var(--brand-b));color:#fff}
 .form-field{display:grid;gap:.35rem;margin-bottom:.85rem}
 .form-label{font-size:.72rem;font-weight:950;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .form-hint{font-size:.72rem;color:var(--muted);margin-top:.25rem}
-.avatar-box{display:grid;width:96px;height:96px;place-items:center;border-radius:22px;background:linear-gradient(135deg,#45efaa,#4f46e5);font-size:2.5rem;font-weight:950;color:#fff;box-shadow:0 0 40px rgba(52,230,154,.22);flex-shrink:0}
+.avatar-box{display:grid;width:96px;height:96px;place-items:center;border-radius:22px;background:linear-gradient(135deg,#45efaa,#4f46e5);font-size:2.5rem;font-weight:950;color:#fff;box-shadow:0 0 40px rgba(var(--brand-rgb),.22);flex-shrink:0}
 @media(max-width:860px){.cockpit-grid{grid-template-columns:1fr}}
 </style>
 
@@ -106,52 +136,84 @@
     </div>
 
     <aside class="side-stack">
+        {{-- BiKuBe pilot info --}}
+        <section class="panel" style="border-color:rgba(var(--brand-rgb),.15)">
+            <div class="panel-inner">
+                <div class="panel-head"><h2 class="panel-title" style="color:var(--green)">BiKuBe Pilot</h2></div>
+                <div class="side-card">
+                    <div class="list-row"><span class="muted">Зона</span><strong style="color:#c8f7e4">Narvik</strong></div>
+                    <div class="list-row"><span class="muted">Статус</span>
+                        @php $wst = $user->workerProfile?->status ?? 'pending'; @endphp
+                        <span class="badge {{ $wst === 'approved' ? 'badge-green' : ($wst === 'suspended' ? '' : 'badge-amber') }}"
+                              style="{{ $wst === 'suspended' ? 'border-color:rgba(251,113,133,.3);color:var(--danger)' : '' }}">
+                            {{ $wst === 'approved' ? 'Одобрен' : ($wst === 'suspended' ? 'Приостановлен' : 'Ожидает') }}
+                        </span>
+                    </div>
+                    <div class="list-row"><span class="muted">Аккаунт с</span><strong>{{ $user->created_at->format('d.m.Y') }}</strong></div>
+                    <div class="list-row"><span class="muted">ID</span><strong style="font-size:.76rem">#{{ $user->id }}</strong></div>
+                </div>
+            </div>
+        </section>
+
+        {{-- Document verification status --}}
         <section class="panel">
             <div class="panel-inner">
-                <div class="panel-head"><h2 class="panel-title">Data check</h2></div>
-                <div class="side-card">
-                    <div class="list-row"><span class="muted">User ID</span><strong style="color:var(--text)">#{{ $user->id }}</strong></div>
-                    <div class="list-row"><span class="muted">Worker profile</span>
-                        <span class="badge {{ $user->workerProfile ? 'badge-green' : 'badge-amber' }}">{{ $user->workerProfile ? 'found' : 'missing' }}</span>
+                <div class="panel-head"><h2 class="panel-title">Верификация</h2></div>
+                @php
+                $docs = [
+                    ['label' => 'Личность / ID', 'done' => !is_null($user->workerProfile?->identity_verified_at)],
+                    ['label' => 'Профиль заполнен', 'done' => !empty($user->workerProfile?->vehicle_type)],
+                    ['label' => 'Аккаунт одобрен', 'done' => ($user->workerProfile?->status ?? '') === 'approved'],
+                    ['label' => 'Платёжный профиль', 'done' => false],
+                ];
+                $doneCount = collect($docs)->where('done', true)->count();
+                $pct = count($docs) > 0 ? round($doneCount / count($docs) * 100) : 0;
+                @endphp
+                <div style="margin-bottom:.85rem">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+                        <span style="color:var(--muted);font-size:.74rem">Готовность</span>
+                        <span style="font-size:.78rem;font-weight:900;color:{{ $pct === 100 ? 'var(--green)' : 'var(--amber)' }}">{{ $pct }}%</span>
                     </div>
-                    <div class="list-row"><span class="muted">Status</span><strong style="color:var(--text)">{{ ucfirst($user->workerProfile?->status ?? '—') }}</strong></div>
-                    <div class="list-row"><span class="muted">Worker type</span><strong style="color:var(--text)">{{ ucfirst($user->workerProfile?->worker_type ?? '—') }}</strong></div>
-                    <div class="list-row"><span class="muted">Member since</span><strong style="color:var(--text)">{{ $user->created_at->format('d M Y') }}</strong></div>
+                    <div style="height:5px;border-radius:999px;background:rgba(148,163,184,.12);overflow:hidden">
+                        <div style="height:100%;width:{{ $pct }}%;background:{{ $pct === 100 ? 'var(--green)' : 'var(--amber)' }};border-radius:999px;transition:width .4s"></div>
+                    </div>
                 </div>
+                <div style="display:grid;gap:.38rem">
+                    @foreach($docs as $doc)
+                    <div style="display:flex;align-items:center;gap:.55rem;font-size:.8rem">
+                        <span style="width:16px;height:16px;border-radius:50%;border:1.5px solid {{ $doc['done'] ? 'rgba(var(--brand-rgb),.5)' : 'rgba(148,163,184,.25)' }};background:{{ $doc['done'] ? 'rgba(var(--brand-rgb),.12)' : 'transparent' }};display:grid;place-items:center;flex-shrink:0;font-size:.6rem;color:{{ $doc['done'] ? 'var(--green)' : 'var(--muted)' }}">{{ $doc['done'] ? '✓' : '' }}</span>
+                        <span style="color:{{ $doc['done'] ? '#d0f0e4' : 'var(--muted)' }}">{{ $doc['label'] }}</span>
+                        @if(!$doc['done'])<span style="margin-left:auto;font-size:.62rem;color:var(--amber)">Ожидает</span>@endif
+                    </div>
+                    @endforeach
+                </div>
+                <a href="{{ route('worker.payout-reviews.index') }}" class="a-btn" style="width:100%;margin-top:.85rem;justify-content:center;font-size:.8rem">Документы и проверки →</a>
             </div>
         </section>
 
         <section class="panel">
             <div class="panel-inner">
-                <div class="panel-head"><h2 class="panel-title">Save</h2></div>
-                <p class="muted" style="font-size:.82rem;margin:0 0 .85rem">This is a real action: updates user profile and WorkerProfile via the controller.</p>
-                <button type="submit" class="a-btn a-btn-primary" style="width:100%">Save changes →</button>
-                <a href="{{ route('worker.support.index') }}" class="a-btn" style="width:100%;margin-top:.55rem;justify-content:center">⚙️ Open support ticket</a>
+                <div class="panel-head"><h2 class="panel-title">Сохранить</h2></div>
+                <button type="submit" class="a-btn a-btn-primary" style="width:100%">Сохранить изменения →</button>
+                <a href="{{ route('worker.support.index') }}" class="a-btn" style="width:100%;margin-top:.55rem;justify-content:center">🛟 Служба поддержки</a>
             </div>
         </section>
 
         @php $avStatus = $user->workerAvailability?->status ?? 'offline'; @endphp
         <section class="panel">
             <div class="panel-inner">
-                <div class="panel-head"><h2 class="panel-title">Presence</h2></div>
-                <div class="side-card" style="text-align:center">
-                    <div style="font-size:2rem;margin-bottom:.5rem">{{ in_array($avStatus,['online','available']) ? '🟢' : '🔴' }}</div>
-                    <strong style="color:var(--text)">{{ ucfirst($avStatus) }}</strong>
-                    <p class="muted" style="margin:.3rem 0 0;font-size:.78rem">Current presence status</p>
+                <div class="panel-head"><h2 class="panel-title">Присутствие</h2></div>
+                <div style="display:flex;align-items:center;gap:.65rem;padding:.65rem;border-radius:10px;background:{{ in_array($avStatus,['online','available']) ? 'rgba(var(--brand-rgb),.07)' : 'rgba(148,163,184,.05)' }};border:1px solid {{ in_array($avStatus,['online','available']) ? 'rgba(var(--brand-rgb),.22)' : 'rgba(148,163,184,.12)' }};margin-bottom:.65rem">
+                    <span style="width:10px;height:10px;border-radius:50%;background:{{ in_array($avStatus,['online','available']) ? 'var(--green)' : 'var(--muted)' }};flex-shrink:0"></span>
+                    <strong style="color:{{ in_array($avStatus,['online','available']) ? 'var(--green)' : 'var(--muted)' }};font-size:.88rem">{{ in_array($avStatus,['online','available']) ? 'Онлайн' : 'Оффлайн' }}</strong>
                 </div>
-                <div style="display:flex;gap:.5rem;margin-top:.75rem">
-                    @if(in_array($avStatus,['online','available']))
-                    <form method="post" action="{{ route('worker.presence.offline') }}" style="flex:1">
-                        @csrf
-                        <button class="a-btn" type="submit" style="width:100%;border-color:rgba(251,113,133,.4);color:var(--danger)">Go offline</button>
-                    </form>
-                    @else
-                    <form method="post" action="{{ route('worker.presence.online') }}" style="flex:1">
-                        @csrf
-                        <button class="a-btn a-btn-primary" type="submit" style="width:100%">Go online</button>
-                    </form>
-                    @endif
-                </div>
+                @if(in_array($avStatus,['online','available']))
+                <form method="post" action="{{ route('worker.presence.offline') }}">@csrf
+                    <button class="a-btn" type="submit" style="width:100%;border-color:rgba(251,113,133,.4);color:var(--danger)">Уйти оффлайн</button>
+                </form>
+                @else
+                <a href="{{ route('worker.dashboard') }}" class="a-btn a-btn-primary" style="width:100%;text-align:center;text-decoration:none;display:flex;justify-content:center">Выйти в онлайн →</a>
+                @endif
             </div>
         </section>
     </aside>
